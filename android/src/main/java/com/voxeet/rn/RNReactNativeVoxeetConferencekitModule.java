@@ -54,6 +54,10 @@ public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJava
                 consumerKey, consumerSecret, null);
 
         VoxeetToolkit.initialize((Application) getReactApplicationContext().getApplicationContext(), EventBus.getDefault());
+
+        //now register the component of the app
+        VoxeetSdk.getInstance().register(getReactApplicationContext().getApplicationContext(),
+                this);
     }
 
     @ReactMethod
