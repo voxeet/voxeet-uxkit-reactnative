@@ -1,7 +1,9 @@
 package com.voxeet.specifics;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.ReactActivity;
@@ -12,11 +14,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import eu.codlab.simplepromise.solve.ErrorPromise;
+import eu.codlab.simplepromise.solve.PromiseExec;
+import eu.codlab.simplepromise.solve.Solver;
 import voxeet.com.sdk.core.VoxeetSdk;
 import voxeet.com.sdk.core.services.ScreenShareService;
 import voxeet.com.sdk.events.error.ConferenceJoinedError;
+import voxeet.com.sdk.events.error.PermissionRefusedEvent;
 import voxeet.com.sdk.events.success.ConferenceJoinedSuccessEvent;
 import voxeet.com.sdk.events.success.ConferencePreJoinedEvent;
+import voxeet.com.sdk.utils.Validate;
 
 /**
  * Created by kevinleperf on 11/09/2018.
@@ -65,9 +72,55 @@ public abstract class RNVoxeetActivity extends ReactActivity {
 
     @Override
     protected void onPause() {
+        if (null != VoxeetSdk.getInstance()) {
+            //stop fetching stats if any pending
+            if (!VoxeetSdk.getInstance().getConferenceService().isLive()) {
+                VoxeetSdk.getInstance().getLocalStatsService().stopAutoFetch();
+            }
+        }
         EventBus.getDefault().unregister(this);
 
         super.onPause();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case PermissionRefusedEvent.RESULT_CAMERA: {
+                if (null != VoxeetSdk.getInstance() && VoxeetSdk.getInstance().getConferenceService().isLive()) {
+                    VoxeetSdk.getInstance().getConferenceService().startVideo()
+                            .then(new PromiseExec<Boolean, Object>() {
+                                @Override
+                                public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
+
+                                }
+                            })
+                            .error(new ErrorPromise() {
+                                @Override
+                                public void onError(@NonNull Throwable error) {
+                                    error.printStackTrace();
+                                }
+                            });
+                }
+                return;
+            }
+            default:
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(PermissionRefusedEvent event) {
+        if (null != event.getPermission()) {
+            switch (event.getPermission()) {
+                case CAMERA:
+                    Validate.requestMandatoryPermissions(this,
+                            new String[]{Manifest.permission.CAMERA},
+                            PermissionRefusedEvent.RESULT_CAMERA);
+                    break;
+            }
+        }
     }
 
     @Override
