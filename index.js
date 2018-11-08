@@ -5,63 +5,104 @@ const { RNReactNativeVoxeetConferencekit } = NativeModules;
 
 export default RNReactNativeVoxeetConferencekit;*/
 
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 const { RNReactNativeVoxeetConferencekit } = NativeModules;
 
 export type ConferenceUser = {
-  id: string,
+  externalId: string,
   name: string,
   avatar: string,
 };
 
 class VoxeetSDK {
-  initialize(consumerKey:string, consumerSecret:string) {
-    RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+
+  initialize(consumerKey, consumerSecret) {
+    return RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
 
-  openSession(userId: string, name: string, avatarURL: string): Promise {
-    return RNReactNativeVoxeetConferencekit.openSession(userId, name, avatarURL);
+  openSession(userInfo: ConferenceUser): Promise {
+    return RNReactNativeVoxeetConferencekit.openSession(userInfo);
+  }
+
+  disconnect() {
+    return RNReactNativeVoxeetConferencekit.disconnect();
+  }
+
+  create(parameters) {
+    return RNReactNativeVoxeetConferencekit.create(parameters);
+  }
+
+  join(conferenceId) {
+    return RNReactNativeVoxeetConferencekit.join(conferenceId);
+  }
+
+  leave() {
+    return RNReactNativeVoxeetConferencekit.leave();
+  }
+
+  invite(conferenceId, participants) {
+    return RNReactNativeVoxeetConferencekit.invite(conferenceId, participants);
+      const array = participants ? participants.map(e => e.json()) : null;
+      return new Promise((resolve, reject) => {
+          exec(resolve, reject, SERVICE, 'invite', [conferenceId, array]);
+      });
+  }
+
+  sendBroadcastMessage(message) {
+    return RNReactNativeVoxeetConferencekit.sendBroadcastMessage(message);
   }
 
   appearMaximized(activate: boolean) {
     RNReactNativeVoxeetConferencekit.appearMaximized(activate);
   }
 
-  defaultBuiltInSpeaker(activate: boolean) {
-    RNReactNativeVoxeetConferencekit.defaultBuiltInSpeaker(activate);
-  }
-
   screenAutoLock(activate: boolean) {
     RNReactNativeVoxeetConferencekit.screenAutoLock(activate);
-  }
-
-  startConference(conferenceId: string, participants: Array<ConferenceUser>, invite: boolean): Promise {
-    return RNReactNativeVoxeetConferencekit.startConference(conferenceId, participants, invite);
-  }
-
-  initialize(consumerKey:string, consumerSecret:string) {
-    RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
-  }
-
-  openSession(userId: string, name: string, avatarURL: string): Promise {
-    return RNReactNativeVoxeetConferencekit.openSession(userId, name, avatarURL);
-  }
-
-  appearMaximized(activate: boolean) {
-    RNReactNativeVoxeetConferencekit.appearMaximized(activate);
   }
 
   defaultBuiltInSpeaker(activate: boolean) {
     RNReactNativeVoxeetConferencekit.defaultBuiltInSpeaker(activate);
   }
 
+  defaultVideo(enabled) {
+    RNReactNativeVoxeetConferencekit.defaultVideo(enabled);
+  }
+
+  /*
+   *  Android methods
+   */
+
   screenAutoLock(activate: boolean) {
     RNReactNativeVoxeetConferencekit.screenAutoLock(activate);
   }
 
-  startConference(conferenceId: string, participants: Array<ConferenceUser>, invite: boolean): Promise {
-    return RNReactNativeVoxeetConferencekit.startConference(conferenceId, participants, invite);
+  isUserLoggedIn() {
+    return RNReactNativeVoxeetConferencekit.isUserLoggedIn();
   }
+
+  checkForAwaitingConference() {
+    return RNReactNativeVoxeetConferencekit.checkForAwaitingConference();
+  }
+
+  /*
+   *  Deprecated methods
+   */
+  startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise {
+    return RNReactNativeVoxeetConferencekit.startConference(conferenceId, participants);
+  }
+
+  stopConference() {
+    return RNReactNativeVoxeetConferencekit.leave();
+  }
+
+  openSession(userInfo: ConferenceUser): Promise {
+    return RNReactNativeVoxeetConferencekit.openSession(userInfo);
+  }
+
+  closeSession() {
+    return RNReactNativeVoxeetConferencekit.closeSession();
+  }
+
 }
 
 module.exports = new VoxeetSDK();
