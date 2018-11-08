@@ -20,7 +20,7 @@ class VoxeetSDK {
     return RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
 
-  openSession(userInfo: ConferenceUser): Promise {
+  connect(userInfo: ConferenceUser): Promise {
     return RNReactNativeVoxeetConferencekit.openSession(userInfo);
   }
 
