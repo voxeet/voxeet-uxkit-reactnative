@@ -16,6 +16,10 @@ export type ConferenceUser = {
 
 class VoxeetSDK {
 
+  debug(): string {
+    return RNReactNativeVoxeetConferencekit.debug();
+  }
+
   initialize(consumerKey: string, consumerSecret: string): Promise {
     return RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
