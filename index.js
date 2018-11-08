@@ -1,9 +1,9 @@
 /*
 import { NativeModules } from 'react-native';
 
-const { RNReactNativeVoxeetConferencekit } = NativeModules;
+const { RNVoxeetConferencekit } = NativeModules;
 
-export default RNReactNativeVoxeetConferencekit;*/
+export default RNVoxeetConferencekit;*/
 
 import { NativeModules, Platform } from 'react-native';
 const { RNVoxeetConferencekit } = NativeModules;
@@ -17,55 +17,51 @@ export type ConferenceUser = {
 class VoxeetSDK {
 
   debug(): string {
-    return RNReactNativeVoxeetConferencekit.debug();
+    return RNVoxeetConferencekit.debug();
   }
 
   initialize(consumerKey: string, consumerSecret: string): Promise {
-    return RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
 
   connect(userInfo: ConferenceUser): Promise {
-    return RNReactNativeVoxeetConferencekit.openSession(userInfo);
+    return RNVoxeetConferencekit.openSession(userInfo);
   }
 
   disconnect(): Promise {
-    return RNReactNativeVoxeetConferencekit.disconnect();
+    return RNVoxeetConferencekit.disconnect();
   }
 
   create(parameters: any): Promise {
-    return RNReactNativeVoxeetConferencekit.create(parameters);
+    return RNVoxeetConferencekit.create(parameters);
   }
 
   join(conferenceId: string): Promise {
-    return RNReactNativeVoxeetConferencekit.join(conferenceId);
+    return RNVoxeetConferencekit.join(conferenceId);
   }
 
   leave(): Promise {
-    return RNReactNativeVoxeetConferencekit.leave();
+    return RNVoxeetConferencekit.leave();
   }
 
   invite(conferenceId: string, participants: ConferenceUser[]): Promise {
-    return RNReactNativeVoxeetConferencekit.invite(conferenceId, participants);
+    return RNVoxeetConferencekit.invite(conferenceId, participants);
   }
 
   sendBroadcastMessage(message: string): Promise {
-    return RNReactNativeVoxeetConferencekit.sendBroadcastMessage(message);
+    return RNVoxeetConferencekit.sendBroadcastMessage(message);
   }
 
   appearMaximized(activate: boolean) {
-    RNReactNativeVoxeetConferencekit.appearMaximized(activate);
-  }
-
-  screenAutoLock(activate: boolean) {
-    RNReactNativeVoxeetConferencekit.screenAutoLock(activate);
+    RNVoxeetConferencekit.appearMaximized(activate);
   }
 
   defaultBuiltInSpeaker(activate: boolean) {
-    RNReactNativeVoxeetConferencekit.defaultBuiltInSpeaker(activate);
+    RNVoxeetConferencekit.defaultBuiltInSpeaker(activate);
   }
 
   defaultVideo(enabled: boolean) {
-    RNReactNativeVoxeetConferencekit.defaultVideo(enabled);
+    RNVoxeetConferencekit.defaultVideo(enabled);
   }
 
   /*
@@ -74,38 +70,38 @@ class VoxeetSDK {
 
   screenAutoLock(activate: boolean) {
     if(Platform.os == "android") {
-      RNReactNativeVoxeetConferencekit.screenAutoLock(activate);
+      RNVoxeetConferencekit.screenAutoLock(activate);
     }
   }
 
   //deprecated
   isUserLoggedIn(): boolean {
-    return RNReactNativeVoxeetConferencekit.isUserLoggedIn();
+    return RNVoxeetConferencekit.isUserLoggedIn();
   }
 
   checkForAwaitingConference(): Promise {
     if(Platform.os != "android") return new Promise(r => r());
 
-    return RNReactNativeVoxeetConferencekit.checkForAwaitingConference();
+    return RNVoxeetConferencekit.checkForAwaitingConference();
   }
 
   /*
    *  Deprecated methods
    */
   startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise {
-    return RNReactNativeVoxeetConferencekit.startConference(conferenceId, participants);
+    return RNVoxeetConferencekit.startConference(conferenceId, participants);
   }
 
   stopConference(): Promise {
-    return RNReactNativeVoxeetConferencekit.leave();
+    return RNVoxeetConferencekit.leave();
   }
 
   openSession(userInfo: ConferenceUser): Promise {
-    return RNReactNativeVoxeetConferencekit.openSession(userInfo);
+    return RNVoxeetConferencekit.openSession(userInfo);
   }
 
   closeSession(): Promise {
-    return RNReactNativeVoxeetConferencekit.closeSession();
+    return RNVoxeetConferencekit.closeSession();
   }
 
 }
