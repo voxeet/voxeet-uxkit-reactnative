@@ -16,7 +16,7 @@ export type ConferenceUser = {
 
 class VoxeetSDK {
 
-  initialize(consumerKey, consumerSecret) {
+  initialize(consumerKey: string, consumerSecret: string): Promise {
     return RNReactNativeVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
 
@@ -24,27 +24,27 @@ class VoxeetSDK {
     return RNReactNativeVoxeetConferencekit.openSession(userInfo);
   }
 
-  disconnect() {
+  disconnect(): Promise {
     return RNReactNativeVoxeetConferencekit.disconnect();
   }
 
-  create(parameters) {
+  create(parameters: any): Promise {
     return RNReactNativeVoxeetConferencekit.create(parameters);
   }
 
-  join(conferenceId) {
+  join(conferenceId: string): Promise {
     return RNReactNativeVoxeetConferencekit.join(conferenceId);
   }
 
-  leave() {
+  leave(): Promise {
     return RNReactNativeVoxeetConferencekit.leave();
   }
 
-  invite(conferenceId, participants) {
+  invite(conferenceId: string, participants: ConferenceUser[]): Promise {
     return RNReactNativeVoxeetConferencekit.invite(conferenceId, participants);
   }
 
-  sendBroadcastMessage(message) {
+  sendBroadcastMessage(message: string): Promise {
     return RNReactNativeVoxeetConferencekit.sendBroadcastMessage(message);
   }
 
@@ -60,7 +60,7 @@ class VoxeetSDK {
     RNReactNativeVoxeetConferencekit.defaultBuiltInSpeaker(activate);
   }
 
-  defaultVideo(enabled) {
+  defaultVideo(enabled: boolean) {
     RNReactNativeVoxeetConferencekit.defaultVideo(enabled);
   }
 
@@ -75,11 +75,11 @@ class VoxeetSDK {
   }
 
   //deprecated
-  isUserLoggedIn() {
+  isUserLoggedIn(): boolean {
     return RNReactNativeVoxeetConferencekit.isUserLoggedIn();
   }
 
-  checkForAwaitingConference() {
+  checkForAwaitingConference(): Promise {
     if(Platform.os != "android") return new Promise(r => r());
 
     return RNReactNativeVoxeetConferencekit.checkForAwaitingConference();
@@ -92,7 +92,7 @@ class VoxeetSDK {
     return RNReactNativeVoxeetConferencekit.startConference(conferenceId, participants);
   }
 
-  stopConference() {
+  stopConference(): Promise {
     return RNReactNativeVoxeetConferencekit.leave();
   }
 
@@ -100,7 +100,7 @@ class VoxeetSDK {
     return RNReactNativeVoxeetConferencekit.openSession(userInfo);
   }
 
-  closeSession() {
+  closeSession(): Promise {
     return RNReactNativeVoxeetConferencekit.closeSession();
   }
 
