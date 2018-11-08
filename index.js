@@ -6,7 +6,7 @@ const { RNReactNativeVoxeetConferencekit } = NativeModules;
 export default RNReactNativeVoxeetConferencekit;*/
 
 import { NativeModules, Platform } from 'react-native';
-const { RNReactNativeVoxeetConferencekit } = NativeModules;
+const { RNVoxeetConferencekit } = NativeModules;
 
 export type ConferenceUser = {
   externalId: string,

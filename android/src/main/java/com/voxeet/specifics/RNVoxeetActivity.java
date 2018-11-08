@@ -5,14 +5,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.ReactActivity;
+import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
+import com.voxeet.toolkit.activities.notification.IncomingCallFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import sdk.voxeet.com.toolkit.activities.notification.IncomingBundleChecker;
-import sdk.voxeet.com.toolkit.activities.notification.IncomingCallFactory;
-import sdk.voxeet.com.toolkit.activities.workflow.VoxeetAppCompatActivity;
 import voxeet.com.sdk.core.VoxeetSdk;
 import voxeet.com.sdk.core.services.ScreenShareService;
 import voxeet.com.sdk.events.error.ConferenceJoinedError;
@@ -59,7 +58,7 @@ public abstract class RNVoxeetActivity extends ReactActivity {
             mIncomingBundleChecker.onAccept();
         }
 
-        if(null != VoxeetSdk.getInstance()) {
+        if (null != VoxeetSdk.getInstance()) {
             VoxeetSdk.getInstance().getScreenShareService().consumeRightsToScreenShare();
         }
     }
@@ -72,7 +71,7 @@ public abstract class RNVoxeetActivity extends ReactActivity {
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
         mIncomingBundleChecker = new IncomingBundleChecker(intent, null);

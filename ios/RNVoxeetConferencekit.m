@@ -1,7 +1,7 @@
 
-#import "RNReactNativeVoxeetConferencekit.h"
+#import "RNVoxeetConferencekit.h"
 
-@implementation RNReactNativeVoxeetConferencekit
+@implementation RNVoxeetConferencekit
 
 - (dispatch_queue_t)methodQueue
 {

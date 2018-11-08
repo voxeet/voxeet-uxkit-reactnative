@@ -1,5 +1,5 @@
 
-package com.voxeet.rn;
+package com.voxeet;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
@@ -12,6 +12,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.voxeet.toolkit.controllers.VoxeetToolkit;
+import com.voxeet.toolkit.implementation.overlays.OverlayState;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -23,33 +25,30 @@ import java.util.List;
 import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
 import eu.codlab.simplepromise.solve.Solver;
-import sdk.voxeet.com.toolkit.main.VoxeetToolkit;
-import sdk.voxeet.com.toolkit.views.uitookit.sdk.overlays.OverlayState;
 import voxeet.com.sdk.core.VoxeetSdk;
 import voxeet.com.sdk.events.success.ConferenceRefreshedEvent;
 import voxeet.com.sdk.events.success.SocketConnectEvent;
 import voxeet.com.sdk.events.success.SocketStateChangeEvent;
 import voxeet.com.sdk.json.UserInfo;
 
-public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJavaModule {
+public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private final static String TAG = RNReactNativeVoxeetConferencekitModule.class.getSimpleName();
 
     private final ReactApplicationContext reactContext;
-    private Promise _log_in_callback;
 
-    public RNReactNativeVoxeetConferencekitModule(ReactApplicationContext reactContext) {
+    public RNVoxeetConferencekitModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
     }
 
     @Override
     public String getName() {
-        return "RNReactNativeVoxeetConferencekit";
+        return "RNVoxeetConferencekit";
     }
 
     @ReactMethod
-    public void initialize(String consumerKey, String consumerSecret) {
+    public void initialize(String consumerKey, String consumerSecret, Promise promise) {
         VoxeetSdk.initialize((Application) getReactApplicationContext().getApplicationContext(),
                 consumerKey, consumerSecret, null);
 
@@ -58,18 +57,31 @@ public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJava
         //now register the component of the app
         VoxeetSdk.getInstance().register(getReactApplicationContext().getApplicationContext(),
                 this);
+
+        promise.resolve(true);
     }
 
     @ReactMethod
-    public void openSession(String userId, String name, String avatarUrl, Promise promise) {
-        if (null != _log_in_callback) {
-            promise.reject("CONNECTING", "Already connecting");
-            return;
-        }
+    public void connect(ReadableMap userInfo, final Promise promise) {
+        openSession(userInfo, promise);
+    }
 
-        VoxeetSdk.getInstance().logUser(new UserInfo(userId, name, avatarUrl));
-
-        _log_in_callback = promise;
+    @ReactMethod
+    public void openSession(ReadableMap userInfo, final Promise promise) {
+        VoxeetSdk.getInstance()
+                .logUserWithChain(toUserInfo(userInfo))
+                .then(new PromiseExec<Boolean, Object>() {
+                    @Override
+                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
+                        promise.resolve(result);
+                    }
+                })
+                .error(new ErrorPromise() {
+                    @Override
+                    public void onError(@NonNull Throwable error) {
+                        promise.reject(error);
+                    }
+                });
     }
 
     @ReactMethod
@@ -89,7 +101,7 @@ public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJava
     }
 
     @ReactMethod
-    public void startConference(String conferenceId /* alias...*/,
+    public void startConference(String conferenceAlias /* alias...*/,
                                 ReadableArray participants,
                                 boolean invite, final Promise promise) {
         List<UserInfo> users = null;
@@ -99,7 +111,7 @@ public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJava
 
         final List<UserInfo> finalUsers = users;
         VoxeetToolkit.getInstance().getConferenceToolkit()
-                .join(conferenceId, null)
+                .join(conferenceAlias, null)
                 .then(new PromiseExec<Boolean, List<ConferenceRefreshedEvent>>() {
                     @Override
                     public void onCall(@Nullable Boolean result, @NonNull Solver<List<ConferenceRefreshedEvent>> solver) {
@@ -129,10 +141,6 @@ public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJava
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final SocketConnectEvent event) {
-        if (null != _log_in_callback) {
-            _log_in_callback.resolve(true);
-            _log_in_callback = null;
-        }
     }
 
 
@@ -141,10 +149,6 @@ public class RNReactNativeVoxeetConferencekitModule extends ReactContextBaseJava
         switch (event.message()) {
             case "CLOSING":
             case "CLOSED":
-                if (null != _log_in_callback) {
-                    _log_in_callback.resolve(false);
-                    _log_in_callback = null;
-                }
         }
     }
 

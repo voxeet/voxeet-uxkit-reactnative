@@ -5,7 +5,7 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
-@interface RNReactNativeVoxeetConferencekit : NSObject <RCTBridgeModule>
+@interface RNVoxeetConferencekit : NSObject <RCTBridgeModule>
 
 @end
   

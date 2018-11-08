@@ -1,6 +1,7 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
     }
 
@@ -34,8 +35,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation ('com.voxeet.sdk:toolkit:1.1.8.1') {
+    implementation ('com.voxeet.sdk:toolkit:1.1.8.36') {
         transitive = true
     }
 }
-  
