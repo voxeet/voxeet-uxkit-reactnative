@@ -11,7 +11,7 @@ const { RNReactNativeVoxeetConferencekit } = NativeModules;
 export type ConferenceUser = {
   externalId: string,
   name: string,
-  avatar: string,
+  avatar: string
 };
 
 class VoxeetSDK {
@@ -42,10 +42,6 @@ class VoxeetSDK {
 
   invite(conferenceId, participants) {
     return RNReactNativeVoxeetConferencekit.invite(conferenceId, participants);
-      const array = participants ? participants.map(e => e.json()) : null;
-      return new Promise((resolve, reject) => {
-          exec(resolve, reject, SERVICE, 'invite', [conferenceId, array]);
-      });
   }
 
   sendBroadcastMessage(message) {
@@ -73,14 +69,19 @@ class VoxeetSDK {
    */
 
   screenAutoLock(activate: boolean) {
-    RNReactNativeVoxeetConferencekit.screenAutoLock(activate);
+    if(Platform.os == "android") {
+      RNReactNativeVoxeetConferencekit.screenAutoLock(activate);
+    }
   }
 
+  //deprecated
   isUserLoggedIn() {
     return RNReactNativeVoxeetConferencekit.isUserLoggedIn();
   }
 
   checkForAwaitingConference() {
+    if(Platform.os != "android") return new Promise(r => r());
+
     return RNReactNativeVoxeetConferencekit.checkForAwaitingConference();
   }
 
