@@ -12,6 +12,7 @@ import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.implementation.overlays.OverlayState;
+import com.voxeet.video.RNVideoViewManager;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -58,6 +59,8 @@ public class RNVoxeetConferencekitPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Collections.emptyList();
+        return Collections.<ViewManager>singletonList(
+                new RNVideoViewManager()
+        );
     }
 }
