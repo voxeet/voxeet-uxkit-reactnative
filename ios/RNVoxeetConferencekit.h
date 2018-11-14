@@ -8,4 +8,3 @@
 @interface RNVoxeetConferencekit : NSObject <RCTBridgeModule>
 
 @end
-  
