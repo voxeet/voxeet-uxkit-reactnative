@@ -5,6 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "bash build_ios_frameworks.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -13,6 +14,6 @@
   "author": "",
   "license": "",
   "peerDependencies": {
-    "react-native": "^0.55.4",
+    "react-native": "^0.55.4"
   }
 }
