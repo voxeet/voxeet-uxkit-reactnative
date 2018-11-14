@@ -8,6 +8,7 @@ import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
+import com.voxeet.events.ConferenceStatusEventEmitter;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;

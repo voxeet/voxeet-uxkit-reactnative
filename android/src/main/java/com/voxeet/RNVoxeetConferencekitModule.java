@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -65,8 +64,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void debug(Callback callback) {
-        callback.invoke("some string from Android");
+    public void debug(Promise promise) {
+        promise.resolve("some string from Android");
     }
 
     @ReactMethod
@@ -307,8 +306,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void isUserLoggedIn(Callback callback) {
-        callback.invoke(VoxeetSdk.getInstance().isSocketOpen());
+    public void isUserLoggedIn(Promise promise) {
+        promise.resolve(VoxeetSdk.getInstance().isSocketOpen());
     }
 
     @ReactMethod

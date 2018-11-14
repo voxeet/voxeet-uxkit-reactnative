@@ -27,8 +27,8 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public static final int IS_ATTACHED = 1;
     public static final int IS_SCREENSHARE = 2;
 
-    private static final String PEER_ID = "peerId";
-    private static final String LABEL = "label";
+    public static final String PEER_ID = "peerId";
+    public static final String LABEL = "label";
 
     private static final String SCALE_FIT = "fit";
     private static final String SCALE_FILL = "fill";
