@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ls `pwd`
+ls -la .
 path="`pwd`/ios"
 echo $path
 cd $path
