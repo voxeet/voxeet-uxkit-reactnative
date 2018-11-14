@@ -2,5 +2,4 @@
 
 cd ./ios
 
-
 carthage update --platform ios
