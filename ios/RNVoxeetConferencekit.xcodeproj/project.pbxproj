@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		57304288219CC01A003FE2DA /* VoxeetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57304287219CC01A003FE2DA /* VoxeetManager.swift */; };
 		B3E7B58A1CC2AC0600A0062D /* RNVoxeetConferencekit.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNVoxeetConferencekit.m */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNVoxeetConferencekit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNVoxeetConferencekit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		57304286219CC01A003FE2DA /* RNVoxeetConferencekit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNVoxeetConferencekit-Bridging-Header.h"; sourceTree = "<group>"; };
+		57304287219CC01A003FE2DA /* VoxeetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoxeetManager.swift; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNVoxeetConferencekit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNVoxeetConferencekit.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNVoxeetConferencekit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNVoxeetConferencekit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,9 +53,11 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				57304287219CC01A003FE2DA /* VoxeetManager.swift */,
 				B3E7B5881CC2AC0600A0062D /* RNVoxeetConferencekit.h */,
 				B3E7B5891CC2AC0600A0062D /* RNVoxeetConferencekit.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				57304286219CC01A003FE2DA /* RNVoxeetConferencekit-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -87,6 +92,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1010;
 					};
 				};
 			};
@@ -112,6 +118,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57304288219CC01A003FE2DA /* VoxeetManager.swift in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RNVoxeetConferencekit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -203,6 +210,7 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -212,16 +220,21 @@
 					"$(SRCROOT)/Carthage/Build/iOS/VoxeetSDK.framework",
 					"$(SRCROOT)/Carthage/Build/iOS/WebRTC.framework",
 				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNVoxeetConferencekit;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNVoxeetConferencekit-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -231,10 +244,13 @@
 					"$(SRCROOT)/Carthage/Build/iOS/VoxeetSDK.framework",
 					"$(SRCROOT)/Carthage/Build/iOS/WebRTC.framework",
 				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNVoxeetConferencekit;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNVoxeetConferencekit-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
