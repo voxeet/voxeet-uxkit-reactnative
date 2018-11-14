@@ -1,7 +1,6 @@
 #!/bin/bash
 
-ls -la .
-path="`pwd`/ios"
-echo $path
-cd $path
+cd ./ios
+
+
 carthage update --platform ios
