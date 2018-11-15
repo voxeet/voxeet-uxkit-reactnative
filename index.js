@@ -5,17 +5,16 @@ import VoxeetEvents from "./lib/VoxeetEvents";
 import VideoView from "./lib/VideoView";
 import VoxeetSDK from "./lib/VoxeetSDK";
 
-import type {
+import {
   ConferenceUser,
   MediaStream
 } from "./lib/VoxeetTypes";
 
 export {
   VoxeetSDK,
-  VideoView
-};
-
-export type {
-  ConferenceUser,
-  MediaStream
+  VideoView,
+  Types: {
+    ConferenceUser,
+    MediaStream
+  }
 };
