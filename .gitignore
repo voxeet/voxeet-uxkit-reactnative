@@ -29,6 +29,7 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
+ios/Carthage/
       
 
 # Android/IntelliJ

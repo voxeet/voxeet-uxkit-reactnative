@@ -15,7 +15,5 @@
 #endif
 
 @interface RNVoxeetConferencekit : NSObject <RCTBridgeModule>
-    
-- (void)test;
 
 @end
