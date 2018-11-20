@@ -6,15 +6,16 @@ import VideoView from "./lib/VideoView";
 import VoxeetSDK from "./lib/VoxeetSDK";
 
 import {
-  ConferenceUser,
-  MediaStream
-} from "./lib/VoxeetTypes";
-
-export {
-  VoxeetSDK,
-  VideoView,
-  Types: {
     ConferenceUser,
     MediaStream
-  }
+} from "./lib/VoxeetTypes";
+
+const Types = {
+    ConferenceUser,
+    MediaStream
+}
+export {
+    VoxeetSDK,
+    VideoView,
+    Types
 };
