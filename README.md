@@ -33,6 +33,64 @@
   	```
       compile project(':react-native-voxeet-conferencekit')
   	```
+### Mandatory modification
+
+**Warning : those modification are not done automatically by `react-native link`. You must set them !**
+
+#### Android
+
+You must edit those files :
+- `MainActivity`
+
+##### MainActivity
+
+Using Android Studio, copy paste the following method calls in the `MainActivity.java` file :
+```
+  private RNVoxeetActivityObject mActivityObject;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+
+      mActivityObject = new RNVoxeetActivityObject();
+      mActivityObject.onCreate(this);
+  }
+
+  @Override
+  protected void onResume() {
+      super.onResume();
+
+      mActivityObject.onResume(this);
+  }
+
+  @Override
+  protected void onPause() {
+      mActivityObject.onPause(this);
+
+      super.onPause();
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+      mActivityObject.onRequestPermissionsResult(requestCode, permissions, grantResults);
+  }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+      super.onNewIntent(intent);
+
+      mActivityObject.onNewIntent(intent);
+  }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+      if (!mActivityObject.onActivityResult(requestCode, resultCode, data)) {
+          super.onActivityResult(requestCode, resultCode, data);
+      }
+  }
+```
 
 ## Usage
 ```javascript
