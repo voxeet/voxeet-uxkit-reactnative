@@ -173,14 +173,24 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void create(ReadableMap parameters, final Promise promise) {
-        String conferenceId = parameters.getString("conferenceId");
-        ReadableMap params = parameters.getMap("params");
-        ReadableMap metadata = parameters.getMap("metadata");
+        String conferenceId = null;
         MetadataHolder holder = new MetadataHolder();
         ParamsHolder paramsHolder = new ParamsHolder();
 
-        if (params.hasKey("videoCodec") && !params.isNull("videoCodec"))
-            paramsHolder.setVideoCodec(params.getString("videoCodec"));
+        if (null != parameters) {
+            conferenceId = parameters.getString("conferenceId");
+            ReadableMap params = parameters.getMap("params");
+            ReadableMap metadata = parameters.getMap("metadata");
+
+            if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
+                paramsHolder.setVideoCodec(params.getString("videoCodec"));
+
+            if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
+                paramsHolder.setVideoCodec(params.getString("videoCodec"));
+
+            //TODO metadata
+        }
+
 
         VoxeetSdk.getInstance().getConferenceService()
                 .create(conferenceId, holder, paramsHolder)
