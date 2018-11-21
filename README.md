@@ -21,7 +21,7 @@
 
 If you want to support CallKit (receiving incoming call when application is killed) with VoIP push notification, enable 'Push Notifications' (you will need to upload your [VoIP push certificate](https://developer.apple.com/account/ios/certificate/) to the Voxeet developer portal).
 
-3. Privacy **permissions**, add two new keys in the Info.plist: 
+3. Privacy **permissions**, add two new keys in the Info.plist:
 - Privacy - Microphone Usage Description
 - Privacy - Camera Usage Description
 
@@ -33,14 +33,15 @@ If you want to support CallKit (receiving incoming call when application is kill
 ```
 
 Input files:
-$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
-$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
-$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
-$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
 
-6. Go to your target settings -> 'Build Settings':
-- FRAMEWORK_SEARCH_PATHS = $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
-- ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
+  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
+  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
+  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
+
+6. Go to your target settings -> 'Build Settings' in `All` (the default view is in `Basic` mode):
+- **FRAMEWORK_SEARCH_PATHS** = $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
+- **ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES** = YES
 
 #### Android
 
