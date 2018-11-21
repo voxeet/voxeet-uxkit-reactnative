@@ -14,10 +14,33 @@
 
 #### iOS
 
-1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
-2. Go to `node_modules` ➜ `react-native-voxeet-conferencekit` and add `RNReactNativeVoxeetConferencekit.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libRNReactNativeVoxeetConferencekit.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
-4. Run your project (`Cmd+R`)<
+1. Open your Xcode project (from YOUR_PROJECT/ios/YOUR_PROJECT.xcodeproj)
+2. Go to your target settings -> 'Capabilities' -> 'Background Modes': enable **background mode**
+- Turn on 'Audio, AirPlay and Picture in Picture'  
+- Turn on 'Voice over IP'
+
+If you want to support CallKit (receiving incoming call when application is killed) with VoIP push notification, enable 'Push Notifications' (you will need to upload your [VoIP push certificate](https://developer.apple.com/account/ios/certificate/) to the Voxeet developer portal).
+
+3. Privacy **permissions**, add two new keys in the Info.plist: 
+- Privacy - Microphone Usage Description
+- Privacy - Camera Usage Description
+
+4. Open a Finder and go to YOUR_PROJECT/node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS, drag and drop `VoxeetSDK.framework`, `WebRTC.framework`, `VoxeetConferenceKit.framework` and `Kingfisher.framework` into the Xcode project (deselect `Copy items if needed` and select your target(s))
+5. Go to your target settings -> 'Build Phases' -> 'Background Modes': Add a **New Run Script Phase**
+
+```bash
+/usr/local/bin/carthage copy-frameworks
+```
+
+Input files:
+$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
+$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
+$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
+$(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
+
+6. Go to your target settings -> 'Build Settings':
+- FRAMEWORK_SEARCH_PATHS = $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
+- ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 
 #### Android
 
