@@ -2,6 +2,7 @@ package com.voxeet.specifics;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -47,9 +48,18 @@ public class RNVoxeetActivityObject {
         BounceVoxeetActivity.registerBouncedActivity(activity.getClass());
 
         mIncomingBundleChecker = new IncomingBundleChecker(activity.getIntent(), null);
+
+        if(null != mActivity.getApplication() && mActivity.getApplication() instanceof RNVoxeetkitPackageProvider) {
+            ((RNVoxeetkitPackageProvider) mActivity.getApplication()).setCurrentActivity(activity);
+        }
     }
 
     public void onResume(@NonNull Activity activity) {
+        mActivity = activity;
+        if(null != activity.getApplication() && activity.getApplication() instanceof RNVoxeetkitPackageProvider) {
+            ((RNVoxeetkitPackageProvider) activity.getApplication()).setCurrentActivity(activity);
+        }
+
         if (null != VoxeetSdk.getInstance()) {
             VoxeetSdk.getInstance().register(activity, this);
         }

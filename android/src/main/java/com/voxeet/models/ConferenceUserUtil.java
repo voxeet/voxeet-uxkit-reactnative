@@ -1,6 +1,7 @@
 package com.voxeet.models;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -21,17 +22,20 @@ public final class ConferenceUserUtil {
     }
 
     @NonNull
-    public static WritableMap toMap(@NonNull DefaultConferenceUser user) {
-        UserInfo userInfo = user.getUserInfo();
+    public static WritableMap toMap(@Nullable DefaultConferenceUser user) {
 
         WritableMap map = new WritableNativeMap();
-        map.putString("userId", user.getUserId());
-        map.putString("conferenceStatus", user.getConferenceStatus().name());
 
-        if (null != user.getUserInfo()) {
-            map.putString("name", userInfo.getName());
-            map.putString("externalId", userInfo.getExternalId());
-            map.putString("avatarUrl", userInfo.getAvatarUrl());
+        if(null != user) {
+            UserInfo userInfo = user.getUserInfo();
+            map.putString("userId", user.getUserId());
+            map.putString("conferenceStatus", user.getConferenceStatus().name());
+
+            if (null != user.getUserInfo()) {
+                map.putString("name", userInfo.getName());
+                map.putString("externalId", userInfo.getExternalId());
+                map.putString("avatarUrl", userInfo.getAvatarUrl());
+            }
         }
 
         return map;

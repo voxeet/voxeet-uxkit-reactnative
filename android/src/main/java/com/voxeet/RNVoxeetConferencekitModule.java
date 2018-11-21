@@ -17,7 +17,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.voxeet.models.ConferenceUserUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
@@ -200,14 +204,17 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                String conferenceId = null;
+                String conferenceAlias = null;
                 MetadataHolder holder = new MetadataHolder();
                 ParamsHolder paramsHolder = new ParamsHolder();
 
                 if (null != parameters) {
-                    conferenceId = parameters.getString("conferenceId");
-                    ReadableMap params = parameters.getMap("params");
-                    ReadableMap metadata = parameters.getMap("metadata");
+                    conferenceAlias = parameters.getString("conferenceAlias");
+                    ReadableMap params = null;
+                    ReadableMap metadata = null;
+
+                    if (parameters.hasKey("params")) params = parameters.getMap("params");
+                    if (parameters.hasKey("metadata")) metadata = parameters.getMap("metadata");
 
                     if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
                         paramsHolder.setVideoCodec(params.getString("videoCodec"));
@@ -220,7 +227,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
 
                 VoxeetSdk.getInstance().getConferenceService()
-                        .create(conferenceId, holder, paramsHolder)
+                        .create(conferenceAlias, holder, paramsHolder)
                         .then(new PromiseExec<ConferenceResponse, Object>() {
                             @Override
                             public void onCall(@Nullable ConferenceResponse result, @NonNull Solver<Object> solver) {
@@ -296,7 +303,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void invite(final ReadableArray participants, final Promise promise) {
+    public void invite(final String conferenceId, final ReadableArray participants, final Promise promise) {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -315,7 +322,15 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                         .then(new PromiseExec<List<ConferenceRefreshedEvent>, Object>() {
                             @Override
                             public void onCall(@Nullable List<ConferenceRefreshedEvent> result, @NonNull Solver<Object> solver) {
-                                promise.resolve(result);
+                                WritableArray res = new WritableNativeArray();
+                                if(null != result) {
+                                    for(ConferenceRefreshedEvent event : result) {
+                                        if(null != event) {
+                                            res.pushMap(ConferenceUserUtil.toMap(event.getUser()));
+                                        }
+                                    }
+                                }
+                                promise.resolve(res);
                             }
                         })
                         .error(new ErrorPromise() {
