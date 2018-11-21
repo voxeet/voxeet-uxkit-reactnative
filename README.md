@@ -41,10 +41,42 @@
 
 You must edit those files :
 - `MainActivity`
+- `MainApplication`
+- `app/build.gradle`
+- `app/src/main/AndroidManifest.xml`
+
+##### app/build.gradle
+
+The SDK currently uses the recyclerview:27.1.1
+
+Modify your app/build.gradle to add
+```
+dependencies {
+  implementation 'com.android.support:recyclerview-v7:27.1.1'
+}
+```
+
+##### MainApplication
+
+`new RNVoxeetConferencekitPackage()` becomes `new RNVoxeetConferencekitPackage(this)`
 
 ##### MainActivity
 
+- if your `MainActivity` extends `ReactActivity`, change `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`
+
+with the following import :
+`import com.voxeet.specifics.RNVoxeetActivity`
+
+- if you are using `Expo` or you do the above modification
 Using Android Studio, copy paste the following method calls in the `MainActivity.java` file :
+* In the imports :
+```
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+```
+
+* In the code :
 ```
   private RNVoxeetActivityObject mActivityObject;
 
@@ -91,6 +123,46 @@ Using Android Studio, copy paste the following method calls in the `MainActivity
       }
   }
 ```
+
+#### app/build.gradle
+
+VoxeetSDK uses Java 8 instructions. Please edit the app/build.gradle to incorporate this compilation mode :
+
+```
+android {
+    ...
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    ...
+}
+```
+
+#### app/src/main/AndroidManifest.xml
+
+After the `permissions` required, add those xml nodes :
+
+```
+  <!-- VOXEET PERMISSION - WARNING : THERE MAY BE DUPLICATES - no expected issues -->
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <uses-permission android:name="android.permission.BLUETOOTH" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.CAMERA" />
+```
+
 
 ## Usage
 ```javascript
