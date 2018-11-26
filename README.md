@@ -3,7 +3,7 @@
 
 ## Getting started
 
-`$ npm install react-native-voxeet-conferencekit --save`
+`$ npm install https://github.com/voxeet/react-native-voxeet-conferencekit --save`
 
 ### Mostly automatic installation
 
