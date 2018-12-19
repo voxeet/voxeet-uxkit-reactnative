@@ -14,7 +14,8 @@
 
 #### iOS
 
-1. Open your Xcode project (from YOUR_PROJECT/ios/YOUR_PROJECT.xcodeproj)
+1. Open your Xcode project from YOUR_PROJECT/ios/YOUR_PROJECT.xcworkspace (or .xcodeproj if there is no .xcworkspace)
+
 2. Go to your target settings -> 'Capabilities' -> 'Background Modes': enable **background mode**
 - Turn on 'Audio, AirPlay and Picture in Picture'  
 - Turn on 'Voice over IP'
@@ -25,23 +26,27 @@ If you want to support CallKit (receiving incoming call when application is kill
 - Privacy - Microphone Usage Description
 - Privacy - Camera Usage Description
 
-4. Open a Finder and go to YOUR_PROJECT/node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS, drag and drop `VoxeetSDK.framework`, `WebRTC.framework`, `VoxeetConferenceKit.framework` and `Kingfisher.framework` into the Xcode project (deselect `Copy items if needed` and select your target(s))
-5. Go to your target settings -> 'Build Phases' -> 'Background Modes': Add a **New Run Script Phase**
+4. Open a Finder and go to YOUR_PROJECT/node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS, drag and drop `VoxeetSDK.framework`, `WebRTC.framework`, `VoxeetConferenceKit.framework` and `Kingfisher.framework` into the **Frameworks** folder from Xcode project (deselect `Copy items if needed` and select your target(s))
+
+5. Go to your target settings -> 'Build Phases': Add a **New Run Script Phase**
 
 ```bash
 /usr/local/bin/carthage copy-frameworks
 ```
 
 Input files:
-
-  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
-  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
-  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
-  - $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
+- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
+- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
+- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
+- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
 
 6. Go to your target settings -> 'Build Settings' in `All` (the default view is in `Basic` mode):
 - **FRAMEWORK_SEARCH_PATHS** = $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
 - **ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES** = YES
+
+7. If you are using **ExpoKit** there is an extra step (https://docs.expo.io/versions/latest/expokit/expokit#ios):
+Select RNVoxeetConferencekit.xcodeproj and go to the target settings -> 'Build Settings':
+- **HEADER_SEARCH_PATHS** = $(PROJECT_DIR)/../../../ios/Pods/Headers/Public (in `recursive`)
 
 #### Android
 
