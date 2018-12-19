@@ -1,9 +1,7 @@
 
 package com.voxeet;
 
-import android.app.Activity;
 import android.app.Application;
-import android.support.annotation.Nullable;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -65,9 +63,5 @@ public class RNVoxeetConferencekitPackage implements ReactPackage {
         return Collections.<ViewManager>singletonList(
                 new RNVideoViewManager()
         );
-    }
-
-    public void setCurrentActivity(@Nullable Activity activity) {
-        mRNRootViewProvider.setCurrentActivity(activity);
     }
 }
