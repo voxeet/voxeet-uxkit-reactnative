@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import sdk.voxeet.com.toolkit.activities.workflow.VoxeetAppCompatActivity;
+import com.voxeet.toolkit.activities.VoxeetAppCompatActivity;
+
 import voxeet.com.sdk.factories.VoxeetIntentFactory;
 
 /**
