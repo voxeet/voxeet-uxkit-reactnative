@@ -50,7 +50,7 @@ public class RNVoxeetConferencekitPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList(new RNVoxeetConferencekitModule(reactContext));
+        return Arrays.<NativeModule>asList(new RNVoxeetConferencekitModule(mRNRootViewProvider, reactContext));
     }
 
     // Deprecated from RN 0.47

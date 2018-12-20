@@ -2,32 +2,13 @@ package com.voxeet.specifics;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.facebook.react.ReactActivity;
-import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
-import com.voxeet.toolkit.activities.notification.IncomingCallFactory;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import eu.codlab.simplepromise.solve.ErrorPromise;
-import eu.codlab.simplepromise.solve.PromiseExec;
-import eu.codlab.simplepromise.solve.Solver;
-import voxeet.com.sdk.core.VoxeetSdk;
-import voxeet.com.sdk.core.services.ScreenShareService;
-import voxeet.com.sdk.events.error.ConferenceJoinedError;
-import voxeet.com.sdk.events.error.PermissionRefusedEvent;
-import voxeet.com.sdk.events.success.ConferenceJoinedSuccessEvent;
-import voxeet.com.sdk.events.success.ConferencePreJoinedEvent;
-import voxeet.com.sdk.utils.Validate;
-
-/**
- * Created by kevinleperf on 11/09/2018.
- */
+import com.voxeet.RNVoxeetConferencekitModule;
+import com.voxeet.specifics.waiting.WaitingAbstractHolder;
 
 public abstract class RNVoxeetActivity extends ReactActivity {
 
@@ -46,10 +27,12 @@ public abstract class RNVoxeetActivity extends ReactActivity {
         super.onResume();
 
         mActivityObject.onResume(this);
+        RNVoxeetConferencekitModule.registerActivity(this);
     }
 
     @Override
     protected void onPause() {
+        //no need to unregister, it's not having multiple activities
         mActivityObject.onPause(this);
 
         super.onPause();
@@ -57,6 +40,29 @@ public abstract class RNVoxeetActivity extends ReactActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        WaitingAbstractHolder holder = RNVoxeetConferencekitModule.getWaitingJoinHolder();
+
+        if (null != holder && RNVoxeetConferencekitModule.isWaiting()) {
+            int i = 0;
+
+            while (i < permissions.length && i < grantResults.length) {
+                if (Manifest.permission.RECORD_AUDIO.equals(permissions[i])) {
+                    if (PackageManager.PERMISSION_GRANTED == grantResults[i]) {
+                        holder.rejoin();
+                    } else {
+                        try {
+                            throw new IllegalStateException("No mic permission granted, can't join");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            holder.getPromise().reject("NO_MIC_PERMISSION", e);
+                        }
+                    }
+                    //managed
+                    return;
+                }
+                i++;
+            }
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         mActivityObject.onRequestPermissionsResult(requestCode, permissions, grantResults);

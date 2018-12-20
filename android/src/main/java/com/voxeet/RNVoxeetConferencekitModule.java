@@ -19,6 +19,11 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.models.ConferenceUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
+import com.voxeet.specifics.RNRootViewProvider;
+import com.voxeet.specifics.RNVoxeetActivity;
+import com.voxeet.specifics.waiting.WaitingAbstractHolder;
+import com.voxeet.specifics.waiting.WaitingJoinHolder;
+import com.voxeet.specifics.waiting.WaitingStartConferenceHolder;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.implementation.overlays.OverlayState;
 
@@ -46,6 +51,7 @@ import voxeet.com.sdk.json.UserInfo;
 import voxeet.com.sdk.json.internal.MetadataHolder;
 import voxeet.com.sdk.json.internal.ParamsHolder;
 import voxeet.com.sdk.models.ConferenceResponse;
+import voxeet.com.sdk.utils.Validate;
 
 public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
@@ -54,15 +60,21 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private final static String TAG = RNVoxeetConferencekitModule.class.getSimpleName();
 
+    @Nullable
+    private static RNVoxeetActivity sActivity;
+
     private final ReactApplicationContext reactContext;
+    private final RNRootViewProvider mRootViewProvider;
     private boolean startVideo;
     private UserInfo _current_user;
     private ReentrantLock lockAwaitingToken = new ReentrantLock();
     private List<TokenCallback> mAwaitingTokenCallback;
+    private static WaitingAbstractHolder sWaitingHolder;
     //private Callback refreshAccessTokenCallbackInstance;
 
-    public RNVoxeetConferencekitModule(ReactApplicationContext reactContext) {
+    public RNVoxeetConferencekitModule(RNRootViewProvider rootViewProvider, ReactApplicationContext reactContext) {
         super(reactContext);
+        mRootViewProvider = rootViewProvider;
         mAwaitingTokenCallback = new ArrayList<>();
         this.reactContext = reactContext;
     }
@@ -289,6 +301,19 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void join(String conferenceId, final Promise promise) {
+
+        //TODO check for direct api call in react native to add listener in it
+        if (!Validate.hasMicrophonePermissions(reactContext)) {
+            Log.d(TAG, "join: NOT PERMISSION 1 " + getActivity());
+            if (null != getActivity()) {
+                sWaitingHolder = new WaitingJoinHolder(this, conferenceId, promise);
+                requestMicrophone();
+                return;
+            } else {
+                Log.d(TAG, "join: UNABLE TO REQUEST PERMISSION -- DID YOU REGISTER THE ACTIVITY ?");
+            }
+        }
+
         VoxeetToolkit.getInstance().enable(VoxeetToolkit.getInstance().getConferenceToolkit());
 
         VoxeetSdk.getInstance().getConferenceService()
@@ -403,6 +428,19 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void startConference(String conferenceAlias /* alias...*/,
                                 ReadableArray participants,
                                 final Promise promise) {
+
+        //TODO check for direct api call in react native to add listener in it
+        if (!Validate.hasMicrophonePermissions(reactContext)) {
+            Log.d(TAG, "join: NOT PERMISSION 2 " + getActivity());
+            if (null != getActivity()) {
+                sWaitingHolder = new WaitingStartConferenceHolder(this, conferenceAlias, participants, promise);
+                requestMicrophone();
+                return;
+            } else {
+                Log.d(TAG, "join: UNABLE TO REQUEST PERMISSION -- DID YOU REGISTER THE ACTIVITY ?");
+            }
+        }
+
         VoxeetToolkit.getInstance().getConferenceToolkit()
                 .join(conferenceAlias, null, null, null)
                 .then(new PromiseExec<Boolean, Boolean>() {
@@ -541,5 +579,31 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
 
         }
+    }
+
+    private Activity getActivity() {
+        if(null != sActivity) return sActivity;
+        return mRootViewProvider.getCurrentActivity();
+    }
+
+    public static void registerActivity(@NonNull RNVoxeetActivity activity) {
+        Log.d(TAG, "registerActivity: sActivity := " + sActivity);
+        sActivity = activity;
+    }
+
+    public static boolean isWaiting() {
+        return null != sWaitingHolder && null != sWaitingHolder.getPromise();
+    }
+
+    @Nullable
+    public static WaitingAbstractHolder getWaitingJoinHolder() {
+        return sWaitingHolder;
+    }
+
+    private void requestMicrophone() {
+        Log.d(TAG, "requestMicrophone: " + getActivity());
+        Validate.requestMandatoryPermissions(getActivity(),
+                new String[]{Manifest.permission.RECORD_AUDIO},
+                PermissionRefusedEvent.RESULT_MICROPHONE);
     }
 }
