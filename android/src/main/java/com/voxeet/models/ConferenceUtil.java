@@ -1,6 +1,7 @@
 package com.voxeet.models;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
@@ -9,6 +10,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 
 import java.util.List;
 
+import voxeet.com.sdk.models.ConferenceResponse;
 import voxeet.com.sdk.models.HistoryConference;
 import voxeet.com.sdk.models.MetaData;
 import voxeet.com.sdk.models.SdkParticipant;
@@ -23,6 +25,17 @@ import voxeet.com.sdk.models.impl.DefaultConferenceUser;
 public final class ConferenceUtil {
     private ConferenceUtil() {
 
+    }
+
+    @NonNull
+    public static WritableMap toMap(@Nullable ConferenceResponse response) {
+        WritableMap map = new WritableNativeMap();
+        if(null != response) {
+            map.putString("conferenceId", response.getConfId());
+            map.putString("conferenceAlias", response.getConfAlias());
+            map.putBoolean("isNew", response.isNew());
+        }
+        return map;
     }
 
     @NonNull
@@ -60,7 +73,7 @@ public final class ConferenceUtil {
 
     public static WritableArray toMap(List<HistoryConference> items) {
         WritableNativeArray array = new WritableNativeArray();
-        if(null != items) {
+        if (null != items) {
             for (HistoryConference item : items) {
                 array.pushMap(ConferenceUtil.toMap(item));
             }

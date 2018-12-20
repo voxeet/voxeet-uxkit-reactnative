@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.voxeet.models.ConferenceUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
@@ -260,14 +261,14 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void create(ReadableMap parameters, final Promise promise) {
-        String conferenceId = parameters.getString("conferenceId");
-        ReadableMap params = parameters.getMap("params");
-        ReadableMap metadata = parameters.getMap("metadata");
+    public void create(@Nullable ReadableMap parameters, @NonNull final Promise promise) {
+        String conferenceId = null != parameters ? parameters.getString("conferenceId") : null;
+        ReadableMap params = null != parameters ? parameters.getMap("params") : null;
+        ReadableMap metadata = null != parameters ? parameters.getMap("metadata") : null;
         MetadataHolder holder = new MetadataHolder();
         ParamsHolder paramsHolder = new ParamsHolder();
 
-        if (params.hasKey("videoCodec") && !params.isNull("videoCodec"))
+        if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
             paramsHolder.setVideoCodec(params.getString("videoCodec"));
 
         VoxeetSdk.getInstance().getConferenceService()
@@ -275,7 +276,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                 .then(new PromiseExec<ConferenceResponse, Object>() {
                     @Override
                     public void onCall(@Nullable ConferenceResponse result, @NonNull Solver<Object> solver) {
-                        promise.resolve(result);
+                        promise.resolve(ConferenceUtil.toMap(result));
                     }
                 })
                 .error(new ErrorPromise() {
