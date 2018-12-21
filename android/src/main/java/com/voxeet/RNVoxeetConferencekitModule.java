@@ -89,9 +89,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         promise.resolve("some string from Android");
     }
 
-
     @ReactMethod
-    public void initializeWithRefresh(String accessToken, Promise promise) {
+    public void initializeToken(String accessToken, Promise promise) {
         Application application = (Application) reactContext.getApplicationContext();
 
         if (null == VoxeetSdk.getInstance()) {
