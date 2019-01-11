@@ -89,6 +89,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         promise.resolve("some string from Android");
     }
 
+
     @ReactMethod
     public void initializeToken(String accessToken, Promise promise) {
         Application application = (Application) reactContext.getApplicationContext();
@@ -273,14 +274,24 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void create(@Nullable ReadableMap parameters, @NonNull final Promise promise) {
-        String conferenceId = null != parameters ? parameters.getString("conferenceId") : null;
-        ReadableMap params = null != parameters ? parameters.getMap("params") : null;
-        ReadableMap metadata = null != parameters ? parameters.getMap("metadata") : null;
+        String conferenceId = null;
+        ReadableMap params = null;
+        ReadableMap metadata = null;
         MetadataHolder holder = new MetadataHolder();
         ParamsHolder paramsHolder = new ParamsHolder();
 
-        if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
-            paramsHolder.setVideoCodec(params.getString("videoCodec"));
+        if (null != parameters) {
+
+            if (parameters.hasKey("conferenceId"))
+                conferenceId = parameters.getString("conferenceId");
+            if (parameters.hasKey("params"))
+                params = parameters.getMap("params");
+            if (parameters.hasKey("metadata"))
+                metadata = parameters.getMap("metadata");
+
+            if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
+                paramsHolder.setVideoCodec(params.getString("videoCodec"));
+        }
 
         VoxeetSdk.getInstance().getConferenceService()
                 .create(conferenceId, holder, paramsHolder)
@@ -581,7 +592,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     private Activity getActivity() {
-        if(null != sActivity) return sActivity;
+        if (null != sActivity) return sActivity;
         return mRootViewProvider.getCurrentActivity();
     }
 
