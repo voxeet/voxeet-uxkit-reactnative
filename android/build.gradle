@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation ('com.voxeet.sdk:toolkit:1.1.17') {
+    implementation ('com.voxeet.sdk:toolkit:1.4.1') {
         transitive = true
     }
 }
