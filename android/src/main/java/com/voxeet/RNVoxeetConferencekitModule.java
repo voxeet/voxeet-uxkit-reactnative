@@ -363,7 +363,10 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void invite(ReadableArray participants, final Promise promise) {
+    public void invite(String conferenceId, ReadableArray participants, final Promise promise) {
+        //TODO expose in the SDK the ability to use the conferenceId
+        Log.d(TAG, "invite: WARNING :: the provided conferenceId is not yet managed, please make sure you have joined the conference before trying to invite users");
+
         List<String> strings = new ArrayList<>();
         List<UserInfo> users = null;
 
