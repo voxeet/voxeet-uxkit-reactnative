@@ -382,7 +382,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                 .then(new PromiseExec<List<ConferenceRefreshedEvent>, Object>() {
                     @Override
                     public void onCall(@Nullable List<ConferenceRefreshedEvent> result, @NonNull Solver<Object> solver) {
-                        promise.resolve(result);
+                        promise.resolve(true);
                     }
                 })
                 .error(new ErrorPromise() {
