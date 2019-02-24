@@ -1,5 +1,4 @@
-
-buildscript {
+/*buildscript {
     repositories {
         google()
         jcenter()
@@ -8,17 +7,17 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
     }
-}
+}*/
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 26
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
@@ -35,7 +34,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation ('com.voxeet.sdk:toolkit:1.4.1') {
+    implementation ('com.voxeet.sdk:toolkit:1.4.11') {
         transitive = true
     }
 }
