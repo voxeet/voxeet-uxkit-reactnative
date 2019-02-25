@@ -77,6 +77,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         mRootViewProvider = rootViewProvider;
         mAwaitingTokenCallback = new ArrayList<>();
         this.reactContext = reactContext;
+
+        VoxeetPreferences.init(reactContext);
     }
 
     @Override
@@ -200,7 +202,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void checkForAwaitingConference(Promise promise) {
-
         if (null == VoxeetSdk.getInstance()) {
             promise.reject(ERROR_SDK_NOT_INITIALIZED);
         } else {

@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.facebook.react.ReactActivity;
+import com.voxeet.RNVoxeetConferencekitModule;
+import com.voxeet.RNVoxeetConferencekitPackage;
 import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.toolkit.activities.notification.IncomingCallFactory;
 
@@ -28,10 +30,10 @@ import voxeet.com.sdk.utils.Validate;
 
 /**
  * Class managing the communication between the Activity and the underlying Bundle manager
- *
+ * <p>
  * To integrate this, if your MainActivity extends ReactActivity, simply replace ReactActivity with
  * RNVoxeetActivity
- *
+ * <p>
  * if your app extends an other non-ReactNative application, please bind the methods used in the RNVoxeetActivity
  */
 
@@ -64,12 +66,21 @@ public class RNVoxeetActivityObject {
         }
 
         if (mIncomingBundleChecker.isBundleValid()) {
-            mIncomingBundleChecker.onAccept();
+            if (null != VoxeetSdk.getInstance()) {
+                mIncomingBundleChecker.onAccept();
+            } else {
+                //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
+            }
         }
 
         if (null != VoxeetSdk.getInstance()) {
             VoxeetSdk.getInstance().getScreenShareService().consumeRightsToScreenShare();
         }
+    }
+
+    @Nullable
+    public IncomingBundleChecker getIncomingBundleChecker() {
+        return mIncomingBundleChecker;
     }
 
     public void onPause(@NonNull Activity activity) {
@@ -79,8 +90,10 @@ public class RNVoxeetActivityObject {
                 VoxeetSdk.getInstance().getLocalStatsService().stopAutoFetch();
             }
         }
-        if(mActivity == activity) mActivity = null;
-        EventBus.getDefault().unregister(this);
+        if (mActivity == activity) mActivity = null;
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -123,7 +136,11 @@ public class RNVoxeetActivityObject {
     public void onNewIntent(Intent intent) {
         mIncomingBundleChecker = new IncomingBundleChecker(intent, null);
         if (mIncomingBundleChecker.isBundleValid()) {
-            mIncomingBundleChecker.onAccept();
+            if (null != VoxeetSdk.getInstance()) {
+                mIncomingBundleChecker.onAccept();
+            } else {
+                //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
+            }
         }
     }
 
