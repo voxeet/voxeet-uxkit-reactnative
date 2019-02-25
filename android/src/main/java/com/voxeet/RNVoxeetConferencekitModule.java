@@ -60,12 +60,13 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private final static String TAG = RNVoxeetConferencekitModule.class.getSimpleName();
 
+    public static boolean startVideo;
+
     @Nullable
     private static RNVoxeetActivity sActivity;
 
     private final ReactApplicationContext reactContext;
     private final RNRootViewProvider mRootViewProvider;
-    private boolean startVideo;
     private UserInfo _current_user;
     private ReentrantLock lockAwaitingToken = new ReentrantLock();
     private List<TokenCallback> mAwaitingTokenCallback;

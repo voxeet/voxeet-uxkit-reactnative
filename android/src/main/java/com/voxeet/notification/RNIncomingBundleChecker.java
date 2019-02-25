@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.WindowManager;
 
+import com.voxeet.RNVoxeetConferencekitModule;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 
 import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
 import eu.codlab.simplepromise.solve.Solver;
+import voxeet.com.sdk.core.VoxeetSdk;
 import voxeet.com.sdk.factories.VoxeetIntentFactory;
 import voxeet.com.sdk.json.UserInfo;
 
@@ -81,6 +84,17 @@ public class RNIncomingBundleChecker {
                         @Override
                         public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
                             //possible callback to set ?
+                            if(RNVoxeetConferencekitModule.startVideo) {
+                                solver.resolve(VoxeetSdk.getInstance().getConferenceService().startVideo());
+                            } else {
+                                solver.resolve(result);
+                            }
+                        }
+                    })
+                    .then(new PromiseExec<Object, Object>() {
+                        @Override
+                        public void onCall(@Nullable Object result, @NonNull Solver<Object> solver) {
+                            //nothing to do
                         }
                     })
                     .error(new ErrorPromise() {
