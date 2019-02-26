@@ -6,17 +6,23 @@ import {
   MediaStream
 } from "./VoxeetTypes";
 
-class VoxeetSDK {
+interface RefreshCallback {
+  (): void;
+};
 
-  constructor() {
-    this.refreshAccessTokenCallback = null;
+export interface TokenRefreshCallback {
+  (): Promise<string>
+};
+
+export default class _VoxeetSDK {
+  refreshAccessTokenCallback: RefreshCallback|null = null;
+
+
+  initialize(consumerKey: string, consumerSecret: string): Promise<any> {
+      return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
 
-  initialize(consumerKey: string, consumerSecret: string): Promise {
-    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
-  }
-
-  initializeToken(accessToken, refreshToken) {
+  initializeToken(accessToken: string|undefined, refreshToken: TokenRefreshCallback) {
     if(!this.refreshAccessTokenCallback) {
       this.refreshAccessTokenCallback = () => {
         refreshToken()
@@ -27,38 +33,38 @@ class VoxeetSDK {
       }
       const eventEmitter = Platform.OS == "android" ? DeviceEventEmitter : new NativeEventEmitter(RNVoxeetConferencekit);
       eventEmitter.addListener("refreshToken", (e: Event) => {
-        this.refreshAccessTokenCallback();
+        this.refreshAccessTokenCallback && this.refreshAccessTokenCallback();
       });
     }
 
     return RNVoxeetConferencekit.initializeToken(accessToken);
   }
 
-  connect(userInfo: ConferenceUser): Promise {
+  connect(userInfo: ConferenceUser): Promise<any> {
     return RNVoxeetConferencekit.connect(userInfo);
   }
 
-  disconnect(): Promise {
+  disconnect(): Promise<any> {
     return RNVoxeetConferencekit.disconnect();
   }
 
-  create(parameters: any): Promise {
+  create(parameters: any): Promise<any> {
     return RNVoxeetConferencekit.create(parameters);
   }
 
-  join(conferenceId: string): Promise {
+  join(conferenceId: string): Promise<any> {
     return RNVoxeetConferencekit.join(conferenceId);
   }
 
-  leave(): Promise {
+  leave(): Promise<any> {
     return RNVoxeetConferencekit.leave();
   }
 
-  invite(conferenceId: string, participants: ConferenceUser[]): Promise {
+  invite(conferenceId: string, participants: ConferenceUser[]): Promise<any> {
     return RNVoxeetConferencekit.invite(conferenceId, participants);
   }
 
-  sendBroadcastMessage(message: string): Promise {
+  sendBroadcastMessage(message: string): Promise<any> {
     return RNVoxeetConferencekit.sendBroadcastMessage(message);
   }
 
@@ -78,11 +84,10 @@ class VoxeetSDK {
   }
 
   /*
-   *  Android methods
-   */
-
+    *  Android methods
+    */
   screenAutoLock(activate: boolean) {
-    if(Platform.os == "android") {
+    if(Platform.OS == "android") {
       RNVoxeetConferencekit.screenAutoLock(activate);
     }
   }
@@ -92,31 +97,29 @@ class VoxeetSDK {
     return RNVoxeetConferencekit.isUserLoggedIn();
   }
 
-  checkForAwaitingConference(): Promise {
-    if(Platform.os != "android") return new Promise(r => r());
+  checkForAwaitingConference(): Promise<any> {
+    if(Platform.OS != "android") return new Promise(r => r());
 
     return RNVoxeetConferencekit.checkForAwaitingConference();
   }
 
   /*
-   *  Deprecated methods
-   */
+    *  Deprecated methods
+    */
 
-  startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise {
+  startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise<any> {
     return RNVoxeetConferencekit.startConference(conferenceId, participants);
   }
 
-  stopConference(): Promise {
+  stopConference(): Promise<any> {
     return RNVoxeetConferencekit.leave();
   }
 
-  openSession(userInfo: ConferenceUser): Promise {
+  openSession(userInfo: ConferenceUser): Promise<any> {
     return RNVoxeetConferencekit.connect(userInfo);
   }
 
-  closeSession(): Promise {
+  closeSession(): Promise<any> {
     return RNVoxeetConferencekit.disconnect();
   }
 }
-
-module.exports = new VoxeetSDK();

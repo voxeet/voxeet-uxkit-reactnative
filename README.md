@@ -3,11 +3,13 @@
 
 ## Getting started
 
-`$ npm install https://github.com/voxeet/react-native-voxeet-conferencekit --save`
+`$ npm install @voxeet/react-native-voxeet-conferencekit --save`
 
 ### Mostly automatic installation
 
-`$ react-native link react-native-voxeet-conferencekit`
+`$ react-native link @voxeet/react-native-voxeet-conferencekit`
+
+**_Note: For Android, you need to update the do the Mandatory Modification_**
 
 ### Manual installation
 
@@ -26,7 +28,7 @@ If you want to support CallKit (receiving incoming call when application is kill
 - Privacy - Microphone Usage Description
 - Privacy - Camera Usage Description
 
-4. Open a Finder and go to YOUR_PROJECT/node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS, drag and drop `VoxeetSDK.framework`, `WebRTC.framework`, `VoxeetConferenceKit.framework` and `Kingfisher.framework` into the **Frameworks** folder from Xcode project (deselect `Copy items if needed` and select your target(s))
+4. Open a Finder and go to YOUR_PROJECT/node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS, drag and drop `VoxeetSDK.framework`, `WebRTC.framework`, `VoxeetConferenceKit.framework` and `Kingfisher.framework` into the **Frameworks** folder from Xcode project (deselect `Copy items if needed` and select your target(s))
 
 5. Go to your target settings -> 'Build Phases': Add a **New Run Script Phase**
 
@@ -35,32 +37,38 @@ If you want to support CallKit (receiving incoming call when application is kill
 ```
 
 Input files:
-- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
-- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
-- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
-- $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
+- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
+- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
+- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
+- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
 
 6. Go to your target settings -> 'Build Settings' in `All` (the default view is in `Basic` mode):
-- **FRAMEWORK_SEARCH_PATHS** = $(PROJECT_DIR)/../node_modules/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
+- **FRAMEWORK_SEARCH_PATHS** = $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
 - **ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES** = YES
 
 7. If you are using **ExpoKit** there is an extra step (https://docs.expo.io/versions/latest/expokit/expokit#ios):
 Select RNVoxeetConferencekit.xcodeproj and go to the target settings -> 'Build Settings':
-- **HEADER_SEARCH_PATHS** = $(PROJECT_DIR)/../../../ios/Pods/Headers/Public (in `recursive`)
+- **HEADER_SEARCH_PATHS** = $(PROJECT_DIR)/../../../../ios/Pods/Headers/Public (in `recursive`)
 
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainActivity.java`
   - Add `import com.reactlibrary.RNReactNativeVoxeetConferencekitPackage;` to the imports at the top of the file
-  - Add `new RNReactNativeVoxeetConferencekitPackage()` to the list returned by the `getPackages()` method
+  - Add `voxeet` to the list returned by the `getPackages()` method
+  - Add a field in the `MainApplication` class named voxeet : `private RNReactNativeVoxeetConferencekitPackage voxeet;`
+  - in the `onCreate` method, instantiate the `voxeet` field to a new instance of the `RNReactNativeVoxeetConferencekitPackage` class : `voxeet = new RNReactNativeVoxeetConferencekitPackage(MainApplication.this);`
+
 2. Append the following lines to `android/settings.gradle`:
   	```
-  	include ':react-native-voxeet-conferencekit'
-  	project(':react-native-voxeet-conferencekit').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-voxeet-conferencekit/android')
+  	include ':@voxeet_react-native-voxeet-conferencekit'
+  	project(':@voxeet_react-native-voxeet-conferencekit').projectDir = new File(rootProject.projectDir, 	'../node_modules/@voxeet/react-native-voxeet-conferencekit/android')
   	```
+
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```
-      compile project(':react-native-voxeet-conferencekit')
+      compile (project(':@voxeet_react-native-voxeet-conferencekit')) {
+          transitive = true
+      }
   	```
 ### Mandatory modification
 
@@ -69,25 +77,65 @@ Select RNVoxeetConferencekit.xcodeproj and go to the target settings -> 'Build S
 #### Android
 
 You must edit those files :
-- `MainActivity`
-- `MainApplication`
+- `build.gradle`
 - `app/build.gradle`
 - `app/src/main/AndroidManifest.xml`
+- `MainActivity`
+- `MainApplication`
+
+##### build.gradle
+
+At the end of the file, add this structure declaration :
+```
+ext {
+    buildToolsVersion = "28.0.3"
+    minSdkVersion = 16
+    compileSdkVersion = 28
+    targetSdkVersion = 27
+    supportLibVersion = "28.0.0"
+    voxeetSdkVersion = "1.4.12"
+    mediaSdkVersion = "0.8.2"
+}
+```
 
 ##### app/build.gradle
 
-The SDK currently uses the recyclerview:27.1.1
+The SDK currently uses the 28.0.0 support libraries, you must add dependencies to those versions to prevent conflict with other non updated libraries
 
 Modify your app/build.gradle to add
 ```
-dependencies {
-  implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation "com.android.support:supportt-compat:${rootProject.ext.supportLibVersion}"
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
+
+    //possibly this one too
+    implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
+```
+
+Note that the following list is not limited to those but since the first 3 ones are directly dependance of the library, it's a best practice to use them.
+
+In case of library incompatibilities, you can also fork them, update them and report the use of the `rootProject.ext.someField` usage as describe in the Android Developer documentation.
+
+
+VoxeetSDK uses Java 8 instructions. Please edit the app/build.gradle to incorporate this compilation mode :
+
+```
+android {
+    ...
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    ...
 }
 ```
 
 ##### MainApplication
 
-`new RNVoxeetConferencekitPackage()` becomes `new RNVoxeetConferencekitPackage(this)`
+Follow the implementation from the `link` documentation, first step
+
 
 ##### MainActivity
 
@@ -153,23 +201,6 @@ import android.support.annotation.NonNull;
   }
 ```
 
-#### app/build.gradle
-
-VoxeetSDK uses Java 8 instructions. Please edit the app/build.gradle to incorporate this compilation mode :
-
-```
-android {
-    ...
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    ...
-}
-```
-
 #### app/src/main/AndroidManifest.xml
 
 After the `permissions` required, add those xml nodes :
@@ -195,9 +226,9 @@ After the `permissions` required, add those xml nodes :
 
 ## Usage
 ```javascript
-import RNReactNativeVoxeetConferencekit from 'react-native-voxeet-conferencekit';
-
-RNReactNativeVoxeetConferencekit;
+import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
+import { ConferenceUser } from "@voxeet/react-native-voxeet-conferencekit/lib/VoxeetTypes";
+...
 ```
 
 ## Configuration

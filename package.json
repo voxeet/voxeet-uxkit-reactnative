@@ -1,11 +1,24 @@
 {
-  "name": "react-native-voxeet-conferencekit",
-  "version": "1.0.0",
+  "name": "@voxeet/react-native-voxeet-conferencekit",
+  "version": "0.0.6",
   "description": "",
   "main": "index.js",
   "scripts": {
     "postinstall": "bash build_ios_frameworks.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-library": "./buildProject.sh && Echo Build completed!",
+    "publish-library": "npm run build-library && cd build/dist && npm publish && echo Package published!"
+  },
+  "devDependencies": {
+    "@types/react": "^16.0.5",
+    "@types/react-native": "^0.50.3",
+    "@types/react-test-renderer": "^16.0.0",
+    "jest-expo-ts": "^22.0.1",
+    "react-native-scripts-ts": "1.7.0",
+    "react-native-typescript-transformer": "^1.1.4",
+    "react-test-renderer": "16.2.0",
+    "tslib": "^1.9.3",
+    "typescript": "^2.5.2"
   },
   "keywords": [
     "react-native"

@@ -1,9 +1,6 @@
-import { NativeModules, Platform } from 'react-native';
-const { RNVoxeetConferencekit } = NativeModules;
-
 import VoxeetEvents from "./lib/VoxeetEvents";
 import VideoView from "./lib/VideoView";
-import VoxeetSDK from "./lib/VoxeetSDK";
+import { default as _VoxeetSDK } from "./lib/VoxeetSDK";
 
 import {
     ConferenceUser,
@@ -14,6 +11,9 @@ const Types = {
     ConferenceUser,
     MediaStream
 }
+
+const VoxeetSDK = new _VoxeetSDK();
+
 export {
     VoxeetSDK,
     VideoView,
