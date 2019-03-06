@@ -23,3 +23,6 @@ mkdir -p build/dist/ios
 cp ios/Cartfile build/dist/ios/Cartfile
 cp -r ios/RNVoxeetConferencekit build/dist/ios/RNVoxeetConferencekit
 cp -r ios/RNVoxeetConferencekit.xcodeproj build/dist/ios/RNVoxeetConferencekit.xcodeproj
+
+#copy back README
+cp README.md build/dist/README.md
