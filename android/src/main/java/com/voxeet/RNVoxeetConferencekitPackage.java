@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import voxeet.com.sdk.core.VoxeetEnvironmentHolder;
 import voxeet.com.sdk.core.preferences.VoxeetPreferences;
 
 public class RNVoxeetConferencekitPackage implements ReactPackage {
@@ -38,7 +39,7 @@ public class RNVoxeetConferencekitPackage implements ReactPackage {
 
         //force a default voxeet preferences manager
         //in sdk mode, no issues
-        VoxeetPreferences.init(application);
+        VoxeetPreferences.init(application, new VoxeetEnvironmentHolder(application));
         //deprecated but we can only use it using the cordova plugin - for now
         VoxeetPreferences.setDefaultActivity(RNIncomingCallActivity.class.getCanonicalName());
 
