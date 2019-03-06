@@ -3,6 +3,7 @@ package com.voxeet.specifics.waiting;
 import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReadableMap;
 import com.voxeet.RNVoxeetConferencekitModule;
 
 /**
@@ -10,11 +11,13 @@ import com.voxeet.RNVoxeetConferencekitModule;
  */
 
 public class WaitingJoinHolder extends WaitingAbstractHolder {
+    private ReadableMap map;
     private String conferenceId;
 
-    public WaitingJoinHolder(RNVoxeetConferencekitModule module, String conferenceId, Promise promise) {
+    public WaitingJoinHolder(RNVoxeetConferencekitModule module, String conferenceId, ReadableMap map, Promise promise) {
         super(module, promise);
         this.conferenceId = conferenceId;
+        this.map = map;
     }
 
     public String getConferenceId() {
@@ -24,8 +27,9 @@ public class WaitingJoinHolder extends WaitingAbstractHolder {
     @Override
     public void rejoin() {
         Log.d("WaitingJoinHolder", "rejoin: conferenceId:=" + conferenceId);
-        module.join(conferenceId, promise);
+        module.join(conferenceId, map, promise);
         module = null;
+        map = null;
         promise = null;
     }
 }

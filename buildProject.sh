@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# remove files
+mkdir -p build/dist
+rm -rf build/dist
+
 # cd to the library files
 cd lib
 

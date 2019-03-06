@@ -39,6 +39,7 @@ import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
 import eu.codlab.simplepromise.solve.Solver;
 import voxeet.com.sdk.core.FirebaseController;
+import voxeet.com.sdk.core.VoxeetEnvironmentHolder;
 import voxeet.com.sdk.core.VoxeetSdk;
 import voxeet.com.sdk.core.preferences.VoxeetPreferences;
 import voxeet.com.sdk.core.services.authenticate.token.RefreshTokenCallback;
@@ -79,7 +80,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         mAwaitingTokenCallback = new ArrayList<>();
         this.reactContext = reactContext;
 
-        VoxeetPreferences.init(reactContext);
+        VoxeetPreferences.init(reactContext, new VoxeetEnvironmentHolder(reactContext));
     }
 
     @Override
@@ -275,24 +276,37 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void create(@Nullable ReadableMap parameters, @NonNull final Promise promise) {
+    public void create(@Nullable ReadableMap options, @NonNull final Promise promise) {
         String conferenceId = null;
-        ReadableMap params = null;
-        ReadableMap metadata = null;
+        ReadableMap params;
         MetadataHolder holder = new MetadataHolder();
         ParamsHolder paramsHolder = new ParamsHolder();
 
-        if (null != parameters) {
+        if (null != options) {
 
-            if (parameters.hasKey("conferenceId"))
-                conferenceId = parameters.getString("conferenceId");
-            if (parameters.hasKey("params"))
-                params = parameters.getMap("params");
-            if (parameters.hasKey("metadata"))
-                metadata = parameters.getMap("metadata");
+            if (options.hasKey("alias"))
+                conferenceId = options.getString("alias");
+            if (options.hasKey("params")) {
+                params = options.getMap("params");
 
-            if (null != params && params.hasKey("videoCodec") && !params.isNull("videoCodec"))
-                paramsHolder.setVideoCodec(params.getString("videoCodec"));
+                if (null != params) {
+                    if (valid(params, "videoCodec"))
+                        paramsHolder.setVideoCodec(params.getString("videoCodec"));
+
+                    if (valid(params, "ttl"))
+                        paramsHolder.putValue("ttl", getInteger(params, "ttl"));
+
+                    if (valid(params, "rtcpMode"))
+                        paramsHolder.putValue("rtcpMode", getString(params, "rtcpMode"));
+
+                    if (valid(params, "mode"))
+                        paramsHolder.putValue("mode", getString(params, "mode"));
+
+                    if (valid(params, "liveRecording"))
+                        paramsHolder.putValue("liveRecording", getString(params, "liveRecording"));
+                }
+            }
+
         }
 
         VoxeetSdk.getInstance().getConferenceService()
@@ -312,13 +326,15 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void join(String conferenceId, final Promise promise) {
+    public void join(String conferenceId, @Nullable ReadableMap map, final Promise promise) {
+        //for now listener mode also needs microphone...
+        boolean listener = false;
 
         //TODO check for direct api call in react native to add listener in it
         if (!Validate.hasMicrophonePermissions(reactContext)) {
             Log.d(TAG, "join: NOT PERMISSION 1 " + getActivity());
             if (null != getActivity()) {
-                sWaitingHolder = new WaitingJoinHolder(this, conferenceId, promise);
+                sWaitingHolder = new WaitingJoinHolder(this, conferenceId, map, promise);
                 requestMicrophone();
                 return;
             } else {
@@ -326,24 +342,48 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             }
         }
 
+        if (null != map && valid(map, "user")) {
+            ReadableMap user = getMap(map, "user");
+            listener = null != user && "listener".equals(getString(user, "type"));
+        }
+
         VoxeetToolkit.getInstance().enable(VoxeetToolkit.getInstance().getConferenceToolkit());
 
-        VoxeetSdk.getInstance().getConferenceService()
-                .join(conferenceId)
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        promise.resolve(result);
+        //TODO when the SDK will be using join parameters, use it
+        Log.d(TAG, "join: joining as listener ? " + listener);
+        if (!listener) {
+            VoxeetSdk.getInstance().getConferenceService()
+                    .join(conferenceId)
+                    .then(new PromiseExec<Boolean, Object>() {
+                        @Override
+                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
+                            promise.resolve(result);
 
-                        checkStartVideo();
-                    }
-                })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        promise.reject(error);
-                    }
-                });
+                            checkStartVideo();
+                        }
+                    })
+                    .error(new ErrorPromise() {
+                        @Override
+                        public void onError(@NonNull Throwable error) {
+                            promise.reject(error);
+                        }
+                    });
+        } else {
+            VoxeetSdk.getInstance().getConferenceService()
+                    .listenConference(conferenceId)
+                    .then(new PromiseExec<Boolean, Object>() {
+                        @Override
+                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
+                            promise.resolve(result);
+                        }
+                    })
+                    .error(new ErrorPromise() {
+                        @Override
+                        public void onError(@NonNull Throwable error) {
+                            promise.reject(error);
+                        }
+                    });
+        }
     }
 
     @ReactMethod
@@ -620,5 +660,52 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         Validate.requestMandatoryPermissions(getActivity(),
                 new String[]{Manifest.permission.RECORD_AUDIO},
                 PermissionRefusedEvent.RESULT_MICROPHONE);
+    }
+
+    private int getInteger(@NonNull ReadableMap map, @NonNull String key) {
+        try {
+            return map.hasKey(key) ? map.getInt(key) : 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    private boolean getBoolean(@NonNull ReadableMap map, @NonNull String key) {
+        try {
+            return map.hasKey(key) && map.getBoolean(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Nullable
+    private ReadableMap getMap(@NonNull ReadableMap map, @NonNull String key) {
+        try {
+            return map.hasKey(key) ? map.getMap(key) : null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Nullable
+    private String getString(@NonNull ReadableMap map, @NonNull String key) {
+        try {
+            if (map.hasKey(key)) return map.getString(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private boolean valid(@NonNull ReadableMap map, @NonNull String key) {
+        try {
+            return map.hasKey(key) && !map.isNull(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

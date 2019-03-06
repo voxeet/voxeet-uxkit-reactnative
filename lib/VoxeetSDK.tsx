@@ -1,12 +1,10 @@
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import ConferenceUser from './types/ConferenceUser';
+import CreateOptions from './types/CreateConference';
+import JoinOptions from './types/JoinConference';
 const { RNVoxeetConferencekit } = NativeModules;
 
-import {
-  ConferenceUser,
-  MediaStream
-} from "./VoxeetTypes";
-
-interface RefreshCallback {
+export interface RefreshCallback {
   (): void;
 };
 
@@ -48,12 +46,12 @@ export default class _VoxeetSDK {
     return RNVoxeetConferencekit.disconnect();
   }
 
-  create(parameters: any): Promise<any> {
-    return RNVoxeetConferencekit.create(parameters);
+  create(options: CreateOptions): Promise<any> {
+    return RNVoxeetConferencekit.create(options);
   }
 
-  join(conferenceId: string): Promise<any> {
-    return RNVoxeetConferencekit.join(conferenceId);
+  join(conferenceId: string, options: JoinOptions = {}): Promise<any> {
+    return RNVoxeetConferencekit.join(conferenceId, options);
   }
 
   leave(): Promise<any> {

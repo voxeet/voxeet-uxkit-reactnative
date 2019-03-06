@@ -3,9 +3,9 @@
 
 
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import { requireNativeComponent, findNodeHandle, UIManager } from 'react-native';
-import { MediaStream } from "./VoxeetTypes";
+
+import MediaStream from "./types/MediaStream";
 
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 
