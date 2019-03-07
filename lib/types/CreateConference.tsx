@@ -22,6 +22,6 @@ export interface CreateParameters {
 }
 
 export default interface CreateOptions {
-  alias: string;
-  params: CreateParameters;
+  alias?: string;
+  params?: CreateParameters;
 }
