@@ -37,10 +37,10 @@ If you want to support CallKit (receiving incoming call when application is kill
 ```
 
 Input files:
-- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework
-- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework
-- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework
-- $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework
+- `$(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/Kingfisher.framework`
+- `$(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetSDK.framework`
+- `$(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/WebRTC.framework`
+- `$(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS/VoxeetConferenceKit.framework`
 
 6. Go to your target settings -> 'Build Settings' in `All` (the default view is in `Basic` mode):
 - **FRAMEWORK_SEARCH_PATHS** = $(PROJECT_DIR)/../node_modules/@voxeet/react-native-voxeet-conferencekit/ios/Carthage/Build/iOS
@@ -226,8 +226,7 @@ After the `permissions` required, add those xml nodes :
 
 ## Usage
 ```javascript
-import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
-import { ConferenceUser } from "@voxeet/react-native-voxeet-conferencekit/lib/VoxeetTypes";
+import { VoxeetSDK, ConferenceUser } from "@voxeet/react-native-voxeet-conferencekit";
 ...
 ```
 

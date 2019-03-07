@@ -91,12 +91,29 @@ RCT_EXPORT_METHOD(disconnect:(RCTPromiseResolveBlock)resolve
     });
 }
 
-RCT_EXPORT_METHOD(create:(NSDictionary *)parameters
+RCT_EXPORT_METHOD(create:(NSDictionary *)options
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
+    NSMutableDictionary *nativeOptions = [[NSMutableDictionary alloc] init];
+    [nativeOptions setValue:[options valueForKey:@"alias"] forKey:@"conferenceAlias"];
+    
+    NSDictionary *params = [options valueForKey:@"params"];
+    if (params) {
+        NSMutableDictionary *nativeOptionsParams = [[NSMutableDictionary alloc] init];
+        [nativeOptionsParams setValue:[params valueForKey:@"ttl"] forKey:@"ttl"];
+        [nativeOptionsParams setValue:[params valueForKey:@"rtcpMode"] forKey:@"rtcpMode"];
+        [nativeOptionsParams setValue:[params valueForKey:@"mode"] forKey:@"mode"];
+        [nativeOptionsParams setValue:[params valueForKey:@"videoCodec"] forKey:@"videoCodec"];
+        [nativeOptions setValue:nativeOptionsParams forKey:@"params"];
+        
+        if ([params valueForKey:@"liveRecording"]) {
+            [nativeOptions setValue:@{@"liveRecording": [params valueForKey:@"liveRecording"]} forKey:@"metadata"];
+        }
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[VoxeetSDK.shared conference] createWithParameters:parameters success:^(NSDictionary<NSString *,id> *response) {
+        [[VoxeetSDK.shared conference] createWithParameters:nativeOptions success:^(NSDictionary<NSString *,id> *response) {
             resolve(response);
         } fail:^(NSError *error) {
             reject(@"create_error", [error localizedDescription], nil);
@@ -105,12 +122,21 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)parameters
 }
 
 RCT_EXPORT_METHOD(join:(NSString *)conferenceID
+                  options:(NSDictionary *)options
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
+    NSMutableDictionary *nativeOptions = [[NSMutableDictionary alloc] init];
+    [nativeOptions setValue:[options valueForKey:@"alias"] forKey:@"conferenceAlias"];
+    
+    NSDictionary *user = [options valueForKey:@"user"];
+    if (user) {
+        [nativeOptions setValue:[user valueForKey:@"type"] forKey:@"participantType"];
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         BOOL video = VoxeetSDK.shared.conference.defaultVideo;
-        [[VoxeetSDK.shared conference] joinWithConferenceID:conferenceID video:video userInfo:nil success:^(NSDictionary<NSString *,id> *response) {
+        [[VoxeetSDK.shared conference] joinWithConferenceID:conferenceID video:video userInfo:nativeOptions success:^(NSDictionary<NSString *,id> *response) {
             resolve(response);
         } fail:^(NSError *error) {
             reject(@"join_error", [error localizedDescription], nil);
