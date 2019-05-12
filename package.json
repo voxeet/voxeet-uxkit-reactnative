@@ -12,6 +12,9 @@
       "darwin": "bash build_ios_frameworks.sh"
     }
   },
+  "dependencies": {
+    "cross-os": "^1.3.0",
+  },
   "devDependencies": {
     "@types/react": "^16.0.5",
     "@types/react-native": "^0.50.3",
