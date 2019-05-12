@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "bash build_ios_frameworks.sh",
+    "postinstall": "cross-os cmd",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-library": "./buildProject.sh && Echo Build completed!",
-    "publish-library": "npm run build-library && cd build/dist && npm publish && echo Package published!"
+    "publish-library": "npm run build-library && cd build/dist && npm publish && echo Package published!",
+    "cmd": {
+      "darwin": "bash build_ios_frameworks.sh"
+    }
   },
   "devDependencies": {
     "@types/react": "^16.0.5",
