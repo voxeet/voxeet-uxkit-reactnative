@@ -9,17 +9,18 @@ import com.voxeet.android.media.MediaStream;
 import com.voxeet.models.ConferenceUserUtil;
 import com.voxeet.models.MediaStreamUtil;
 
+import com.voxeet.sdk.events.success.ConferenceUserJoinedEvent;
+import com.voxeet.sdk.events.success.ConferenceUserLeftEvent;
+import com.voxeet.sdk.events.success.ConferenceUserQualityUpdatedEvent;
+import com.voxeet.sdk.events.success.ConferenceUserUpdatedEvent;
+import com.voxeet.sdk.events.success.ScreenStreamAddedEvent;
+import com.voxeet.sdk.events.success.ScreenStreamRemovedEvent;
+import com.voxeet.sdk.models.abs.ConferenceUser;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import voxeet.com.sdk.events.success.ConferenceUserJoinedEvent;
-import voxeet.com.sdk.events.success.ConferenceUserLeftEvent;
-import voxeet.com.sdk.events.success.ConferenceUserQualityUpdatedEvent;
-import voxeet.com.sdk.events.success.ConferenceUserUpdatedEvent;
-import voxeet.com.sdk.events.success.ScreenStreamAddedEvent;
-import voxeet.com.sdk.events.success.ScreenStreamRemovedEvent;
-import voxeet.com.sdk.models.impl.DefaultConferenceUser;
 
 public class ConferenceUserEventEmitter extends AbstractEventEmitter {
     public ConferenceUserEventEmitter(@NonNull ReactContext context, @NonNull EventBus eventBus) {
@@ -89,14 +90,14 @@ public class ConferenceUserEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    private void toMap(@NonNull WritableMap map, @NonNull DefaultConferenceUser user, @Nullable MediaStream mediaStream) {
+    private void toMap(@NonNull WritableMap map, @NonNull ConferenceUser user, @Nullable MediaStream mediaStream) {
         map.putMap("user", ConferenceUserUtil.toMap(user));
         if (null != mediaStream) {
             map.putMap("mediaStream", MediaStreamUtil.toMap(mediaStream));
         }
     }
 
-    private void toMap(@NonNull WritableMap map, @NonNull DefaultConferenceUser user) {
+    private void toMap(@NonNull WritableMap map, @NonNull ConferenceUser user) {
         map.putMap("user", ConferenceUserUtil.toMap(user));
     }
 

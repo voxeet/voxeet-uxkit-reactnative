@@ -10,14 +10,14 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.voxeet.RNVoxeetConferencekitModule;
+import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.factories.VoxeetIntentFactory;
+import com.voxeet.sdk.json.UserInfo;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 
 import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
 import eu.codlab.simplepromise.solve.Solver;
-import voxeet.com.sdk.core.VoxeetSdk;
-import voxeet.com.sdk.factories.VoxeetIntentFactory;
-import voxeet.com.sdk.json.UserInfo;
 
 public class RNIncomingBundleChecker {
 

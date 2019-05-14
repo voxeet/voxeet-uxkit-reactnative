@@ -13,15 +13,14 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.voxeet.android.media.MediaStream;
+import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.core.abs.ConferenceService;
 import com.voxeet.toolkit.views.VideoView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import voxeet.com.sdk.core.VoxeetSdk;
-import voxeet.com.sdk.core.impl.ConferenceSdkService;
 
 public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public static final int IS_ATTACHED = 1;
@@ -84,7 +83,7 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
         }
 
         if (null != map && map.hasKey(PEER_ID) && map.hasKey(LABEL)) {
-            ConferenceSdkService service = VoxeetSdk.getInstance().getConferenceService();
+            ConferenceService service = VoxeetSdk.getInstance().getConferenceService();
 
             String peerId = map.getString(PEER_ID);
             String label = map.getString(LABEL);

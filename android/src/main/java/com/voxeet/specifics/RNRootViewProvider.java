@@ -7,22 +7,17 @@ import android.support.annotation.NonNull;
 
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
+import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.events.error.ConferenceJoinedError;
+import com.voxeet.sdk.events.success.ConferenceDestroyedPushEvent;
+import com.voxeet.sdk.events.success.ConferenceJoinedSuccessEvent;
+import com.voxeet.sdk.events.success.ConferencePreJoinedEvent;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.providers.rootview.DefaultRootViewProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import voxeet.com.sdk.core.VoxeetSdk;
-import voxeet.com.sdk.events.error.ConferenceJoinedError;
-import voxeet.com.sdk.events.success.ConferenceDestroyedPushEvent;
-import voxeet.com.sdk.events.success.ConferenceJoinedSuccessEvent;
-import voxeet.com.sdk.events.success.ConferencePreJoinedEvent;
-
-/**
- * Created by kevinleperf on 25/05/2018.
- */
 
 public class RNRootViewProvider extends DefaultRootViewProvider {
     private final Application mApplication;

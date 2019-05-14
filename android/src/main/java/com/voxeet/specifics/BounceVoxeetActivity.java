@@ -4,13 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.voxeet.sdk.factories.VoxeetIntentFactory;
 import com.voxeet.toolkit.activities.VoxeetAppCompatActivity;
-
-import voxeet.com.sdk.factories.VoxeetIntentFactory;
-
-/**
- * Created by kevinleperf on 11/09/2018.
- */
 
 public class BounceVoxeetActivity extends VoxeetAppCompatActivity {
 

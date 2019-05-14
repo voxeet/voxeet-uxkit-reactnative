@@ -19,6 +19,21 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.models.ConferenceUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
+import com.voxeet.push.firebase.FirebaseController;
+import com.voxeet.sdk.core.VoxeetEnvironmentHolder;
+import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.core.preferences.VoxeetPreferences;
+import com.voxeet.sdk.core.services.authenticate.token.RefreshTokenCallback;
+import com.voxeet.sdk.core.services.authenticate.token.TokenCallback;
+import com.voxeet.sdk.events.error.PermissionRefusedEvent;
+import com.voxeet.sdk.events.success.ConferenceRefreshedEvent;
+import com.voxeet.sdk.events.success.SocketConnectEvent;
+import com.voxeet.sdk.events.success.SocketStateChangeEvent;
+import com.voxeet.sdk.json.UserInfo;
+import com.voxeet.sdk.json.internal.MetadataHolder;
+import com.voxeet.sdk.json.internal.ParamsHolder;
+import com.voxeet.sdk.models.ConferenceResponse;
+import com.voxeet.sdk.utils.Validate;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.specifics.RNVoxeetActivity;
 import com.voxeet.specifics.waiting.WaitingAbstractHolder;
@@ -38,21 +53,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
 import eu.codlab.simplepromise.solve.Solver;
-import voxeet.com.sdk.core.FirebaseController;
-import voxeet.com.sdk.core.VoxeetEnvironmentHolder;
-import voxeet.com.sdk.core.VoxeetSdk;
-import voxeet.com.sdk.core.preferences.VoxeetPreferences;
-import voxeet.com.sdk.core.services.authenticate.token.RefreshTokenCallback;
-import voxeet.com.sdk.core.services.authenticate.token.TokenCallback;
-import voxeet.com.sdk.events.error.PermissionRefusedEvent;
-import voxeet.com.sdk.events.success.ConferenceRefreshedEvent;
-import voxeet.com.sdk.events.success.SocketConnectEvent;
-import voxeet.com.sdk.events.success.SocketStateChangeEvent;
-import voxeet.com.sdk.json.UserInfo;
-import voxeet.com.sdk.json.internal.MetadataHolder;
-import voxeet.com.sdk.json.internal.ParamsHolder;
-import voxeet.com.sdk.models.ConferenceResponse;
-import voxeet.com.sdk.utils.Validate;
 
 public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
@@ -409,18 +409,14 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         //TODO expose in the SDK the ability to use the conferenceId
         Log.d(TAG, "invite: WARNING :: the provided conferenceId is not yet managed, please make sure you have joined the conference before trying to invite users");
 
-        List<String> strings = new ArrayList<>();
         List<UserInfo> users = null;
 
         if (null != participants) {
             users = toUserInfos(participants);
-            for (UserInfo user : users) {
-                strings.add(user.getExternalId());
-            }
         }
 
         VoxeetSdk.getInstance().getConferenceService()
-                .invite(strings)
+                .inviteUserInfos(conferenceId, users)
                 .then(new PromiseExec<List<ConferenceRefreshedEvent>, Object>() {
                     @Override
                     public void onCall(@Nullable List<ConferenceRefreshedEvent> result, @NonNull Solver<Object> solver) {
@@ -438,7 +434,9 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void sendBroadcastMessage(String message, final Promise promise) {
-        VoxeetSdk.getInstance().getConferenceService().sendBroadcastMessage(message)
+        String conferenceId = VoxeetSdk.getInstance().getConferenceService().getConferenceId();
+
+        VoxeetSdk.getInstance().getConferenceService().sendMessage(conferenceId, message)
                 .then(new PromiseExec<Boolean, Object>() {
                     @Override
                     public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {

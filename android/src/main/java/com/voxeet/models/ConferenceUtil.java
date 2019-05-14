@@ -7,20 +7,15 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.voxeet.sdk.models.ConferenceResponse;
+import com.voxeet.sdk.models.HistoryConference;
+import com.voxeet.sdk.models.MetaData;
+import com.voxeet.sdk.models.SdkParticipant;
+import com.voxeet.sdk.models.SubscribeConference;
+import com.voxeet.sdk.models.abs.Conference;
+import com.voxeet.sdk.models.abs.ConferenceUser;
 
 import java.util.List;
-
-import voxeet.com.sdk.models.ConferenceResponse;
-import voxeet.com.sdk.models.HistoryConference;
-import voxeet.com.sdk.models.MetaData;
-import voxeet.com.sdk.models.SdkParticipant;
-import voxeet.com.sdk.models.SubscribeConference;
-import voxeet.com.sdk.models.impl.DefaultConference;
-import voxeet.com.sdk.models.impl.DefaultConferenceUser;
-
-/**
- * Created by kevinleperf on 11/11/2018.
- */
 
 public final class ConferenceUtil {
     private ConferenceUtil() {
@@ -39,15 +34,15 @@ public final class ConferenceUtil {
     }
 
     @NonNull
-    public static WritableMap toMap(@NonNull DefaultConference conference) {
+    public static WritableMap toMap(@NonNull Conference conference) {
         WritableMap map = new WritableNativeMap();
         map.putString("conferenceId", conference.getConferenceId());
         map.putString("conferenceAlias", conference.getConferenceAlias());
         map.putString("conferenceType", conference.getConferenceType());
 
         WritableNativeArray array = new WritableNativeArray();
-        List<DefaultConferenceUser> users = conference.getConferenceUsers();
-        for (DefaultConferenceUser user : users) {
+        List<ConferenceUser> users = conference.getConferenceUsers();
+        for (ConferenceUser user : users) {
             array.pushMap(ConferenceUserUtil.toMap(user));
         }
         map.putArray("conferenceUsers", array);

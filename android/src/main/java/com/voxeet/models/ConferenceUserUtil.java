@@ -6,14 +6,9 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
-
-import voxeet.com.sdk.json.UserInfo;
-import voxeet.com.sdk.models.SdkParticipant;
-import voxeet.com.sdk.models.impl.DefaultConferenceUser;
-
-/**
- * Created by kevinleperf on 11/11/2018.
- */
+import com.voxeet.sdk.json.UserInfo;
+import com.voxeet.sdk.models.SdkParticipant;
+import com.voxeet.sdk.models.abs.ConferenceUser;
 
 public final class ConferenceUserUtil {
     private ConferenceUserUtil() {
@@ -21,7 +16,7 @@ public final class ConferenceUserUtil {
     }
 
     @NonNull
-    public static WritableMap toMap(@NonNull DefaultConferenceUser user) {
+    public static WritableMap toMap(@NonNull ConferenceUser user) {
         UserInfo userInfo = user.getUserInfo();
 
         WritableMap map = new WritableNativeMap();
@@ -37,10 +32,10 @@ public final class ConferenceUserUtil {
         return map;
     }
 
-    public static WritableArray toMap(Iterable<DefaultConferenceUser> conferenceUsers) {
+    public static WritableArray toMap(Iterable<ConferenceUser> conferenceUsers) {
         WritableNativeArray array = new WritableNativeArray();
         if(null != conferenceUsers) {
-            for (DefaultConferenceUser user: conferenceUsers) {
+            for (ConferenceUser user: conferenceUsers) {
                 array.pushMap(toMap(user));
             }
         }

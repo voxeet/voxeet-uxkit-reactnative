@@ -14,13 +14,19 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
+def ext = rootProject.ext
+def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 28
+def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "28.0.3"
+def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 14
+def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 28
+
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion _compile
+    buildToolsVersion _buildTools
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion _minSdk
+        targetSdkVersion _targetSdk
         versionCode 1
         versionName "1.0"
     }

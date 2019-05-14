@@ -10,6 +10,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.voxeet.events.ConferenceStatusEventEmitter;
 import com.voxeet.notification.RNIncomingCallActivity;
+import com.voxeet.sdk.core.VoxeetEnvironmentHolder;
+import com.voxeet.sdk.core.preferences.VoxeetPreferences;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.implementation.overlays.OverlayState;
@@ -20,9 +22,6 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import voxeet.com.sdk.core.VoxeetEnvironmentHolder;
-import voxeet.com.sdk.core.preferences.VoxeetPreferences;
 
 public class RNVoxeetConferencekitPackage implements ReactPackage {
 

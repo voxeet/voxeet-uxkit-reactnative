@@ -10,6 +10,13 @@ import android.support.annotation.Nullable;
 import com.facebook.react.ReactActivity;
 import com.voxeet.RNVoxeetConferencekitModule;
 import com.voxeet.RNVoxeetConferencekitPackage;
+import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.core.services.ScreenShareService;
+import com.voxeet.sdk.events.error.ConferenceJoinedError;
+import com.voxeet.sdk.events.error.PermissionRefusedEvent;
+import com.voxeet.sdk.events.success.ConferenceJoinedSuccessEvent;
+import com.voxeet.sdk.events.success.ConferencePreJoinedEvent;
+import com.voxeet.sdk.utils.Validate;
 import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.toolkit.activities.notification.IncomingCallFactory;
 
@@ -20,13 +27,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import eu.codlab.simplepromise.solve.ErrorPromise;
 import eu.codlab.simplepromise.solve.PromiseExec;
 import eu.codlab.simplepromise.solve.Solver;
-import voxeet.com.sdk.core.VoxeetSdk;
-import voxeet.com.sdk.core.services.ScreenShareService;
-import voxeet.com.sdk.events.error.ConferenceJoinedError;
-import voxeet.com.sdk.events.error.PermissionRefusedEvent;
-import voxeet.com.sdk.events.success.ConferenceJoinedSuccessEvent;
-import voxeet.com.sdk.events.success.ConferencePreJoinedEvent;
-import voxeet.com.sdk.utils.Validate;
 
 /**
  * Class managing the communication between the Activity and the underlying Bundle manager
