@@ -452,6 +452,26 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void setAudio3DEnabled(boolean enabled) {
+        VoxeetSdk.getInstance().getMediaService().setAudio3DEnabled(enabled);
+    }
+
+    @ReactMethod
+    public void setTelecomMode(boolean enabled) {
+        VoxeetSdk.getInstance().getConferenceService().setTelecomMode(enabled);
+    }
+
+    @ReactMethod
+    public void isAudio3DEnabled(Promise promise) {
+        promise.resolve(VoxeetSdk.getInstance().getMediaService().isAudio3DEnabled());
+    }
+
+    @ReactMethod
+    public void isTelecomMode(Promise promise) {
+        promise.resolve(VoxeetSdk.getInstance().getConferenceService().isTelecomMode());
+    }
+
+    @ReactMethod
     public void appearMaximized(boolean activate) {
         VoxeetToolkit.getInstance().getConferenceToolkit().setDefaultOverlayState(activate ?
                 OverlayState.EXPANDED : OverlayState.MINIMIZED);
