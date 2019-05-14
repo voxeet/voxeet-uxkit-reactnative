@@ -1,5 +1,16 @@
-//no buildscript
-//the subproject will use the provided one
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
+    }
+}
 
 apply plugin: 'com.android.library'
 
@@ -26,7 +37,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation ('com.voxeet.sdk:toolkit:1.4.16') {
+    implementation ('com.voxeet.sdk:toolkit:2.0.23') {
         transitive = true
     }
 }
