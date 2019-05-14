@@ -66,6 +66,14 @@ export default class _VoxeetSDK {
     return RNVoxeetConferencekit.sendBroadcastMessage(message);
   }
 
+  isTelecomMode(): Promise<boolean> {
+    return RNVoxeetConferencekit.isTelecomMode();
+  }
+
+  isAudio3DEnabled(): Promise<boolean> {
+    return RNVoxeetConferencekit.isAudio3DEnabled();
+  }
+
   appearMaximized(enable: boolean): boolean {
     RNVoxeetConferencekit.appearMaximized(enable);
     return true;
