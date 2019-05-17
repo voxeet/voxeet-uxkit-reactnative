@@ -209,6 +209,32 @@ RCT_EXPORT_METHOD(defaultBuiltInSpeaker:(BOOL)enable)
     });
 }
 
+RCT_EXPORT_METHOD(setAudio3DEnabled:(BOOL)enable)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VoxeetSDK.shared.audio3D = enable;
+    });
+}
+
+RCT_EXPORT_METHOD(setTelecomMode:(BOOL)enable)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VoxeetConferenceKit.shared.telecom = enable;
+    });
+}
+
+RCT_EXPORT_METHOD(isAudio3DEnabled:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve(VoxeetSDK.shared.audio3D);
+}
+
+RCT_EXPORT_METHOD(isTelecomMode:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve(VoxeetConferenceKit.shared.telecom);
+}
+
 RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
