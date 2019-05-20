@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation ('com.voxeet.sdk:toolkit:2.0.23') {
+    compile ('com.voxeet.sdk:toolkit:2.0.27.4') {
         transitive = true
     }
 }
