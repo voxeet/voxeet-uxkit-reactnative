@@ -43,7 +43,7 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        VoxeetSDK.shared.pushNotification.type = VTPushNotificationTypeNone;
+        VoxeetSDK.shared.pushNotification.type = VTPushNotificationTypeCallKit;
         
         [VoxeetSDK.shared initializeWithAccessToken:accessToken userInfo:nil refreshTokenClosure:^(void (^closure)(NSString *)) {
             self.refreshAccessTokenClosure = closure;
