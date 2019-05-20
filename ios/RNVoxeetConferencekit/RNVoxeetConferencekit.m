@@ -212,7 +212,7 @@ RCT_EXPORT_METHOD(defaultBuiltInSpeaker:(BOOL)enable)
 RCT_EXPORT_METHOD(setAudio3DEnabled:(BOOL)enable)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        VoxeetSDK.shared.audio3D = enable;
+        VoxeetSDK.shared.conference.audio3D = enable;
     });
 }
 
@@ -226,13 +226,13 @@ RCT_EXPORT_METHOD(setTelecomMode:(BOOL)enable)
 RCT_EXPORT_METHOD(isAudio3DEnabled:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve(VoxeetSDK.shared.audio3D);
+    resolve([NSNumber numberWithBool:VoxeetSDK.shared.conference.audio3D]);
 }
 
 RCT_EXPORT_METHOD(isTelecomMode:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve(VoxeetConferenceKit.shared.telecom);
+    resolve([NSNumber numberWithBool:VoxeetConferenceKit.shared.telecom]);
 }
 
 RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
