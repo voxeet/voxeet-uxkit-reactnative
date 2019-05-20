@@ -30,7 +30,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        VoxeetSDK.shared.callKit = YES;
+        VoxeetSDK.shared.pushNotification.type = VTPushNotificationTypeCallKit;
         
         [VoxeetSDK.shared initializeWithConsumerKey:consumerKey consumerSecret:consumerSecret userInfo:nil connectSession:YES];
         [VoxeetConferenceKit.shared initialize];
@@ -43,7 +43,8 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        VoxeetSDK.shared.callKit = NO;
+        VoxeetSDK.shared.pushNotification.type = VTPushNotificationTypeNone;
+        
         [VoxeetSDK.shared initializeWithAccessToken:accessToken userInfo:nil refreshTokenClosure:^(void (^closure)(NSString *)) {
             self.refreshAccessTokenClosure = closure;
             if (self->_hasListeners) {
