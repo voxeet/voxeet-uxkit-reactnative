@@ -1,2 +1,2 @@
-github "voxeet/voxeet-ios-conferencekit" == 1.2.0
-github "voxeet/voxeet-ios-sdk" == 1.4.0
+github "voxeet/voxeet-ios-conferencekit" == 1.2.1
+github "voxeet/voxeet-ios-sdk" == 1.4.2
