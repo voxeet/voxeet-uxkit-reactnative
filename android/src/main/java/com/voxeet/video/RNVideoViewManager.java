@@ -14,11 +14,10 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.sdk.core.VoxeetSdk;
-import com.voxeet.sdk.core.abs.ConferenceService;
-import com.voxeet.toolkit.views.VideoView;
+import com.voxeet.sdk.core.services.ConferenceService;
+import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.views.VideoView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +27,7 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
 
     public static final String PEER_ID = "peerId";
     public static final String LABEL = "label";
+    public static final String STREAM_TYPE = "type";
 
     private static final String SCALE_FIT = "fit";
     private static final String SCALE_FILL = "fill";
@@ -47,7 +47,8 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     @Override
     protected VideoView createViewInstance(@NonNull ThemedReactContext reactContext) {
 
-        if(null == eventDispatcher) eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        if (null == eventDispatcher)
+            eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         return new VideoView(reactContext);
     }
 
@@ -69,48 +70,38 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
         view.setFlip(hasFlip);
     }
 
-    @ReactProp(name = "isAutoUnAttach", defaultBoolean = true)
-    public void isAutoUnAttach(@NonNull VideoView view,
-                               boolean isAutoUnAttach) {
-        view.setAutoUnAttach(isAutoUnAttach);
-    }
-
     @ReactProp(name = "attach")
     public void attach(@NonNull VideoView view,
                        @Nullable ReadableMap map) {
-        if (null == VoxeetSdk.getInstance()) {
+        ConferenceService service = VoxeetSdk.conference();
+        if (null == service) {
             Log.d(TAG, "VideoView :: SDK NOT INITIALIZED");
         }
 
         if (null != map && map.hasKey(PEER_ID) && map.hasKey(LABEL)) {
-            ConferenceService service = VoxeetSdk.getInstance().getConferenceService();
-
             String peerId = map.getString(PEER_ID);
             String label = map.getString(LABEL);
 
             if (null == peerId) peerId = "";
             if (null == label) label = "";
 
-            MediaStream mediaStream = tryToFindMediaStream(peerId, label, service.getMapOfStreams());
+            MediaStream mediaStream = tryToFindMediaStream(peerId, label);
 
-            if (null == mediaStream) {
-                mediaStream = tryToFindMediaStream(peerId, label, service.getMapOfScreenShareStreams());
-            }
-
-            if (null != mediaStream) {
-                view.attach(peerId, mediaStream, true);
-            }
+            if (null != mediaStream) view.attach(peerId, mediaStream);
         } else {
             view.unAttach();
         }
     }
 
     @Nullable
-    private MediaStream tryToFindMediaStream(String peerId, String label, HashMap<String, MediaStream> mapOfStreams) {
-        Map<String, MediaStream> streams = VoxeetSdk.getInstance().getConferenceService().getMapOfStreams();
+    private MediaStream tryToFindMediaStream(String peerId, String label) {
+        ConferenceService conferenceService = VoxeetSdk.conference();
+        if (null == conferenceService) return null;
 
-        List<MediaStream> list = new ArrayList<>();
-        list.addAll(streams.values());
+        User user = conferenceService.findUserById(peerId);
+        if (null == user) return null;
+
+        List<MediaStream> list = user.streams();
 
         for (MediaStream in_list : list) {
             if (null != in_list && peerId.equals(in_list.peerId()) && label.equals(in_list.label())) {

@@ -7,13 +7,13 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.voxeet.sdk.models.ConferenceResponse;
-import com.voxeet.sdk.models.HistoryConference;
-import com.voxeet.sdk.models.MetaData;
-import com.voxeet.sdk.models.SdkParticipant;
-import com.voxeet.sdk.models.SubscribeConference;
-import com.voxeet.sdk.models.abs.Conference;
-import com.voxeet.sdk.models.abs.ConferenceUser;
+import com.voxeet.sdk.models.Conference;
+import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.v1.CreateConferenceResult;
+import com.voxeet.sdk.models.v1.HistoryConference;
+import com.voxeet.sdk.models.v1.MetaData;
+import com.voxeet.sdk.models.v1.SdkParticipant;
+import com.voxeet.sdk.models.v1.SubscribeConference;
 
 import java.util.List;
 
@@ -23,12 +23,12 @@ public final class ConferenceUtil {
     }
 
     @NonNull
-    public static WritableMap toMap(@Nullable ConferenceResponse response) {
+    public static WritableMap toMap(@Nullable CreateConferenceResult response) {
         WritableMap map = new WritableNativeMap();
         if(null != response) {
-            map.putString("conferenceId", response.getConfId());
-            map.putString("conferenceAlias", response.getConfAlias());
-            map.putBoolean("isNew", response.isNew());
+            map.putString("conferenceId", response.conferenceId);
+            map.putString("conferenceAlias", response.conferenceAlias);
+            map.putBoolean("isNew", response.isNew);
         }
         return map;
     }
@@ -36,13 +36,12 @@ public final class ConferenceUtil {
     @NonNull
     public static WritableMap toMap(@NonNull Conference conference) {
         WritableMap map = new WritableNativeMap();
-        map.putString("conferenceId", conference.getConferenceId());
-        map.putString("conferenceAlias", conference.getConferenceAlias());
-        map.putString("conferenceType", conference.getConferenceType());
+        map.putString("conferenceId", conference.getId());
+        map.putString("conferenceAlias", conference.getAlias());
 
         WritableNativeArray array = new WritableNativeArray();
-        List<ConferenceUser> users = conference.getConferenceUsers();
-        for (ConferenceUser user : users) {
+        List<User> users = conference.getUsers();
+        for (User user : users) {
             array.pushMap(ConferenceUserUtil.toMap(user));
         }
         map.putArray("conferenceUsers", array);

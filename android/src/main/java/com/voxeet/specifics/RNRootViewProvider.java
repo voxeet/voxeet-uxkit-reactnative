@@ -8,10 +8,9 @@ import android.support.annotation.NonNull;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.sdk.core.VoxeetSdk;
-import com.voxeet.sdk.events.error.ConferenceJoinedError;
-import com.voxeet.sdk.events.success.ConferenceDestroyedPushEvent;
-import com.voxeet.sdk.events.success.ConferenceJoinedSuccessEvent;
-import com.voxeet.sdk.events.success.ConferencePreJoinedEvent;
+import com.voxeet.sdk.core.services.SessionService;
+import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.providers.rootview.DefaultRootViewProvider;
 
@@ -54,8 +53,8 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
 
-            if (null != VoxeetSdk.getInstance() && !EventBus.getDefault().isRegistered(this)) {
-                VoxeetSdk.getInstance().register(mApplication, this);
+            if (null != VoxeetSdk.instance()) {
+                VoxeetSdk.instance().register(this);
             }
 
             if (!EventBus.getDefault().isRegistered(this)) {
@@ -64,7 +63,8 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
             RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
-                if (null != VoxeetSdk.getInstance() && VoxeetSdk.getInstance().isSocketOpen()) {
+                SessionService sessionService = VoxeetSdk.session();
+                if (null != sessionService && sessionService.isSocketOpen()) {
                     checker.onAccept();
                     RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE = null;
                 }
@@ -106,27 +106,20 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceDestroyedPushEvent event) {
-        if (mRNIncomingBundleChecker != null)
-            mRNIncomingBundleChecker.flushIntent();
+    public void onEvent(ConferenceStateEvent event) {
+        switch (event.state) {
+            case JOINING:
+            case JOINED:
+            case JOINED_ERROR:
+                if (mRNIncomingBundleChecker != null)
+                    mRNIncomingBundleChecker.flushIntent();
+            default:
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferencePreJoinedEvent event) {
+    public void onEvent(ConferenceDestroyedPush event) {
         if (mRNIncomingBundleChecker != null)
             mRNIncomingBundleChecker.flushIntent();
     }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceJoinedSuccessEvent event) {
-        if (mRNIncomingBundleChecker != null)
-            mRNIncomingBundleChecker.flushIntent();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceJoinedError event) {
-        if (mRNIncomingBundleChecker != null)
-            mRNIncomingBundleChecker.flushIntent();
-    }
-
 }

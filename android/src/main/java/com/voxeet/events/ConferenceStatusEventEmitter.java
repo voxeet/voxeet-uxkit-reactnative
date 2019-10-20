@@ -4,120 +4,56 @@ import android.support.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
-import com.voxeet.models.ConferenceUserUtil;
-import com.voxeet.models.ConferenceUtil;
-
-import org.greenrobot.eventbus.EventBus;
-
 import com.voxeet.sdk.events.error.CameraSwitchErrorEvent;
-import com.voxeet.sdk.events.error.ConferenceCreatedError;
-import com.voxeet.sdk.events.error.ConferenceJoinedError;
-import com.voxeet.sdk.events.error.ConferenceLeftError;
 import com.voxeet.sdk.events.error.GetConferenceHistoryErrorEvent;
 import com.voxeet.sdk.events.error.GetConferenceStatusErrorEvent;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.error.ReplayConferenceErrorEvent;
 import com.voxeet.sdk.events.error.SdkLogoutErrorEvent;
-import com.voxeet.sdk.events.error.SubscribeConferenceErrorEvent;
-import com.voxeet.sdk.events.error.SubscribeForCallConferenceErrorEvent;
 import com.voxeet.sdk.events.error.UnsubscribeFromCallConferenceErrorEvent;
 import com.voxeet.sdk.events.promises.PromiseParticipantAddedErrorEventException;
-import com.voxeet.sdk.events.success.AddConferenceParticipantResultEvent;
-import com.voxeet.sdk.events.success.CameraSwitchSuccessEvent;
-import com.voxeet.sdk.events.success.ConferenceCreationSuccess;
-import com.voxeet.sdk.events.success.ConferenceDestroyedPushEvent;
-import com.voxeet.sdk.events.success.ConferenceEndedEvent;
-import com.voxeet.sdk.events.success.ConferenceJoinedSuccessEvent;
-import com.voxeet.sdk.events.success.ConferenceLeftSuccessEvent;
-import com.voxeet.sdk.events.success.ConferencePreJoinedEvent;
-import com.voxeet.sdk.events.success.ConferenceRefreshedEvent;
-import com.voxeet.sdk.events.success.ConferenceStatsEvent;
-import com.voxeet.sdk.events.success.ConferenceUserCallDeclinedEvent;
-import com.voxeet.sdk.events.success.ConferenceUsersInvitedEvent;
-import com.voxeet.sdk.events.success.DeclineConferenceResultEvent;
-import com.voxeet.sdk.events.success.GetConferenceHistoryEvent;
-import com.voxeet.sdk.events.success.GetConferenceStatusEvent;
-import com.voxeet.sdk.events.success.IncomingCallEvent;
-import com.voxeet.sdk.events.success.QualityIndicators;
-import com.voxeet.sdk.events.success.SdkLogoutSuccessEvent;
-import com.voxeet.sdk.events.success.SendBroadcastResultEvent;
-import com.voxeet.sdk.events.success.StartRecordingResultEvent;
-import com.voxeet.sdk.events.success.StartScreenShareAnswerEvent;
-import com.voxeet.sdk.events.success.StartVideoAnswerEvent;
-import com.voxeet.sdk.events.success.StopRecordingResultEvent;
-import com.voxeet.sdk.events.success.StopScreenShareAnswerEvent;
-import com.voxeet.sdk.events.success.StopVideoAnswerEvent;
-import com.voxeet.sdk.events.success.SubscribeConferenceEvent;
-import com.voxeet.sdk.events.success.SubscribeForCallConferenceAnswerEvent;
-import com.voxeet.sdk.events.success.UnSubscribeConferenceAnswerEvent;
-import com.voxeet.sdk.events.success.UnSubscribeFromConferenceAnswerEvent;
+import com.voxeet.sdk.events.sdk.CameraSwitchSuccessEvent;
+import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.events.sdk.ConferenceUserCallDeclinedEvent;
+import com.voxeet.sdk.events.sdk.DeclineConferenceResultEvent;
+import com.voxeet.sdk.events.sdk.IncomingCallEvent;
+import com.voxeet.sdk.events.sdk.QualityIndicators;
+import com.voxeet.sdk.events.sdk.SdkLogoutSuccessEvent;
+import com.voxeet.sdk.events.sdk.StartScreenShareAnswerEvent;
+import com.voxeet.sdk.events.sdk.StopScreenShareAnswerEvent;
+import com.voxeet.sdk.events.sdk.StopVideoAnswerEvent;
+import com.voxeet.sdk.events.success.not_to_fire.AddConferenceParticipantResultEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
 import com.voxeet.sdk.json.RecordingStatusUpdateEvent;
+import com.voxeet.sdk.json.StartVideoResponse;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
 
     public ConferenceStatusEventEmitter(@NonNull ReactContext context, @NonNull EventBus eventBus) {
         super(context, eventBus);
 
-        register(new EventFormatterCallback<ConferenceCreatedError>(ConferenceCreatedError.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceCreatedError instance) {
-                map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<DeclineConferenceResultEvent>(DeclineConferenceResultEvent.class) {
+        register(new EventFormatterCallback<DeclineConferenceResultEvent>(DeclineConferenceResultEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull DeclineConferenceResultEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<StartScreenShareAnswerEvent>(StartScreenShareAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull StartScreenShareAnswerEvent instance) {
-                map.putBoolean("isAlreadyStarted", instance.isAlreadyStarted());
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<StopScreenShareAnswerEvent>(StopScreenShareAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull StopScreenShareAnswerEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
+                map.putBoolean("isSuccess", instance.success);
             }
         }).register(new EventFormatterCallback<PermissionRefusedEvent>(PermissionRefusedEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull PermissionRefusedEvent instance) {
                 map.putString("permission", instance.getPermission().name());
             }
-        }).register(new EventFormatterCallback<StartVideoAnswerEvent>(StartVideoAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull StartVideoAnswerEvent instance) {
-                map.putBoolean("isAlreadyStarted", instance.isAlreadyStarted());
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<StopVideoAnswerEvent>(StopVideoAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull StopVideoAnswerEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
         }).register(new EventFormatterCallback<PromiseParticipantAddedErrorEventException>(PromiseParticipantAddedErrorEventException.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull PromiseParticipantAddedErrorEventException instance) {
                 map.putString("message", instance.getEvent().message());
             }
-        }).register(new EventFormatterCallback<ConferenceCreationSuccess>(ConferenceCreationSuccess.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceCreationSuccess instance) {
-                map.putString("conferenceId", instance.getConfId());
-                map.putString("conferenceAlias", instance.getConfAlias());
-            }
         }).register(new EventFormatterCallback<AddConferenceParticipantResultEvent>(AddConferenceParticipantResultEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull AddConferenceParticipantResultEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<ConferenceRefreshedEvent>(ConferenceRefreshedEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceRefreshedEvent instance) {
-                map.putMap("user", ConferenceUserUtil.toMap(instance.getUser()));
-                map.putString("userId", instance.getUserId());
+                map.putBoolean("isSuccess", instance.success);
             }
         }).register(new EventFormatterCallback<SdkLogoutSuccessEvent>(SdkLogoutSuccessEvent.class) {
             @Override
@@ -134,32 +70,17 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             void transform(@NonNull WritableMap map, @NonNull ReplayConferenceErrorEvent instance) {
                 map.putString("message", instance.message());
             }
-        }).register(new EventFormatterCallback<StartRecordingResultEvent>(StartRecordingResultEvent.class) {
+        }).register(new EventFormatterCallback<ConferenceStateEvent>(ConferenceStateEvent.class) {
             @Override
-            void transform(@NonNull WritableMap map, @NonNull StartRecordingResultEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<StopRecordingResultEvent>(StopRecordingResultEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull StopRecordingResultEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<GetConferenceStatusEvent>(GetConferenceStatusEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull GetConferenceStatusEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-                map.putString("conferenceAlias", instance.getAliasId());
-                map.putString("type", instance.getType());
+            void transform(@NonNull WritableMap map, @NonNull ConferenceStateEvent instance) {
+                map.putString("conferenceId", null != instance.conference ? instance.conference.getId() : null);
+                map.putString("conferenceAlias", instance.conferenceAlias);
+                map.putString("state", instance.state.name());
             }
         }).register(new EventFormatterCallback<GetConferenceStatusErrorEvent>(GetConferenceStatusErrorEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull GetConferenceStatusErrorEvent instance) {
                 map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<GetConferenceHistoryEvent>(GetConferenceHistoryEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull GetConferenceHistoryEvent instance) {
-                map.putArray("histories", ConferenceUtil.toMap(instance.getItems()));
             }
         }).register(new EventFormatterCallback<GetConferenceHistoryErrorEvent>(GetConferenceHistoryErrorEvent.class) {
             @Override
@@ -169,138 +90,56 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         }).register(new EventFormatterCallback<CameraSwitchSuccessEvent>(CameraSwitchSuccessEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull CameraSwitchSuccessEvent instance) {
-                map.putBoolean("isFront", instance.isFront());
+                map.putBoolean("isFront", instance.isFront);
             }
         }).register(new EventFormatterCallback<CameraSwitchErrorEvent>(CameraSwitchErrorEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull CameraSwitchErrorEvent instance) {
                 map.putString("message", instance.message());
             }
-        }).register(new EventFormatterCallback<SubscribeConferenceEvent>(SubscribeConferenceEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull SubscribeConferenceEvent instance) {
-                map.putMap("conference", ConferenceUtil.toMap(instance.getSubscribeConference()));
-            }
-        }).register(new EventFormatterCallback<SubscribeConferenceErrorEvent>(SubscribeConferenceErrorEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull SubscribeConferenceErrorEvent instance) {
-                map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<UnSubscribeConferenceAnswerEvent>(UnSubscribeConferenceAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull UnSubscribeConferenceAnswerEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<SubscribeForCallConferenceAnswerEvent>(SubscribeForCallConferenceAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull SubscribeForCallConferenceAnswerEvent instance) {
-                map.putString("conferenceId", instance.getSubscribeConference());
-            }
-        }).register(new EventFormatterCallback<SubscribeForCallConferenceErrorEvent>(SubscribeForCallConferenceErrorEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull SubscribeForCallConferenceErrorEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-            }
-        }).register(new EventFormatterCallback<UnSubscribeFromConferenceAnswerEvent>(UnSubscribeFromConferenceAnswerEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull UnSubscribeFromConferenceAnswerEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-            }
         }).register(new EventFormatterCallback<UnsubscribeFromCallConferenceErrorEvent>(UnsubscribeFromCallConferenceErrorEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull UnsubscribeFromCallConferenceErrorEvent instance) {
                 map.putString("conferenceId", instance.getConferenceId());
             }
-        }).register(new EventFormatterCallback<ConferencePreJoinedEvent>(ConferencePreJoinedEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferencePreJoinedEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-                map.putString("conferenceAlias", instance.getAliasId());
-            }
-        }).register(new EventFormatterCallback<ConferenceJoinedError>(ConferenceJoinedError.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceJoinedError instance) {
-                map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<ConferenceJoinedSuccessEvent>(ConferenceJoinedSuccessEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceJoinedSuccessEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-                map.putString("conferenceAlias", instance.getAliasId());
-            }
-        }).register(new EventFormatterCallback<ConferenceUsersInvitedEvent>(ConferenceUsersInvitedEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceUsersInvitedEvent instance) {
-                map.putArray("conferenceUsers", ConferenceUserUtil.toMap(instance.getConferenceUsers()));
-            }
-        }).register(new EventFormatterCallback<SendBroadcastResultEvent>(SendBroadcastResultEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull SendBroadcastResultEvent instance) {
-                map.putBoolean("isSuccess", instance.isSuccess());
-            }
-        }).register(new EventFormatterCallback<ConferenceLeftSuccessEvent>(ConferenceLeftSuccessEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceLeftSuccessEvent instance) {
-                map.putInt("remainingUsers", instance.getRemainingUsers());
-            }
-        }).register(new EventFormatterCallback<ConferenceLeftError>(ConferenceLeftError.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceLeftError instance) {
-                map.putString("message", instance.message());
-            }
         }).register(new EventFormatterCallback<QualityIndicators>(QualityIndicators.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull QualityIndicators instance) {
-                map.putDouble("mos", instance.getMos());
-            }
-        }).register(new EventFormatterCallback<ConferenceStatsEvent>(ConferenceStatsEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceStatsEvent instance) {
-                map.putString("conferenceId", instance.getEvent().getConference_id());
+                map.putDouble("mos", instance.mos);
             }
         }).register(new EventFormatterCallback<IncomingCallEvent>(IncomingCallEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull IncomingCallEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
+                map.putString("conferenceId", instance.conferenceId);
             }
         }).register(new EventFormatterCallback<RecordingStatusUpdateEvent>(RecordingStatusUpdateEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull RecordingStatusUpdateEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-                map.putString("userId", instance.getUserId());
-                map.putString("recordingStatus", instance.getRecordingStatus());
+                map.putString("conferenceId", instance.conferenceId);
+                map.putString("userId", instance.userId);
+                map.putString("recordingStatus", instance.recordingStatus);
                 map.putString("type", instance.getType());
             }
         }).register(new EventFormatterCallback<ConferenceUserCallDeclinedEvent>(ConferenceUserCallDeclinedEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull ConferenceUserCallDeclinedEvent instance) {
-                map.putString("conferenceId", instance.getConfId());
-                map.putString("userId", instance.getUserId());
-            }
-        }).register(new EventFormatterCallback<ConferenceDestroyedPushEvent>(ConferenceDestroyedPushEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceDestroyedPushEvent instance) {
-                map.putString("conferenceId", instance.getPush().getConferenceId());
+                map.putString("conferenceId", instance.conferenceId);
+                map.putString("userId", instance.userId);
             }
         }).register(new EventFormatterCallback<ConferenceDestroyedPush>(ConferenceDestroyedPush.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull ConferenceDestroyedPush instance) {
-                map.putString("conferenceId", instance.getConferenceId());
-            }
-        }).register(new EventFormatterCallback<ConferenceEndedEvent>(ConferenceEndedEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceEndedEvent instance) {
-                map.putString("conferenceId", instance.getEvent().getConferenceId());
+                map.putString("conferenceId", instance.conferenceId);
             }
         }).register(new EventFormatterCallback<ConferenceEnded>(ConferenceEnded.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull ConferenceEnded instance) {
-                map.putString("conferenceId", instance.getConferenceId());
+                map.putString("conferenceId", instance.conferenceId);
             }
         });
     }
 
-    public void onEvent(ConferenceCreatedError event) {
+    public void onEvent(ConferenceStateEvent event) {
         emit(event);
     }
 
@@ -320,7 +159,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(StartVideoAnswerEvent event) {
+    public void onEvent(StartVideoResponse event) {
         emit(event);
     }
 
@@ -332,15 +171,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(ConferenceCreationSuccess event) {
-        emit(event);
-    }
-
     public void onEvent(AddConferenceParticipantResultEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceRefreshedEvent event) {
         emit(event);
     }
 
@@ -356,23 +187,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(StartRecordingResultEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(StopRecordingResultEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(GetConferenceStatusEvent event) {
-        emit(event);
-    }
-
     public void onEvent(GetConferenceStatusErrorEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(GetConferenceHistoryEvent event) {
         emit(event);
     }
 
@@ -388,67 +203,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(SubscribeConferenceEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(SubscribeConferenceErrorEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(UnSubscribeConferenceAnswerEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(SubscribeForCallConferenceAnswerEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(SubscribeForCallConferenceErrorEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(UnSubscribeFromConferenceAnswerEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(UnsubscribeFromCallConferenceErrorEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferencePreJoinedEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceJoinedError event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceJoinedSuccessEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceUsersInvitedEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(SendBroadcastResultEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceLeftSuccessEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceLeftError event) {
-        emit(event);
-    }
-
     public void onEvent(QualityIndicators event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceStatsEvent event) {
         emit(event);
     }
 
@@ -464,15 +219,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(ConferenceDestroyedPushEvent event) {
-        emit(event);
-    }
-
     public void onEvent(ConferenceDestroyedPush event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceEndedEvent event) {
         emit(event);
     }
 

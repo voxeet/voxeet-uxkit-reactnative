@@ -17,8 +17,10 @@ apply plugin: 'com.android.library'
 def ext = rootProject.ext
 def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 28
 def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "28.0.3"
-def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 14
+def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 16
 def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 28
+
+if(_minSdk < 16) _minSdk = 16
 
 android {
     compileSdkVersion _compile
@@ -43,7 +45,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    compile ('com.voxeet.sdk:toolkit:2.0.27.4') {
+    compile ('com.voxeet.sdk:toolkit:2.0.71') {
         transitive = true
     }
 }

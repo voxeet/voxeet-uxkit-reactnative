@@ -7,8 +7,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.voxeet.sdk.json.UserInfo;
-import com.voxeet.sdk.models.SdkParticipant;
-import com.voxeet.sdk.models.abs.ConferenceUser;
+import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.v1.SdkParticipant;
 
 public final class ConferenceUserUtil {
     private ConferenceUserUtil() {
@@ -16,12 +16,12 @@ public final class ConferenceUserUtil {
     }
 
     @NonNull
-    public static WritableMap toMap(@NonNull ConferenceUser user) {
+    public static WritableMap toMap(@NonNull User user) {
         UserInfo userInfo = user.getUserInfo();
 
         WritableMap map = new WritableNativeMap();
-        map.putString("userId", user.getUserId());
-        map.putString("conferenceStatus", user.getConferenceStatus().name());
+        map.putString("userId", user.getId());
+        map.putString("conferenceStatus", user.getStatus().name());
 
         if (null != user.getUserInfo()) {
             map.putString("name", userInfo.getName());
@@ -32,10 +32,10 @@ public final class ConferenceUserUtil {
         return map;
     }
 
-    public static WritableArray toMap(Iterable<ConferenceUser> conferenceUsers) {
+    public static WritableArray toMap(Iterable<User> conferenceUsers) {
         WritableNativeArray array = new WritableNativeArray();
         if(null != conferenceUsers) {
-            for (ConferenceUser user: conferenceUsers) {
+            for (User user: conferenceUsers) {
                 array.pushMap(toMap(user));
             }
         }

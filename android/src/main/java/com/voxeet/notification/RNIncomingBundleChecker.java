@@ -6,13 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.WindowManager;
 
 import com.voxeet.RNVoxeetConferencekitModule;
 import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.core.services.ConferenceService;
 import com.voxeet.sdk.factories.VoxeetIntentFactory;
 import com.voxeet.sdk.json.UserInfo;
+import com.voxeet.sdk.models.Conference;
+import com.voxeet.toolkit.controllers.ConferenceToolkitController;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 
 import eu.codlab.simplepromise.solve.ErrorPromise;
@@ -77,15 +79,18 @@ public class RNIncomingBundleChecker {
                     getExternalUserId(),
                     getAvatarUrl());
 
-            VoxeetToolkit.getInstance()
-                    .getConferenceToolkit()
-                    .joinUsingConferenceId(mConferenceId, info)
+            final ConferenceService conferenceService = VoxeetSdk.conference();
+
+            VoxeetToolkit.instance().enable(ConferenceToolkitController.class);
+
+            //TODO add inviter
+            conferenceService.join(mConferenceId) //, info)
                     .then(new PromiseExec<Boolean, Object>() {
                         @Override
                         public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
                             //possible callback to set ?
-                            if(RNVoxeetConferencekitModule.startVideo) {
-                                solver.resolve(VoxeetSdk.getInstance().getConferenceService().startVideo());
+                            if (RNVoxeetConferencekitModule.startVideo) {
+                                solver.resolve(conferenceService.startVideo());
                             } else {
                                 solver.resolve(result);
                             }
@@ -150,7 +155,12 @@ public class RNIncomingBundleChecker {
         return null != mIntent ? mIntent.getBundleExtra(BUNDLE_EXTRA_BUNDLE) : null;
     }
 
-    final public boolean isSameConference(String conferenceId) {
+    final public boolean isSameConference(@Nullable Conference conference) {
+        if (null == conference) return false;
+        return isSameConference(conference.getId());
+    }
+
+    final public boolean isSameConference(@Nullable String conferenceId) {
         return mConferenceId != null && mConferenceId.equals(conferenceId);
     }
 

@@ -3,19 +3,15 @@ package com.voxeet.specifics;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.facebook.react.ReactActivity;
-import com.voxeet.RNVoxeetConferencekitModule;
-import com.voxeet.RNVoxeetConferencekitPackage;
 import com.voxeet.sdk.core.VoxeetSdk;
+import com.voxeet.sdk.core.services.ConferenceService;
 import com.voxeet.sdk.core.services.ScreenShareService;
-import com.voxeet.sdk.events.error.ConferenceJoinedError;
+import com.voxeet.sdk.core.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
-import com.voxeet.sdk.events.success.ConferenceJoinedSuccessEvent;
-import com.voxeet.sdk.events.success.ConferencePreJoinedEvent;
+import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
 import com.voxeet.sdk.utils.Validate;
 import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.toolkit.activities.notification.IncomingCallFactory;
@@ -52,8 +48,8 @@ public class RNVoxeetActivityObject {
     }
 
     public void onResume(@NonNull Activity activity) {
-        if (null != VoxeetSdk.getInstance()) {
-            VoxeetSdk.getInstance().register(activity, this);
+        if (null != VoxeetSdk.instance()) {
+            VoxeetSdk.instance().register(this);
         }
 
         if (!EventBus.getDefault().isRegistered(this)) {
@@ -66,15 +62,16 @@ public class RNVoxeetActivityObject {
         }
 
         if (mIncomingBundleChecker.isBundleValid()) {
-            if (null != VoxeetSdk.getInstance()) {
+            if (null != VoxeetSdk.instance()) {
                 mIncomingBundleChecker.onAccept();
             } else {
                 //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
             }
         }
 
-        if (null != VoxeetSdk.getInstance()) {
-            VoxeetSdk.getInstance().getScreenShareService().consumeRightsToScreenShare();
+        ScreenShareService screenShareService = VoxeetSdk.screenShare();
+        if (null != screenShareService) {
+            screenShareService.consumeRightsToScreenShare();
         }
     }
 
@@ -84,10 +81,11 @@ public class RNVoxeetActivityObject {
     }
 
     public void onPause(@NonNull Activity activity) {
-        if (null != VoxeetSdk.getInstance()) {
+        ConferenceService conferenceService = VoxeetSdk.conference();
+        if (null != conferenceService) {
             //stop fetching stats if any pending
-            if (!VoxeetSdk.getInstance().getConferenceService().isLive()) {
-                VoxeetSdk.getInstance().getLocalStatsService().stopAutoFetch();
+            if (!conferenceService.isLive()) {
+                VoxeetSdk.localStats().stopAutoFetch();
             }
         }
         if (mActivity == activity) mActivity = null;
@@ -99,8 +97,9 @@ public class RNVoxeetActivityObject {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case PermissionRefusedEvent.RESULT_CAMERA: {
-                if (null != VoxeetSdk.getInstance() && VoxeetSdk.getInstance().getConferenceService().isLive()) {
-                    VoxeetSdk.getInstance().getConferenceService().startVideo()
+                ConferenceService conferenceService = VoxeetSdk.conference();
+                if (null != conferenceService && conferenceService.isLive()) {
+                    VoxeetSdk.conference().startVideo()
                             .then(new PromiseExec<Boolean, Object>() {
                                 @Override
                                 public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
@@ -136,7 +135,7 @@ public class RNVoxeetActivityObject {
     public void onNewIntent(Intent intent) {
         mIncomingBundleChecker = new IncomingBundleChecker(intent, null);
         if (mIncomingBundleChecker.isBundleValid()) {
-            if (null != VoxeetSdk.getInstance()) {
+            if (null != VoxeetSdk.instance()) {
                 mIncomingBundleChecker.onAccept();
             } else {
                 //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
@@ -146,35 +145,32 @@ public class RNVoxeetActivityObject {
 
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         boolean managed = false;
-        if (null != VoxeetSdk.getInstance()) {
-            managed = VoxeetSdk.getInstance().getScreenShareService().onActivityResult(requestCode, resultCode, data);
+        ScreenShareService screenShareService = VoxeetSdk.screenShare();
+        if (null != screenShareService) {
+            managed = screenShareService.onActivityResult(requestCode, resultCode, data);
         }
 
         return managed;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ScreenShareService.RequestScreenSharePermissionEvent event) {
-        VoxeetSdk.getInstance().getScreenShareService()
-                .sendUserPermissionRequest(mActivity);
+    public void onEvent(RequestScreenSharePermissionEvent event) {
+        VoxeetSdk.screenShare().sendUserPermissionRequest(mActivity);
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * Specific event used to manage the current "incoming" call feature
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferencePreJoinedEvent event) {
-        mIncomingBundleChecker.flushIntent();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceJoinedSuccessEvent event) {
-        mIncomingBundleChecker.flushIntent();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceJoinedError event) {
-        mIncomingBundleChecker.flushIntent();
+    public void onEvent(ConferenceStateEvent event) {
+        switch (event.state) {
+            case JOINING:
+            case JOINED:
+            case JOINED_ERROR:
+                mIncomingBundleChecker.flushIntent();
+                break;
+            default:
+        }
     }
 
     /**

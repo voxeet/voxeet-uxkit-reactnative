@@ -13,14 +13,15 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.voxeet.audio.AudioRoute;
-import com.voxeet.sdk.audio.SoundManager;
 import com.voxeet.sdk.core.VoxeetSdk;
 import com.voxeet.sdk.core.services.AudioService;
+import com.voxeet.sdk.core.services.ConferenceService;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
-import com.voxeet.sdk.events.success.ConferenceDestroyedPushEvent;
-import com.voxeet.sdk.events.success.ConferenceEndedEvent;
-import com.voxeet.sdk.events.success.ConferencePreJoinedEvent;
-import com.voxeet.sdk.events.success.DeclineConferenceResultEvent;
+import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.events.sdk.DeclineConferenceResultEvent;
+import com.voxeet.sdk.json.ConferenceDestroyedPush;
+import com.voxeet.sdk.json.ConferenceEnded;
+import com.voxeet.sdk.media.audio.SoundManager;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.AudioType;
 import com.voxeet.toolkit.views.internal.rounded.RoundedImageView;
@@ -118,8 +119,9 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         }
 
         if (mIncomingBundleChecker.isBundleValid()) {
-            if (null != VoxeetSdk.getInstance()) {
-                mEventBus = VoxeetSdk.getInstance().getEventBus();
+            VoxeetSdk instance = VoxeetSdk.instance();
+            if (null != instance) {
+                mEventBus = instance.getEventBus();
                 if (null != mEventBus) mEventBus.register(this);
             }
 
@@ -156,8 +158,9 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
 
         switch (requestCode) {
             case PermissionRefusedEvent.RESULT_CAMERA: {
-                if (null != VoxeetSdk.getInstance() && VoxeetSdk.getInstance().getConferenceService().isLive()) {
-                    VoxeetSdk.getInstance().getConferenceService().startVideo()
+                ConferenceService conferenceService = VoxeetSdk.conference();
+                if (null != conferenceService && conferenceService.isLive()) {
+                    conferenceService.startVideo()
                             .then(new PromiseExec<Boolean, Object>() {
                                 @Override
                                 public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
@@ -178,8 +181,8 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceDestroyedPushEvent event) {
-        if (mIncomingBundleChecker.isSameConference(event.getPush().getConferenceId())) {
+    public void onEvent(ConferenceDestroyedPush event) {
+        if (mIncomingBundleChecker.isSameConference(event.conferenceId)) {
             finish();
         }
     }
@@ -188,8 +191,8 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
      * Specific event used to manage the current "incoming" call feature
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceEndedEvent event) {
-        if (mIncomingBundleChecker.isSameConference(event.getEvent().getConferenceId())) {
+    public void onEvent(ConferenceEnded event) {
+        if (mIncomingBundleChecker.isSameConference(event.conferenceId)) {
             finish();
         }
     }
@@ -200,9 +203,13 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferencePreJoinedEvent event) {
-        if (mIncomingBundleChecker.isSameConference(event.getConferenceId())) {
-            finish();
+    public void onEvent(ConferenceStateEvent event) {
+        switch (event.state) {
+            case JOINING:
+                if (mIncomingBundleChecker.isSameConference(event.conference)) {
+                    finish();
+                }
+            default:
         }
     }
 
@@ -212,8 +219,9 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     protected void onDecline() {
-        if (getConferenceId() != null && null != VoxeetSdk.getInstance()) {
-            VoxeetSdk.getInstance().getConferenceService().decline(getConferenceId())
+        ConferenceService conferenceService = VoxeetSdk.conference();
+        if (null != getConferenceId() && null != conferenceService) {
+            conferenceService.decline(getConferenceId())
                     .then(new PromiseExec<DeclineConferenceResultEvent, Object>() {
                         @Override
                         public void onCall(@Nullable DeclineConferenceResultEvent result, @NonNull Solver<Object> solver) {
