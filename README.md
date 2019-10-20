@@ -242,6 +242,20 @@ Please go to [iOS Conferencekit](https://github.com/voxeet/voxeet-ios-conference
 
 Please go to [Android SDK Sample](https://github.com/voxeet/android-sdk-sample)
 
+## Build locally
+
+To build locally 
+
+```
+npm run build-library
+```
+
+the typescript command line needs local dev resolutions (available in the `package.json`)
+
+```
+npm i -D @types/react ...
+```
+
 ## License
 
 ```

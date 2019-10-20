@@ -117,7 +117,7 @@ export default class VideoView extends Component<Props, State> {
     return (
       <RCTVoxeetVideoView
         {...this.props}
-        ref={v => this._videoView = v}
+        ref={(v: React.Component) => this._videoView = v}
         { ...{onCallReturn: (event :any) => this._onCallReturn(event)} }
       />
     );
