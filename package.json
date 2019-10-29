@@ -7,7 +7,7 @@
     "postinstall": "cross-os cmd",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-library": "tsc && Echo Build completed!",
-    "publish-library": "npm run build-library && cd build/dist && npm publish && echo Package published!"
+    "publish-library": "npm run build-library && npm publish && echo Package published!"
   },
   "cross-os": {
     "cmd": {
