@@ -21,6 +21,10 @@ import com.voxeet.authent.token.TokenCallback;
 import com.voxeet.models.ConferenceUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
+import com.voxeet.push.center.NotificationCenterFactory;
+import com.voxeet.push.center.management.EnforcedNotificationMode;
+import com.voxeet.push.center.management.NotificationMode;
+import com.voxeet.push.center.management.VersionFilter;
 import com.voxeet.push.firebase.FirebaseController;
 import com.voxeet.sdk.core.VoxeetEnvironmentHolder;
 import com.voxeet.sdk.core.VoxeetSdk;
@@ -45,6 +49,8 @@ import com.voxeet.specifics.waiting.WaitingStartConferenceHolder;
 import com.voxeet.toolkit.controllers.ConferenceToolkitController;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.implementation.overlays.OverlayState;
+import com.voxeet.toolkit.incoming.IncomingFullScreen;
+import com.voxeet.toolkit.incoming.IncomingNotification;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -152,13 +158,27 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         //reset the incoming call activity, in case the SDK was no initialized, it would have
         //erased this method call
-        VoxeetPreferences.setDefaultActivity(RNIncomingCallActivity.class.getCanonicalName());
+        //VoxeetPreferences.setDefaultActivity(RNIncomingCallActivity.class.getCanonicalName());
+
+        initNotificationCenter();
 
         VoxeetToolkit
                 .initialize(application, EventBus.getDefault())
                 .enableOverlay(true);
 
         VoxeetSdk.instance().register(this);
+    }
+
+    //TODO create a RNINcomingNotification to start a proxy activity - same implementation as Cordova once it's fixed
+    public static void initNotificationCenter() {
+        //set Android Q as the minimum version no more supported by the full screen mode
+        NotificationCenterFactory.instance.register(NotificationMode.FULLSCREEN_INCOMING_CALL, new VersionFilter(VersionFilter.ALL, 29))
+                //register notification only mode
+                .register(NotificationMode.OVERHEAD_INCOMING_CALL, new IncomingNotification())
+                //register full screen mode
+                .register(NotificationMode.FULLSCREEN_INCOMING_CALL, new IncomingFullScreen(RNIncomingCallActivity.class))
+                //activate fullscreen -> notification mode only
+                .setEnforcedNotificationMode(EnforcedNotificationMode.MIXED_INCOMING_CALL);
     }
 
     @ReactMethod

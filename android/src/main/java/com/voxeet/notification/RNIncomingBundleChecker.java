@@ -1,5 +1,6 @@
 package com.voxeet.notification;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.voxeet.RNVoxeetConferencekitModule;
+import com.voxeet.push.center.management.Constants;
 import com.voxeet.sdk.core.VoxeetSdk;
 import com.voxeet.sdk.core.services.ConferenceService;
 import com.voxeet.sdk.factories.VoxeetIntentFactory;
@@ -59,11 +61,11 @@ public class RNIncomingBundleChecker {
         mIntent = intent;
 
         if (null != mIntent) {
-            mUserName = mIntent.getStringExtra(VoxeetIntentFactory.INVITER_NAME);
-            mExternalUserId = mIntent.getStringExtra(VoxeetIntentFactory.INVITER_EXTERNAL_ID);
-            mUserId = mIntent.getStringExtra(VoxeetIntentFactory.INVITER_ID);
-            mAvatarUrl = mIntent.getStringExtra(VoxeetIntentFactory.INVITER_URL);
-            mConferenceId = mIntent.getStringExtra(VoxeetIntentFactory.CONF_ID);
+            mUserName = mIntent.getStringExtra(Constants.INVITER_NAME);
+            mExternalUserId = mIntent.getStringExtra(Constants.INVITER_EXTERNAL_ID);
+            mUserId = mIntent.getStringExtra(Constants.INVITER_ID);
+            mAvatarUrl = mIntent.getStringExtra(Constants.INVITER_URL);
+            mConferenceId = mIntent.getStringExtra(Constants.CONF_ID);
         }
     }
 
@@ -118,11 +120,11 @@ public class RNIncomingBundleChecker {
      */
     final public boolean isBundleValid() {
         return null != mIntent
-                && mIntent.hasExtra(VoxeetIntentFactory.INVITER_NAME)
-                && mIntent.hasExtra(VoxeetIntentFactory.INVITER_EXTERNAL_ID)
-                && mIntent.hasExtra(VoxeetIntentFactory.INVITER_ID)
-                && mIntent.hasExtra(VoxeetIntentFactory.INVITER_URL)
-                && mIntent.hasExtra(VoxeetIntentFactory.CONF_ID);
+                && mIntent.hasExtra(Constants.INVITER_NAME)
+                && mIntent.hasExtra(Constants.INVITER_EXTERNAL_ID)
+                && mIntent.hasExtra(Constants.INVITER_ID)
+                && mIntent.hasExtra(Constants.INVITER_URL)
+                && mIntent.hasExtra(Constants.CONF_ID);
     }
 
     @Nullable
@@ -171,6 +173,7 @@ public class RNIncomingBundleChecker {
      * @param caller the non null caller
      * @return a valid intent
      */
+    @SuppressLint("WrongConstant")
     @NonNull
     final public Intent createActivityAccepted(@NonNull Activity caller) {
         Class to_call = createClassToCall();
@@ -188,11 +191,11 @@ public class RNIncomingBundleChecker {
 
         intent.putExtra(BUNDLE_EXTRA_BUNDLE, createExtraBundle());
 
-        intent.putExtra(VoxeetIntentFactory.CONF_ID, getConferenceId())
-                .putExtra(VoxeetIntentFactory.INVITER_NAME, getUserName())
-                .putExtra(VoxeetIntentFactory.INVITER_ID, getExternalUserId())
-                .putExtra(VoxeetIntentFactory.INVITER_EXTERNAL_ID, getExternalUserId())
-                .putExtra(VoxeetIntentFactory.INVITER_URL, getAvatarUrl());
+        intent.putExtra(Constants.CONF_ID, getConferenceId())
+                .putExtra(Constants.INVITER_NAME, getUserName())
+                .putExtra(Constants.INVITER_ID, getExternalUserId())
+                .putExtra(Constants.INVITER_EXTERNAL_ID, getExternalUserId())
+                .putExtra(Constants.INVITER_URL, getAvatarUrl());
 
         //deprecated
         intent.putExtra("join", true);
@@ -215,11 +218,11 @@ public class RNIncomingBundleChecker {
      */
     public void flushIntent() {
         if (null != mIntent) {
-            mIntent.removeExtra(VoxeetIntentFactory.INVITER_ID);
-            mIntent.removeExtra(VoxeetIntentFactory.INVITER_EXTERNAL_ID);
-            mIntent.removeExtra(VoxeetIntentFactory.CONF_ID);
-            mIntent.removeExtra(VoxeetIntentFactory.INVITER_URL);
-            mIntent.removeExtra(VoxeetIntentFactory.INVITER_NAME);
+            mIntent.removeExtra(Constants.INVITER_ID);
+            mIntent.removeExtra(Constants.INVITER_EXTERNAL_ID);
+            mIntent.removeExtra(Constants.CONF_ID);
+            mIntent.removeExtra(Constants.INVITER_URL);
+            mIntent.removeExtra(Constants.INVITER_NAME);
         }
     }
 

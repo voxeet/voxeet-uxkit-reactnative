@@ -14,7 +14,7 @@ import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
 import com.voxeet.sdk.utils.Validate;
 import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
-import com.voxeet.toolkit.activities.notification.IncomingCallFactory;
+import com.voxeet.toolkit.incoming.factory.IncomingCallFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

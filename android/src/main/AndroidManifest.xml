@@ -1,6 +1,13 @@
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.voxeet">
+    package="com.voxeet">
+
+    <application android:supportsRtl="true">
+        <provider
+            android:name="com.voxeet.rn.manifests.RNVoxeetManifestComponent"
+            android:authorities="${applicationId}.manifests.FirebasePushEnablerManifestComponent"
+            android:enabled="true"
+            android:exported="false" />
+    </application>
 
 </manifest>
   
