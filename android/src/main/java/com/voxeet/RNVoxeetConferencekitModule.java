@@ -25,7 +25,6 @@ import com.voxeet.push.center.NotificationCenterFactory;
 import com.voxeet.push.center.management.EnforcedNotificationMode;
 import com.voxeet.push.center.management.NotificationMode;
 import com.voxeet.push.center.management.VersionFilter;
-import com.voxeet.push.firebase.FirebaseController;
 import com.voxeet.sdk.core.VoxeetEnvironmentHolder;
 import com.voxeet.sdk.core.VoxeetSdk;
 import com.voxeet.sdk.core.preferences.VoxeetPreferences;
@@ -149,12 +148,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     private void internalInitialize() {
         Application application = (Application) reactContext.getApplicationContext();
         VoxeetSdk.conference().setTimeOut(30 * 1000); //30s
-
-        //also enable the push token upload and log
-        FirebaseController.getInstance()
-                .log(true)
-                .enable(true);
-        FirebaseController.createNotificationChannel(application);
 
         //reset the incoming call activity, in case the SDK was no initialized, it would have
         //erased this method call

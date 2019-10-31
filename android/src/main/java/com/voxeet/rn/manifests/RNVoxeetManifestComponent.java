@@ -5,8 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.firebase.FirebaseApp;
-import com.voxeet.push.firebase.FirebaseController;
 import com.voxeet.sdk.core.VoxeetEnvironmentHolder;
 import com.voxeet.sdk.core.preferences.VoxeetPreferences;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;

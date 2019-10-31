@@ -1,6 +1,8 @@
 
 # react-native-voxeet-conferencekit
 
+**Note: To enable Firebase on Android (for Push Notification). Please add also the [react-native-voxeet-firebase](https://github.com/voxeet/react-native-voxeet-firebase) library**
+
 ## Getting started
 
 `$ npm install @voxeet/react-native-voxeet-conferencekit --save`

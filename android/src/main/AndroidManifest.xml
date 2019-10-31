@@ -4,7 +4,7 @@
     <application android:supportsRtl="true">
         <provider
             android:name="com.voxeet.rn.manifests.RNVoxeetManifestComponent"
-            android:authorities="${applicationId}.manifests.FirebasePushEnablerManifestComponent"
+            android:authorities="${applicationId}.manifests.RNVoxeetManifestComponent"
             android:enabled="true"
             android:exported="false" />
     </application>
