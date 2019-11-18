@@ -6,12 +6,12 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.voxeet.sdk.core.VoxeetSdk;
-import com.voxeet.sdk.core.services.ConferenceService;
-import com.voxeet.sdk.core.services.ScreenShareService;
-import com.voxeet.sdk.core.services.screenshare.RequestScreenSharePermissionEvent;
+import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.services.ConferenceService;
+import com.voxeet.sdk.services.ScreenShareService;
+import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.utils.Validate;
 import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.toolkit.incoming.factory.IncomingCallFactory;

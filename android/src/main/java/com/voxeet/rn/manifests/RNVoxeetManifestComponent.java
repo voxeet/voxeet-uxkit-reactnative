@@ -5,9 +5,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.voxeet.sdk.core.VoxeetEnvironmentHolder;
-import com.voxeet.sdk.core.preferences.VoxeetPreferences;
+import com.voxeet.sdk.VoxeetEnvironmentHolder;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
+import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.implementation.overlays.OverlayState;

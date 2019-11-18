@@ -11,11 +11,10 @@ import android.view.WindowManager;
 
 import com.voxeet.RNVoxeetConferencekitModule;
 import com.voxeet.push.center.management.Constants;
-import com.voxeet.sdk.core.VoxeetSdk;
-import com.voxeet.sdk.core.services.ConferenceService;
-import com.voxeet.sdk.factories.VoxeetIntentFactory;
+import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.json.UserInfo;
 import com.voxeet.sdk.models.Conference;
+import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.toolkit.controllers.ConferenceToolkitController;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 

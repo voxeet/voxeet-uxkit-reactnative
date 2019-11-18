@@ -13,15 +13,14 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.voxeet.audio.AudioRoute;
-import com.voxeet.sdk.core.VoxeetSdk;
-import com.voxeet.sdk.core.services.AudioService;
-import com.voxeet.sdk.core.services.ConferenceService;
+import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
-import com.voxeet.sdk.events.sdk.DeclineConferenceResultEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
 import com.voxeet.sdk.media.audio.SoundManager;
+import com.voxeet.sdk.services.AudioService;
+import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.AudioType;
 import com.voxeet.toolkit.views.internal.rounded.RoundedImageView;
@@ -198,11 +197,6 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(DeclineConferenceResultEvent event) {
-        finish();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ConferenceStateEvent event) {
         switch (event.state) {
             case JOINING:
@@ -222,10 +216,10 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         ConferenceService conferenceService = VoxeetSdk.conference();
         if (null != getConferenceId() && null != conferenceService) {
             conferenceService.decline(getConferenceId())
-                    .then(new PromiseExec<DeclineConferenceResultEvent, Object>() {
+                    .then(new PromiseExec<Boolean, Object>() {
                         @Override
-                        public void onCall(@Nullable DeclineConferenceResultEvent result, @NonNull Solver<Object> solver) {
-                            //
+                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
+                            finish();
                         }
                     })
                     .error(new ErrorPromise() {

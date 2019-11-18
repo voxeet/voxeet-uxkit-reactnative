@@ -13,9 +13,9 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.voxeet.android.media.MediaStream;
-import com.voxeet.sdk.core.VoxeetSdk;
-import com.voxeet.sdk.core.services.ConferenceService;
+import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.views.VideoView;
 
 import java.util.List;

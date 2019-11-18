@@ -14,18 +14,15 @@ import com.voxeet.sdk.events.error.UnsubscribeFromCallConferenceErrorEvent;
 import com.voxeet.sdk.events.promises.PromiseParticipantAddedErrorEventException;
 import com.voxeet.sdk.events.sdk.CameraSwitchSuccessEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
-import com.voxeet.sdk.events.sdk.ConferenceUserCallDeclinedEvent;
-import com.voxeet.sdk.events.sdk.DeclineConferenceResultEvent;
 import com.voxeet.sdk.events.sdk.IncomingCallEvent;
 import com.voxeet.sdk.events.sdk.QualityIndicators;
 import com.voxeet.sdk.events.sdk.SdkLogoutSuccessEvent;
 import com.voxeet.sdk.events.sdk.StartScreenShareAnswerEvent;
 import com.voxeet.sdk.events.sdk.StopScreenShareAnswerEvent;
 import com.voxeet.sdk.events.sdk.StopVideoAnswerEvent;
-import com.voxeet.sdk.events.success.not_to_fire.AddConferenceParticipantResultEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
-import com.voxeet.sdk.json.RecordingStatusUpdateEvent;
+import com.voxeet.sdk.json.RecordingStatusUpdatedEvent;
 import com.voxeet.sdk.json.StartVideoResponse;
 
 import org.greenrobot.eventbus.EventBus;
@@ -35,12 +32,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
     public ConferenceStatusEventEmitter(@NonNull ReactContext context, @NonNull EventBus eventBus) {
         super(context, eventBus);
 
-        register(new EventFormatterCallback<DeclineConferenceResultEvent>(DeclineConferenceResultEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull DeclineConferenceResultEvent instance) {
-                map.putBoolean("isSuccess", instance.success);
-            }
-        }).register(new EventFormatterCallback<PermissionRefusedEvent>(PermissionRefusedEvent.class) {
+        register(new EventFormatterCallback<PermissionRefusedEvent>(PermissionRefusedEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull PermissionRefusedEvent instance) {
                 map.putString("permission", instance.getPermission().name());
@@ -49,11 +41,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             @Override
             void transform(@NonNull WritableMap map, @NonNull PromiseParticipantAddedErrorEventException instance) {
                 map.putString("message", instance.getEvent().message());
-            }
-        }).register(new EventFormatterCallback<AddConferenceParticipantResultEvent>(AddConferenceParticipantResultEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull AddConferenceParticipantResultEvent instance) {
-                map.putBoolean("isSuccess", instance.success);
             }
         }).register(new EventFormatterCallback<SdkLogoutSuccessEvent>(SdkLogoutSuccessEvent.class) {
             @Override
@@ -112,19 +99,13 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             void transform(@NonNull WritableMap map, @NonNull IncomingCallEvent instance) {
                 map.putString("conferenceId", instance.conferenceId);
             }
-        }).register(new EventFormatterCallback<RecordingStatusUpdateEvent>(RecordingStatusUpdateEvent.class) {
+        }).register(new EventFormatterCallback<RecordingStatusUpdatedEvent>(RecordingStatusUpdatedEvent.class) {
             @Override
-            void transform(@NonNull WritableMap map, @NonNull RecordingStatusUpdateEvent instance) {
+            void transform(@NonNull WritableMap map, @NonNull RecordingStatusUpdatedEvent instance) {
                 map.putString("conferenceId", instance.conferenceId);
                 map.putString("userId", instance.userId);
                 map.putString("recordingStatus", instance.recordingStatus);
                 map.putString("type", instance.getType());
-            }
-        }).register(new EventFormatterCallback<ConferenceUserCallDeclinedEvent>(ConferenceUserCallDeclinedEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceUserCallDeclinedEvent instance) {
-                map.putString("conferenceId", instance.conferenceId);
-                map.putString("userId", instance.userId);
             }
         }).register(new EventFormatterCallback<ConferenceDestroyedPush>(ConferenceDestroyedPush.class) {
             @Override
@@ -140,10 +121,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
     }
 
     public void onEvent(ConferenceStateEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(DeclineConferenceResultEvent event) {
         emit(event);
     }
 
@@ -168,10 +145,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
     }
 
     public void onEvent(PromiseParticipantAddedErrorEventException event) {
-        emit(event);
-    }
-
-    public void onEvent(AddConferenceParticipantResultEvent event) {
         emit(event);
     }
 
@@ -211,11 +184,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(RecordingStatusUpdateEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(ConferenceUserCallDeclinedEvent event) {
+    public void onEvent(RecordingStatusUpdatedEvent event) {
         emit(event);
     }
 
