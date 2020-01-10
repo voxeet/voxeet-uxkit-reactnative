@@ -24,7 +24,6 @@ cp android/build.gradle build/dist/android/build.gradle
 
 #copy ios
 mkdir -p build/dist/ios
-cp ios/Cartfile build/dist/ios/Cartfile
 cp -r ios/RNVoxeetConferencekit build/dist/ios/RNVoxeetConferencekit
 cp -r ios/RNVoxeetConferencekit.xcodeproj build/dist/ios/RNVoxeetConferencekit.xcodeproj
 

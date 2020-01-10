@@ -1,18 +1,12 @@
 {
   "name": "@voxeet/react-native-voxeet-conferencekit",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "cross-os cmd",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-library": "tsc && Echo Build completed!",
     "publish-library": "npm run build-library && npm publish && echo Package published!"
-  },
-  "cross-os": {
-    "cmd": {
-      "darwin": "bash build_ios_frameworks.sh"
-    }
   },
   "dependencies": {
     "cross-os": "^1.3.0"
@@ -21,7 +15,6 @@
     "@types/react": "^16.9.9",
     "@types/react-native": "^0.50.8",
     "@types/react-test-renderer": "^16.0.0",
-    "cross-os": "^1.3.0",
     "jest-expo-ts": "^22.0.1",
     "react-native-scripts-ts": "1.7.0",
     "react-native-typescript-transformer": "^1.1.4",
@@ -38,10 +31,8 @@
     "package.json",
     "lib/",
     "dist/",
-    "build_ios_frameworks.sh",
     "android/src",
     "android/build.gradle",
-    "ios/Cartfile",
     "ios/RNVoxeetConferencekit",
     "ios/RNVoxeetConferencekit.xcodeproj",
     "README.md",
