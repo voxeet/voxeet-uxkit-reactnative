@@ -1,6 +1,6 @@
 {
   "name": "@voxeet/react-native-voxeet-conferencekit",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -33,7 +33,7 @@
     "dist/",
     "android/src",
     "android/build.gradle",
-    "ios/voxeet-uxkit-reactnative.podspec",
+    "voxeet-uxkit-reactnative.podspec",
     "ios/RNVoxeetConferencekit",
     "ios/RNVoxeetConferencekit.xcodeproj",
     "README.md",
