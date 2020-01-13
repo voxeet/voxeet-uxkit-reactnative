@@ -1,0 +1,1 @@
+(grep -q 'use_frameworks' $1/ios/Podfile && echo already exists) || sed -i -e '/platform\ \:ios/a\'$'\n''use_frameworks!\'$'\n' $1/ios/Podfile
