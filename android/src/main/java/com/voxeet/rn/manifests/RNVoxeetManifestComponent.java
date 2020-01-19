@@ -2,8 +2,9 @@ package com.voxeet.rn.manifests;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;

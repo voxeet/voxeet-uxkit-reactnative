@@ -3,7 +3,8 @@ package com.voxeet.specifics;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;

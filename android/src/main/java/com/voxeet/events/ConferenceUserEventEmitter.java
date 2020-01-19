@@ -1,14 +1,13 @@
 package com.voxeet.events;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.models.ConferenceUserUtil;
 import com.voxeet.models.MediaStreamUtil;
-import com.voxeet.sdk.events.error.ParticipantAddedErrorEvent;
 import com.voxeet.sdk.events.sdk.ConferenceParticipantQualityUpdatedEvent;
 import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
 import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;

@@ -3,18 +3,15 @@ package com.voxeet.notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.squareup.picasso.Picasso;
-import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.PromiseExec;
-import com.voxeet.promise.solve.Solver;
 import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
