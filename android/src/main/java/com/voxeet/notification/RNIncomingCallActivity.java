@@ -12,12 +12,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-import com.voxeet.audio.AudioRoute;
+import com.voxeet.promise.solve.ErrorPromise;
+import com.voxeet.promise.solve.PromiseExec;
+import com.voxeet.promise.solve.Solver;
 import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
-import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
+import com.voxeet.sdk.media.audio.AudioRoute;
 import com.voxeet.sdk.media.audio.SoundManager;
 import com.voxeet.sdk.services.AudioService;
 import com.voxeet.sdk.services.ConferenceService;
@@ -28,10 +31,6 @@ import com.voxeet.toolkit.views.internal.rounded.RoundedImageView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import eu.codlab.simplepromise.solve.ErrorPromise;
-import eu.codlab.simplepromise.solve.PromiseExec;
-import eu.codlab.simplepromise.solve.Solver;
 
 public class RNIncomingCallActivity extends AppCompatActivity implements RNIncomingBundleChecker.IExtraBundleFillerListener {
 
@@ -77,30 +76,17 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         mAcceptTextView = (TextView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_accept);
         mDeclineTextView = (TextView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_decline);
 
-        mDeclineTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onDecline();
-            }
-        });
+        mDeclineTextView.setOnClickListener(view -> onDecline());
 
-        mAcceptTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onAccept();
-            }
-        });
+        mAcceptTextView.setOnClickListener(view -> onAccept());
 
         mHandler = new Handler();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (null != mHandler)
-                        finish();
-                } catch (Exception e) {
+        mHandler.postDelayed(() -> {
+            try {
+                if (null != mHandler)
+                    finish();
+            } catch (Exception e) {
 
-                }
             }
         }, AndroidManifest.readMetadataInt(this, DEFAULT_VOXEET_INCOMING_CALL_DURATION_KEY,
                 DEFAULT_VOXEET_INCOMING_CALL_DURATION_VALUE));
@@ -160,18 +146,10 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
                 ConferenceService conferenceService = VoxeetSdk.conference();
                 if (null != conferenceService && conferenceService.isLive()) {
                     conferenceService.startVideo()
-                            .then(new PromiseExec<Boolean, Object>() {
-                                @Override
-                                public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
+                            .then(result -> {
 
-                                }
                             })
-                            .error(new ErrorPromise() {
-                                @Override
-                                public void onError(@NonNull Throwable error) {
-                                    error.printStackTrace();
-                                }
-                            });
+                            .error(Throwable::printStackTrace);
                 }
                 return;
             }
@@ -197,7 +175,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceStateEvent event) {
+    public void onEvent(ConferenceStatusUpdatedEvent event) {
         switch (event.state) {
             case JOINING:
                 if (mIncomingBundleChecker.isSameConference(event.conference)) {
@@ -216,18 +194,10 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         ConferenceService conferenceService = VoxeetSdk.conference();
         if (null != getConferenceId() && null != conferenceService) {
             conferenceService.decline(getConferenceId())
-                    .then(new PromiseExec<Boolean, Object>() {
-                        @Override
-                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                            finish();
-                        }
+                    .then(result -> {
+                        finish();
                     })
-                    .error(new ErrorPromise() {
-                        @Override
-                        public void onError(Throwable error) {
-                            finish();
-                        }
-                    });
+                    .error(error -> finish());
         } else {
             finish();
         }

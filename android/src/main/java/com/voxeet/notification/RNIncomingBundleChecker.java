@@ -10,17 +10,17 @@ import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import com.voxeet.RNVoxeetConferencekitModule;
-import com.voxeet.push.center.management.Constants;
+import com.voxeet.promise.solve.ErrorPromise;
+import com.voxeet.promise.solve.PromiseExec;
+import com.voxeet.promise.solve.Solver;
+import com.voxeet.promise.solve.ThenVoid;
 import com.voxeet.sdk.VoxeetSdk;
-import com.voxeet.sdk.json.UserInfo;
+import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.Conference;
+import com.voxeet.sdk.push.center.management.Constants;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.toolkit.controllers.ConferenceToolkitController;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
-
-import eu.codlab.simplepromise.solve.ErrorPromise;
-import eu.codlab.simplepromise.solve.PromiseExec;
-import eu.codlab.simplepromise.solve.Solver;
 
 public class RNIncomingBundleChecker {
 
@@ -76,7 +76,7 @@ public class RNIncomingBundleChecker {
      */
     public void onAccept() {
         if (mConferenceId != null) {
-            UserInfo info = new UserInfo(getUserName(),
+            ParticipantInfo info = new ParticipantInfo(getUserName(),
                     getExternalUserId(),
                     getAvatarUrl());
 
@@ -86,22 +86,16 @@ public class RNIncomingBundleChecker {
 
             //TODO add inviter
             conferenceService.join(mConferenceId) //, info)
-                    .then(new PromiseExec<Boolean, Object>() {
-                        @Override
-                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                            //possible callback to set ?
-                            if (RNVoxeetConferencekitModule.startVideo) {
-                                solver.resolve(conferenceService.startVideo());
-                            } else {
-                                solver.resolve(result);
-                            }
+                    .then((PromiseExec<Boolean, Boolean>) (result, solver) -> {
+                        //possible callback to set ?
+                        if (RNVoxeetConferencekitModule.startVideo) {
+                            solver.resolve(conferenceService.startVideo());
+                        } else {
+                            solver.resolve(result);
                         }
                     })
-                    .then(new PromiseExec<Object, Object>() {
-                        @Override
-                        public void onCall(@Nullable Object result, @NonNull Solver<Object> solver) {
-                            //nothing to do
-                        }
+                    .then(booleanBooleanPromiseExec -> {
+
                     })
                     .error(new ErrorPromise() {
                         @Override

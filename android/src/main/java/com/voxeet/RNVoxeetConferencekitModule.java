@@ -16,29 +16,34 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.voxeet.authent.token.RefreshTokenCallback;
-import com.voxeet.authent.token.TokenCallback;
 import com.voxeet.models.ConferenceUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
-import com.voxeet.push.center.NotificationCenterFactory;
-import com.voxeet.push.center.management.EnforcedNotificationMode;
-import com.voxeet.push.center.management.NotificationMode;
-import com.voxeet.push.center.management.VersionFilter;
-import com.voxeet.sdk.VoxeetEnvironmentHolder;
+import com.voxeet.promise.solve.ErrorPromise;
+import com.voxeet.promise.solve.PromiseExec;
+import com.voxeet.promise.solve.Solver;
+import com.voxeet.promise.solve.ThenVoid;
 import com.voxeet.sdk.VoxeetSdk;
+import com.voxeet.sdk.authent.token.RefreshTokenCallback;
+import com.voxeet.sdk.authent.token.TokenCallback;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.SocketStateChangeEvent;
-import com.voxeet.sdk.json.UserInfo;
+import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.MetadataHolder;
 import com.voxeet.sdk.json.internal.ParamsHolder;
-import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.Conference;
+import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
+import com.voxeet.sdk.push.center.NotificationCenterFactory;
+import com.voxeet.sdk.push.center.management.EnforcedNotificationMode;
+import com.voxeet.sdk.push.center.management.NotificationMode;
+import com.voxeet.sdk.push.center.management.VersionFilter;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.SessionService;
-import com.voxeet.sdk.services.builders.ConferenceCreateInformation;
+import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
 import com.voxeet.sdk.utils.Validate;
+import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.specifics.RNVoxeetActivity;
 import com.voxeet.specifics.waiting.WaitingAbstractHolder;
@@ -58,10 +63,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import eu.codlab.simplepromise.solve.ErrorPromise;
-import eu.codlab.simplepromise.solve.PromiseExec;
-import eu.codlab.simplepromise.solve.Solver;
-
 public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private static final String ERROR_SDK_NOT_INITIALIZED = "ERROR_SDK_NOT_INITIALIZED";
@@ -76,7 +77,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
     private final RNRootViewProvider mRootViewProvider;
-    private UserInfo _current_user;
+    private ParticipantInfo _current_user;
     private ReentrantLock lockAwaitingToken = new ReentrantLock();
     private List<TokenCallback> mAwaitingTokenCallback;
     private static WaitingAbstractHolder sWaitingHolder;
@@ -112,16 +113,13 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             VoxeetSdk.setApplication(application);
             VoxeetSdk.initialize(
                     accessToken,
-                    new RefreshTokenCallback() {
-                        @Override
-                        public void onRequired(TokenCallback callback) {
-                            lock(lockAwaitingToken);
-                            if (!mAwaitingTokenCallback.contains(callback)) {
-                                mAwaitingTokenCallback.add(callback);
-                            }
-                            unlock(lockAwaitingToken);
-                            postRefreshAccessToken();
+                    callback -> {
+                        lock(lockAwaitingToken);
+                        if (!mAwaitingTokenCallback.contains(callback)) {
+                            mAwaitingTokenCallback.add(callback);
                         }
+                        unlock(lockAwaitingToken);
+                        postRefreshAccessToken();
                     });
 
             internalInitialize();
@@ -247,7 +245,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void openSession(ReadableMap userInfo, final Promise promise) {
-        final UserInfo info = toUserInfo(userInfo);
+        final ParticipantInfo info = toUserInfo(userInfo);
 
         if (isConnected() && isSameUser(info)) {
             checkForIncomingConference();
@@ -256,20 +254,14 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         }
         VoxeetSdk.session()
                 .open(info)
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        _current_user = info;
-                        promise.resolve(result);
-                        checkForIncomingConference();
-                    }
+                .then((result, solver) -> {
+                    _current_user = info;
+                    promise.resolve(result);
+                    checkForIncomingConference();
                 })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        promise.reject(error);
-                        cancelIncomingConference();
-                    }
+                .error(error -> {
+                    promise.reject(error);
+                    cancelIncomingConference();
                 });
     }
 
@@ -277,19 +269,13 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void disconnect(final Promise promise) {
         VoxeetSdk.session()
                 .close()
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        _current_user = null;
-                        promise.resolve(result);
-                    }
+                .then((result, solver) -> {
+                    _current_user = null;
+                    promise.resolve(result);
                 })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        _current_user = null;
-                        promise.reject(error);
-                    }
+                .error(error -> {
+                    _current_user = null;
+                    promise.reject(error);
                 });
     }
 
@@ -328,23 +314,13 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         }
 
         VoxeetSdk.conference()
-                .create(new ConferenceCreateInformation.Builder()
+                .create(new ConferenceCreateOptions.Builder()
                         .setConferenceAlias(conferenceId)
                         .setMetadataHolder(holder)
                         .setParamsHolder(paramsHolder).build()
                 )
-                .then(new PromiseExec<CreateConferenceResult, Object>() {
-                    @Override
-                    public void onCall(@Nullable CreateConferenceResult result, @NonNull Solver<Object> solver) {
-                        promise.resolve(ConferenceUtil.toMap(result));
-                    }
-                })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        promise.reject(error);
-                    }
-                });
+                .then((result, solver) -> promise.resolve(ConferenceUtil.toMap(result)))
+                .error(promise::reject);
     }
 
     @ReactMethod
@@ -376,35 +352,17 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         if (!listener) {
             VoxeetSdk.conference()
                     .join(conferenceId)
-                    .then(new PromiseExec<Boolean, Object>() {
-                        @Override
-                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                            promise.resolve(result);
+                    .then((PromiseExec<Boolean, Object>) (result, solver) -> {
+                        promise.resolve(result);
 
-                            checkStartVideo();
-                        }
+                        checkStartVideo();
                     })
-                    .error(new ErrorPromise() {
-                        @Override
-                        public void onError(@NonNull Throwable error) {
-                            promise.reject(error);
-                        }
-                    });
+                    .error(promise::reject);
         } else {
             VoxeetSdk.conference()
                     .listen(conferenceId)
-                    .then(new PromiseExec<Boolean, Object>() {
-                        @Override
-                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                            promise.resolve(result);
-                        }
-                    })
-                    .error(new ErrorPromise() {
-                        @Override
-                        public void onError(@NonNull Throwable error) {
-                            promise.reject(error);
-                        }
-                    });
+                    .then(promise::resolve)
+                    .error(promise::reject);
         }
     }
 
@@ -412,18 +370,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void leave(final Promise promise) {
         VoxeetSdk.conference()
                 .leave()
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        promise.resolve(result);
-                    }
-                })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        promise.reject(error);
-                    }
-                });
+                .then(promise::resolve)
+                .error(promise::reject);
     }
 
     @ReactMethod
@@ -431,7 +379,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         //TODO expose in the SDK the ability to use the conferenceId
         Log.d(TAG, "invite: WARNING :: the provided conferenceId is not yet managed, please make sure you have joined the conference before trying to invite users");
 
-        List<UserInfo> users = null;
+        List<ParticipantInfo> users = null;
 
         if (null != participants) {
             users = toUserInfos(participants);
@@ -439,18 +387,10 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         VoxeetSdk.conference()
                 .invite(conferenceId, users)
-                .then(new PromiseExec<List<User>, Object>() {
-                    @Override
-                    public void onCall(@Nullable List<User> result, @NonNull Solver<Object> solver) {
-                        promise.resolve(true);
-                    }
+                .then(participants1 -> {
+                    promise.resolve(true);
                 })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        promise.reject(error);
-                    }
-                });
+                .error(promise::reject);
 
     }
 
@@ -459,18 +399,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         String conferenceId = VoxeetSdk.conference().getConferenceId();
 
         VoxeetSdk.command().send(conferenceId, message)
-                .then(new PromiseExec<Boolean, Object>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-                        promise.resolve(result);
-                    }
-                })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        promise.reject(error);
-                    }
-                });
+                .then(promise::resolve)
+                .error(promise::reject);
     }
 
     @ReactMethod
@@ -539,19 +469,14 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         VoxeetToolkit.instance().enable(ConferenceToolkitController.class);
         VoxeetSdk.conference()
                 .join(conferenceAlias)
-                .then(new PromiseExec<Boolean, Boolean>() {
-                    @Override
-                    public void onCall(@Nullable Boolean result, @NonNull Solver<Boolean> solver) {
-                        Log.d(TAG, "onCall: conference joined");
-                        checkStartVideo();
-                    }
+                .then(conference -> {
+                    Log.d(TAG, "onCall: conference joined");
+                    checkStartVideo();
+                    promise.resolve(true);
                 })
-                .error(new ErrorPromise() {
-                    @Override
-                    public void onError(@NonNull Throwable error) {
-                        error.printStackTrace();
-                        promise.reject(error);
-                    }
+                .error(error -> {
+                    error.printStackTrace();
+                    promise.reject(error);
                 });
     }
 
@@ -582,8 +507,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private List<UserInfo> toUserInfos(ReadableArray array) {
-        List<UserInfo> result = new ArrayList<>();
+    private List<ParticipantInfo> toUserInfos(ReadableArray array) {
+        List<ParticipantInfo> result = new ArrayList<>();
         int index = 0;
 
         while (index < array.size()) {
@@ -597,8 +522,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         return result;
     }
 
-    private UserInfo toUserInfo(ReadableMap map) {
-        return new UserInfo(map.getString("name"),
+    private ParticipantInfo toUserInfo(ReadableMap map) {
+        return new ParticipantInfo(map.getString("name"),
                 map.getString("externalId"),
                 map.getString("avatarUrl"));
     }
@@ -608,23 +533,15 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         if (startVideo && null != conferenceService) {
             conferenceService
                     .startVideo()
-                    .then(new PromiseExec<Boolean, Object>() {
-                        @Override
-                        public void onCall(@Nullable Boolean result, @NonNull Solver<Object> solver) {
-
-                        }
+                    .then(result -> {
+                        Log.d(TAG, "startVideo " + result);
                     })
-                    .error(new ErrorPromise() {
-                        @Override
-                        public void onError(@NonNull Throwable error) {
-
-                        }
-                    });
+                    .error(Throwable::printStackTrace);
         }
     }
 
 
-    public UserInfo getCurrentUser() {
+    public ParticipantInfo getCurrentUser() {
         return _current_user;
     }
 
@@ -633,7 +550,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         return null != sessionService && sessionService.isSocketOpen();
     }
 
-    private boolean isSameUser(@NonNull UserInfo userInfo) {
+    private boolean isSameUser(@NonNull ParticipantInfo userInfo) {
         return userInfo.getExternalId().equals(getCurrentUser());
     }
 

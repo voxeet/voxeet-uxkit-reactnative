@@ -8,12 +8,13 @@ import com.facebook.react.bridge.WritableMap;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.models.ConferenceUserUtil;
 import com.voxeet.models.MediaStreamUtil;
-import com.voxeet.sdk.events.sdk.ConferenceUserQualityUpdatedEvent;
+import com.voxeet.sdk.events.error.ParticipantAddedErrorEvent;
+import com.voxeet.sdk.events.sdk.ConferenceParticipantQualityUpdatedEvent;
+import com.voxeet.sdk.events.v2.ParticipantAddedEvent;
+import com.voxeet.sdk.events.v2.ParticipantUpdatedEvent;
 import com.voxeet.sdk.events.v2.StreamAddedEvent;
 import com.voxeet.sdk.events.v2.StreamRemovedEvent;
-import com.voxeet.sdk.events.v2.UserAddedEvent;
-import com.voxeet.sdk.events.v2.UserUpdatedEvent;
-import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.Participant;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -25,41 +26,41 @@ public class ConferenceUserEventEmitter extends AbstractEventEmitter {
         super(context, eventBus);
 
 
-        register(new EventFormatterCallback<UserAddedEvent>(UserAddedEvent.class) {
+        register(new EventFormatterCallback<ParticipantAddedEvent>(ParticipantAddedEvent.class) {
             @Override
-            public void transform(@NonNull WritableMap map, @NonNull UserAddedEvent instance) {
-                toMap(map, instance.user);
+            public void transform(@NonNull WritableMap map, @NonNull ParticipantAddedEvent instance) {
+                toMap(map, instance.participant);
             }
-        }).register(new EventFormatterCallback<UserUpdatedEvent>(UserUpdatedEvent.class) {
+        }).register(new EventFormatterCallback<ParticipantUpdatedEvent>(ParticipantUpdatedEvent.class) {
             @Override
-            public void transform(@NonNull WritableMap map, @NonNull UserUpdatedEvent instance) {
-                toMap(map, instance.user);
+            public void transform(@NonNull WritableMap map, @NonNull ParticipantUpdatedEvent instance) {
+                toMap(map, instance.participant);
             }
         }).register(new EventFormatterCallback<StreamAddedEvent>(StreamAddedEvent.class) {
             @Override
             public void transform(@NonNull WritableMap map, @NonNull StreamAddedEvent instance) {
-                toMap(map, instance.user, instance.mediaStream);
+                toMap(map, instance.participant, instance.mediaStream);
             }
         }).register(new EventFormatterCallback<StreamRemovedEvent>(StreamRemovedEvent.class) {
             @Override
             public void transform(@NonNull WritableMap map, @NonNull StreamRemovedEvent instance) {
-                toMap(map, instance.user, instance.mediaStream);
+                toMap(map, instance.participant, instance.mediaStream);
             }
-        }).register(new EventFormatterCallback<ConferenceUserQualityUpdatedEvent>(ConferenceUserQualityUpdatedEvent.class) {
+        }).register(new EventFormatterCallback<ConferenceParticipantQualityUpdatedEvent>(ConferenceParticipantQualityUpdatedEvent.class) {
             @Override
-            public void transform(@NonNull WritableMap map, @NonNull ConferenceUserQualityUpdatedEvent instance) {
-                toMap(map, instance.user);
+            public void transform(@NonNull WritableMap map, @NonNull ConferenceParticipantQualityUpdatedEvent instance) {
+                toMap(map, instance.participant);
             }
         });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UserAddedEvent event) {
+    public void onEvent(ParticipantAddedEvent event) {
         emit(event);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(UserUpdatedEvent event) {
+    public void onEvent(ParticipantUpdatedEvent event) {
         emit(event);
     }
 
@@ -74,18 +75,18 @@ public class ConferenceUserEventEmitter extends AbstractEventEmitter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceUserQualityUpdatedEvent event) {
+    public void onEvent(ConferenceParticipantQualityUpdatedEvent event) {
         emit(event);
     }
 
-    private void toMap(@NonNull WritableMap map, @NonNull User user, @Nullable MediaStream mediaStream) {
+    private void toMap(@NonNull WritableMap map, @NonNull Participant user, @Nullable MediaStream mediaStream) {
         map.putMap("user", ConferenceUserUtil.toMap(user));
         if (null != mediaStream) {
             map.putMap("mediaStream", MediaStreamUtil.toMap(mediaStream));
         }
     }
 
-    private void toMap(@NonNull WritableMap map, @NonNull User user) {
+    private void toMap(@NonNull WritableMap map, @NonNull Participant user) {
         map.putMap("user", ConferenceUserUtil.toMap(user));
     }
 

@@ -8,7 +8,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.voxeet.sdk.models.Conference;
-import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.CreateConferenceResult;
 import com.voxeet.sdk.models.v1.HistoryConference;
 import com.voxeet.sdk.models.v1.MetaData;
@@ -40,8 +40,8 @@ public final class ConferenceUtil {
         map.putString("conferenceAlias", conference.getAlias());
 
         WritableNativeArray array = new WritableNativeArray();
-        List<User> users = conference.getUsers();
-        for (User user : users) {
+        List<Participant> users = conference.getParticipants();
+        for (Participant user : users) {
             array.pushMap(ConferenceUserUtil.toMap(user));
         }
         map.putArray("conferenceUsers", array);

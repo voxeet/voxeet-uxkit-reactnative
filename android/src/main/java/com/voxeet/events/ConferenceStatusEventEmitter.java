@@ -5,15 +5,14 @@ import android.support.annotation.NonNull;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.voxeet.sdk.events.error.CameraSwitchErrorEvent;
-import com.voxeet.sdk.events.error.GetConferenceHistoryErrorEvent;
 import com.voxeet.sdk.events.error.GetConferenceStatusErrorEvent;
+import com.voxeet.sdk.events.error.ParticipantAddedErrorEvent;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
-import com.voxeet.sdk.events.error.ReplayConferenceErrorEvent;
 import com.voxeet.sdk.events.error.SdkLogoutErrorEvent;
-import com.voxeet.sdk.events.error.UnsubscribeFromCallConferenceErrorEvent;
-import com.voxeet.sdk.events.promises.PromiseParticipantAddedErrorEventException;
+import com.voxeet.sdk.events.restapi.ReplayConferenceResult;
 import com.voxeet.sdk.events.sdk.CameraSwitchSuccessEvent;
-import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.events.sdk.ConferenceHistoryResult;
+import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.events.sdk.IncomingCallEvent;
 import com.voxeet.sdk.events.sdk.QualityIndicators;
 import com.voxeet.sdk.events.sdk.SdkLogoutSuccessEvent;
@@ -37,10 +36,10 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             void transform(@NonNull WritableMap map, @NonNull PermissionRefusedEvent instance) {
                 map.putString("permission", instance.getPermission().name());
             }
-        }).register(new EventFormatterCallback<PromiseParticipantAddedErrorEventException>(PromiseParticipantAddedErrorEventException.class) {
+        }).register(new EventFormatterCallback<ParticipantAddedErrorEvent>(ParticipantAddedErrorEvent.class) {
             @Override
-            void transform(@NonNull WritableMap map, @NonNull PromiseParticipantAddedErrorEventException instance) {
-                map.putString("message", instance.getEvent().message());
+            void transform(@NonNull WritableMap map, @NonNull ParticipantAddedErrorEvent instance) {
+                map.putString("message", instance.message());
             }
         }).register(new EventFormatterCallback<SdkLogoutSuccessEvent>(SdkLogoutSuccessEvent.class) {
             @Override
@@ -52,14 +51,9 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             void transform(@NonNull WritableMap map, @NonNull SdkLogoutErrorEvent instance) {
                 map.putString("message", instance.message());
             }
-        }).register(new EventFormatterCallback<ReplayConferenceErrorEvent>(ReplayConferenceErrorEvent.class) {
+        }).register(new EventFormatterCallback<ConferenceStatusUpdatedEvent>(ConferenceStatusUpdatedEvent.class) {
             @Override
-            void transform(@NonNull WritableMap map, @NonNull ReplayConferenceErrorEvent instance) {
-                map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<ConferenceStateEvent>(ConferenceStateEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull ConferenceStateEvent instance) {
+            void transform(@NonNull WritableMap map, @NonNull ConferenceStatusUpdatedEvent instance) {
                 map.putString("conferenceId", null != instance.conference ? instance.conference.getId() : null);
                 map.putString("conferenceAlias", instance.conferenceAlias);
                 map.putString("state", instance.state.name());
@@ -67,11 +61,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         }).register(new EventFormatterCallback<GetConferenceStatusErrorEvent>(GetConferenceStatusErrorEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull GetConferenceStatusErrorEvent instance) {
-                map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<GetConferenceHistoryErrorEvent>(GetConferenceHistoryErrorEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull GetConferenceHistoryErrorEvent instance) {
                 map.putString("message", instance.message());
             }
         }).register(new EventFormatterCallback<CameraSwitchSuccessEvent>(CameraSwitchSuccessEvent.class) {
@@ -83,11 +72,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             @Override
             void transform(@NonNull WritableMap map, @NonNull CameraSwitchErrorEvent instance) {
                 map.putString("message", instance.message());
-            }
-        }).register(new EventFormatterCallback<UnsubscribeFromCallConferenceErrorEvent>(UnsubscribeFromCallConferenceErrorEvent.class) {
-            @Override
-            void transform(@NonNull WritableMap map, @NonNull UnsubscribeFromCallConferenceErrorEvent instance) {
-                map.putString("conferenceId", instance.getConferenceId());
             }
         }).register(new EventFormatterCallback<QualityIndicators>(QualityIndicators.class) {
             @Override
@@ -103,7 +87,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             @Override
             void transform(@NonNull WritableMap map, @NonNull RecordingStatusUpdatedEvent instance) {
                 map.putString("conferenceId", instance.conferenceId);
-                map.putString("userId", instance.userId);
+                map.putString("userId", instance.participantId);
                 map.putString("recordingStatus", instance.recordingStatus);
                 map.putString("type", instance.getType());
             }
@@ -120,7 +104,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         });
     }
 
-    public void onEvent(ConferenceStateEvent event) {
+    public void onEvent(ConferenceStatusUpdatedEvent event) {
         emit(event);
     }
 
@@ -144,10 +128,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(PromiseParticipantAddedErrorEventException event) {
-        emit(event);
-    }
-
     public void onEvent(SdkLogoutSuccessEvent event) {
         emit(event);
     }
@@ -156,15 +136,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(ReplayConferenceErrorEvent event) {
-        emit(event);
-    }
-
     public void onEvent(GetConferenceStatusErrorEvent event) {
-        emit(event);
-    }
-
-    public void onEvent(GetConferenceHistoryErrorEvent event) {
         emit(event);
     }
 

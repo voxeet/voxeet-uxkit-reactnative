@@ -4,8 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.voxeet.push.center.management.Constants;
-import com.voxeet.sdk.factories.VoxeetIntentFactory;
+import com.voxeet.sdk.push.center.management.Constants;
 import com.voxeet.toolkit.activities.VoxeetAppCompatActivity;
 
 public class BounceVoxeetActivity extends VoxeetAppCompatActivity {

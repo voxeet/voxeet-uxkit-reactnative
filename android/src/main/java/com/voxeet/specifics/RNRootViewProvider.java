@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.sdk.VoxeetSdk;
-import com.voxeet.sdk.events.sdk.ConferenceStateEvent;
+import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.services.SessionService;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
@@ -106,11 +106,11 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(ConferenceStateEvent event) {
+    public void onEvent(ConferenceStatusUpdatedEvent event) {
         switch (event.state) {
             case JOINING:
             case JOINED:
-            case JOINED_ERROR:
+            case ERROR:
                 if (mRNIncomingBundleChecker != null)
                     mRNIncomingBundleChecker.flushIntent();
             default:

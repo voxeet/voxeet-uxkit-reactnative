@@ -35,6 +35,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 repositories {
@@ -45,7 +50,12 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    compile ('com.voxeet.sdk:toolkit:2.0.73.2') {
+
+    //add by default the optional firebase dependency
+    compile ('com.voxeet.sdk:toolkit-firebase:2.0.74')
+
+    //use the latest toolkit
+    compile ('com.voxeet.sdk:toolkit:2.0.74') {
         transitive = true
     }
 }

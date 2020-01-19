@@ -14,7 +14,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.sdk.VoxeetSdk;
-import com.voxeet.sdk.models.User;
+import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.views.VideoView;
 
@@ -98,7 +98,7 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
         ConferenceService conferenceService = VoxeetSdk.conference();
         if (null == conferenceService) return null;
 
-        User user = conferenceService.findUserById(peerId);
+        Participant user = conferenceService.findParticipantById(peerId);
         if (null == user) return null;
 
         List<MediaStream> list = user.streams();

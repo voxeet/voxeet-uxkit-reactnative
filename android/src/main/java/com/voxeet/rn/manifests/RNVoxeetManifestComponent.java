@@ -5,9 +5,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.voxeet.sdk.VoxeetEnvironmentHolder;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
+import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
 import com.voxeet.specifics.RNRootViewProvider;
 import com.voxeet.toolkit.controllers.VoxeetToolkit;
 import com.voxeet.toolkit.implementation.overlays.OverlayState;
@@ -25,8 +25,8 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
 
     @Override
     protected void init(@NonNull Context context) {
-        if(!(context instanceof Application)) {
-            Log.d(TAG, "init: ISSUE CONTEXT IS NOT AN APPPPPPLLIIICCAAATTIIIOOONNNN");
+        if (!(context instanceof Application)) {
+            Log.d(TAG, "init: ISSUE CONTEXT IS NOT AN Application");
             return;
         }
 
