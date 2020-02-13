@@ -221,7 +221,7 @@ Depending on your Environment, you must configurate your project according to th
 
 ### iOS
 
-Please go to [iOS Conferencekit](https://github.com/voxeet/voxeet-ios-conferencekit)
+Please go to [iOS VoxeetUXKit](https://github.com/voxeet/voxeet-uxkit-ios)
 
 ### Android
 
@@ -231,20 +231,20 @@ Please go to [Android SDK Sample](https://github.com/voxeet/android-sdk-sample)
 
 To build locally 
 
-```
+```bash
 npm run build-library
 ```
 
 the typescript command line needs local dev resolutions (available in the `package.json`)
 
-```
+```bash
 npm i -D @types/react ...
 ```
 
 ## License
 
 ```
-   Copyright 2019 - Voxeet
+   Copyright 2020 - Voxeet
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
