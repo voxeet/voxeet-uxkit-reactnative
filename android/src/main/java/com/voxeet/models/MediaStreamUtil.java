@@ -7,10 +7,6 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.voxeet.android.media.MediaStream;
 import com.voxeet.video.RNVideoViewManager;
 
-/**
- * Created by kevinleperf on 11/11/2018.
- */
-
 public final class MediaStreamUtil {
     private MediaStreamUtil() {
 

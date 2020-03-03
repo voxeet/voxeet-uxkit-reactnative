@@ -4,10 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.WritableMap;
 
-/**
- * Created by kevinleperf on 11/11/2018.
- */
-
 public abstract class EventFormatterCallback<TYPE> {
 
     private String name;

@@ -18,8 +18,6 @@ import java.util.List;
 
 public class RNVoxeetConferenceEventModule extends ReactContextBaseJavaModule {
 
-    private final static String TAG = RNVoxeetConferenceEventModule.class.getSimpleName();
-
     private final ReactApplicationContext reactContext;
     private final List<AbstractEventEmitter> eventEmitters;
 

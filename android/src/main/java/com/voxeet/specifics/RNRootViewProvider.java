@@ -6,14 +6,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.voxeet.VoxeetSDK;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
-import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.services.SessionService;
-import com.voxeet.toolkit.controllers.VoxeetToolkit;
-import com.voxeet.toolkit.providers.rootview.DefaultRootViewProvider;
+import com.voxeet.uxkit.controllers.VoxeetToolkit;
+import com.voxeet.uxkit.providers.rootview.DefaultRootViewProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -54,8 +54,8 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
 
-            if (null != VoxeetSdk.instance()) {
-                VoxeetSdk.instance().register(this);
+            if (null != VoxeetSDK.instance()) {
+                VoxeetSDK.instance().register(this);
             }
 
             if (!EventBus.getDefault().isRegistered(this)) {
@@ -64,7 +64,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
             RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
-                SessionService sessionService = VoxeetSdk.session();
+                SessionService sessionService = VoxeetSDK.session();
                 if (null != sessionService && sessionService.isSocketOpen()) {
                     checker.onAccept();
                     RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE = null;
