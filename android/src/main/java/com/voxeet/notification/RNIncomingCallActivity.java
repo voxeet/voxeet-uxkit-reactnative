@@ -3,19 +3,16 @@ package com.voxeet.notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.squareup.picasso.Picasso;
-import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.PromiseExec;
-import com.voxeet.promise.solve.Solver;
-import com.voxeet.sdk.VoxeetSdk;
+import com.voxeet.VoxeetSDK;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
@@ -26,7 +23,7 @@ import com.voxeet.sdk.services.AudioService;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.AudioType;
-import com.voxeet.toolkit.views.internal.rounded.RoundedImageView;
+import com.voxeet.uxkit.views.internal.rounded.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -68,13 +65,13 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(com.voxeet.toolkit.R.layout.voxeet_activity_incoming_call);
+        setContentView(com.voxeet.uxkit.R.layout.voxeet_activity_incoming_call);
 
-        mUsername = (TextView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_username);
-        mAvatar = (RoundedImageView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_avatar_image);
-        mStateTextView = (TextView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_text);
-        mAcceptTextView = (TextView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_accept);
-        mDeclineTextView = (TextView) findViewById(com.voxeet.toolkit.R.id.voxeet_incoming_decline);
+        mUsername = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_username);
+        mAvatar = (RoundedImageView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_avatar_image);
+        mStateTextView = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_text);
+        mAcceptTextView = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_accept);
+        mDeclineTextView = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_decline);
 
         mDeclineTextView.setOnClickListener(view -> onDecline());
 
@@ -104,7 +101,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         }
 
         if (mIncomingBundleChecker.isBundleValid()) {
-            VoxeetSdk instance = VoxeetSdk.instance();
+            VoxeetSDK instance = VoxeetSDK.instance();
             if (null != instance) {
                 mEventBus = instance.getEventBus();
                 if (null != mEventBus) mEventBus.register(this);
@@ -115,7 +112,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
                     .load(mIncomingBundleChecker.getAvatarUrl())
                     .into(mAvatar);
         } else {
-            Toast.makeText(this, getString(com.voxeet.toolkit.R.string.invalid_bundle), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(com.voxeet.uxkit.R.string.invalid_bundle), Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -143,7 +140,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
 
         switch (requestCode) {
             case PermissionRefusedEvent.RESULT_CAMERA: {
-                ConferenceService conferenceService = VoxeetSdk.conference();
+                ConferenceService conferenceService = VoxeetSDK.conference();
                 if (null != conferenceService && conferenceService.isLive()) {
                     conferenceService.startVideo()
                             .then(result -> {
@@ -191,7 +188,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     protected void onDecline() {
-        ConferenceService conferenceService = VoxeetSdk.conference();
+        ConferenceService conferenceService = VoxeetSDK.conference();
         if (null != getConferenceId() && null != conferenceService) {
             conferenceService.decline(getConferenceId())
                     .then(result -> {

@@ -1,12 +1,8 @@
 package com.voxeet.events;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.WritableMap;
-
-/**
- * Created by kevinleperf on 11/11/2018.
- */
 
 public abstract class EventFormatterCallback<TYPE> {
 

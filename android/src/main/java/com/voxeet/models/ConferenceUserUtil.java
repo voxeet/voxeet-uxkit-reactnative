@@ -1,6 +1,6 @@
 package com.voxeet.models;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;

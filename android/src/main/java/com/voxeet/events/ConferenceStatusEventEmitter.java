@@ -1,6 +1,6 @@
 package com.voxeet.events;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
@@ -9,9 +9,7 @@ import com.voxeet.sdk.events.error.GetConferenceStatusErrorEvent;
 import com.voxeet.sdk.events.error.ParticipantAddedErrorEvent;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.error.SdkLogoutErrorEvent;
-import com.voxeet.sdk.events.restapi.ReplayConferenceResult;
 import com.voxeet.sdk.events.sdk.CameraSwitchSuccessEvent;
-import com.voxeet.sdk.events.sdk.ConferenceHistoryResult;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.events.sdk.IncomingCallEvent;
 import com.voxeet.sdk.events.sdk.QualityIndicators;

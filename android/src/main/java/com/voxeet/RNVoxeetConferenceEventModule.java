@@ -1,7 +1,7 @@
 
 package com.voxeet;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RNVoxeetConferenceEventModule extends ReactContextBaseJavaModule {
-
-    private final static String TAG = RNVoxeetConferenceEventModule.class.getSimpleName();
 
     private final ReactApplicationContext reactContext;
     private final List<AbstractEventEmitter> eventEmitters;
@@ -53,7 +51,7 @@ public class RNVoxeetConferenceEventModule extends ReactContextBaseJavaModule {
             emitter.register();
         }
 
-        if(null != promise) {
+        if (null != promise) {
             promise.resolve(true);
         }
     }
@@ -64,7 +62,7 @@ public class RNVoxeetConferenceEventModule extends ReactContextBaseJavaModule {
             emitter.unRegister();
         }
 
-        if(null != promise) {
+        if (null != promise) {
             promise.resolve(true);
         }
     }

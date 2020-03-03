@@ -5,10 +5,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
-/**
- * Created by kevinleperf on 10/11/2018.
- */
-
 public class RCTVideoViewBooleanEvent extends Event<RCTVideoViewBooleanEvent> {
     final static String EVENT_NAME = "videoViewEventReturned";
     private final WritableMap payload;

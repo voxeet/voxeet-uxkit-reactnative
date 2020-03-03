@@ -7,6 +7,9 @@
             android:authorities="${applicationId}.manifests.RNVoxeetManifestComponent"
             android:enabled="true"
             android:exported="false" />
+
+        <activity android:name=".notification.RNIncomingCallActivity" />
+        <activity android:name=".specifics.BounceVoxeetActivity" />
     </application>
 
 </manifest>

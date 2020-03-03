@@ -3,12 +3,10 @@ package com.voxeet.specifics;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.PromiseExec;
-import com.voxeet.promise.solve.Solver;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;

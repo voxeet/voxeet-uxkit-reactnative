@@ -1,7 +1,8 @@
 package com.voxeet.specifics;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by kevinleperf on 21/11/2018.
