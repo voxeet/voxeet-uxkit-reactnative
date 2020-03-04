@@ -31,6 +31,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VoxeetSDK.shared.notification.type = VTNotificationTypeCallKit;
+        VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
         [VoxeetSDK.shared initializeWithConsumerKey:consumerKey consumerSecret:consumerSecret];
         [VoxeetUXKit.shared initialize];
@@ -44,6 +45,7 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VoxeetSDK.shared.notification.type = VTNotificationTypeCallKit;
+        VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
         [VoxeetSDK.shared initializeWithAccessToken:accessToken refreshTokenClosure:^(void (^closure)(NSString *)) {
             self.refreshAccessTokenClosure = closure;
@@ -165,14 +167,19 @@ RCT_EXPORT_METHOD(invite:(NSString *)conferenceID
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSMutableArray *userIDs = [[NSMutableArray alloc] init];
+        NSMutableArray<VTParticipantInfo *> *participantInfos = [[NSMutableArray alloc] init];
         
         for (NSDictionary *participant in participants) {
-            [userIDs addObject:[participant objectForKey:@"externalId"]];
+            NSString *externalID = [participant objectForKey:@"externalId"];
+            NSString *name = [participant objectForKey:@"name"];
+            NSString *avatarURL = [participant objectForKey:@"avatarUrl"];
+            
+            VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+            [participantInfos addObject:participantInfo];
         }
         
         [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
-            [VoxeetSDK.shared.notification inviteWithConference:conference externalIDs:userIDs completion:^(NSError *error) {
+            [VoxeetSDK.shared.notification inviteWithConference:conference participantInfos:participantInfos completion:^(NSError *error) {
                 if (error != nil) {
                     reject(@"invite_error", [error localizedDescription], nil);
                 } else {
