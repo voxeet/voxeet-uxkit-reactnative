@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.voxeet.RNVoxeetConferencekitModule;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
@@ -47,6 +48,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         VoxeetToolkit.instance().getConferenceToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
         VoxeetToolkit.instance().getReplayMessageToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
 
+        RNVoxeetConferencekitModule.initNotificationCenter();
     }
 
     @Override

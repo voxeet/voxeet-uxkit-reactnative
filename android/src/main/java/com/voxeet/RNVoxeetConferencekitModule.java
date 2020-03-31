@@ -28,12 +28,14 @@ import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.MetadataHolder;
 import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
-import com.voxeet.sdk.push.center.NotificationCenterFactory;
+import com.voxeet.sdk.push.center.NotificationCenter;
 import com.voxeet.sdk.push.center.management.EnforcedNotificationMode;
 import com.voxeet.sdk.push.center.management.NotificationMode;
 import com.voxeet.sdk.push.center.management.VersionFilter;
+import com.voxeet.sdk.push.center.subscription.register.SubscribeInvitation;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.SessionService;
+import com.voxeet.sdk.services.TelemetryService;
 import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
 import com.voxeet.sdk.services.telemetry.SdkEnvironment;
 import com.voxeet.sdk.utils.Validate;
@@ -84,6 +86,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         this.reactContext = reactContext;
 
         VoxeetPreferences.init(reactContext, new VoxeetEnvironmentHolder(reactContext));
+        TelemetryService.register(SdkEnvironment.REACT_NATIVE, BuildConfig.VERSION_NAME);
     }
 
     @Override
@@ -151,19 +154,24 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                 .enableOverlay(true);
 
         VoxeetSDK.instance().register(this);
-        VoxeetSDK.telemetry().registerEnvironment(SdkEnvironment.REACT_NATIVE, BuildConfig.VERSION_NAME);
     }
 
     //TODO create a RNINcomingNotification to start a proxy activity - same implementation as Cordova once it's fixed
     public static void initNotificationCenter() {
         //set Android Q as the minimum version no more supported by the full screen mode
-        NotificationCenterFactory.instance.register(NotificationMode.FULLSCREEN_INCOMING_CALL, new VersionFilter(VersionFilter.ALL, 29))
+        NotificationCenter.instance.register(NotificationMode.FULLSCREEN_INCOMING_CALL, new VersionFilter(VersionFilter.ALL, 29))
                 //register notification only mode
                 .register(NotificationMode.OVERHEAD_INCOMING_CALL, new IncomingNotification())
                 //register full screen mode
                 .register(NotificationMode.FULLSCREEN_INCOMING_CALL, new IncomingFullScreen(RNIncomingCallActivity.class))
                 //activate fullscreen -> notification mode only
                 .setEnforcedNotificationMode(EnforcedNotificationMode.MIXED_INCOMING_CALL);
+
+        try {
+            VoxeetSDK.notification().subscribe(new SubscribeInvitation()).execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @ReactMethod
