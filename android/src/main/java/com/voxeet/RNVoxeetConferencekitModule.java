@@ -20,13 +20,13 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.models.ConferenceUtil;
 import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
-import com.voxeet.promise.solve.PromiseExec;
 import com.voxeet.sdk.authent.token.TokenCallback;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.SocketStateChangeEvent;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.MetadataHolder;
 import com.voxeet.sdk.json.internal.ParamsHolder;
+import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.push.center.NotificationCenter;
 import com.voxeet.sdk.push.center.management.EnforcedNotificationMode;
@@ -120,7 +120,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                     });
 
             internalInitialize();
-            //callback.invoke();
         }
         promise.resolve(true);
     }
@@ -257,7 +256,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         }
         VoxeetSDK.session()
                 .open(info)
-                .then((result, solver) -> {
+                .then(result -> {
                     _current_user = info;
                     promise.resolve(result);
                     checkForIncomingConference();
@@ -272,7 +271,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void disconnect(final Promise promise) {
         VoxeetSDK.session()
                 .close()
-                .then((result, solver) -> {
+                .then(result -> {
                     _current_user = null;
                     promise.resolve(result);
                 })
@@ -322,7 +321,9 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                         .setMetadataHolder(holder)
                         .setParamsHolder(paramsHolder).build()
                 )
-                .then((result, solver) -> promise.resolve(ConferenceUtil.toMap(result)))
+                .then(result -> {
+                    promise.resolve(ConferenceUtil.toMap(result));
+                })
                 .error(promise::reject);
     }
 
@@ -333,7 +334,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         //TODO check for direct api call in react native to add listener in it
         if (!Validate.hasMicrophonePermissions(reactContext)) {
-            Log.d(TAG, "join: NOT PERMISSION 1 " + getActivity());
+            Log.d(TAG, "join: " + getActivity()+" does not have mic permission");
             if (null != getActivity()) {
                 sWaitingHolder = new WaitingJoinHolder(this, conferenceId, map, promise);
                 requestMicrophone();
@@ -348,13 +349,20 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             listener = null != user && "listener".equals(getString(user, "type"));
         }
 
-        VoxeetToolkit.getInstance().enable(VoxeetToolkit.getInstance().getConferenceToolkit());
+        VoxeetToolkit.instance().enable(VoxeetToolkit.instance().getConferenceToolkit());
+
+        Conference expected_conference = VoxeetSDK.conference().getConference(conferenceId);
+
+        if(null == expected_conference) {
+            promise.reject("-1", "Invalid conference, check the conferenceId used");
+            return;
+        }
 
         //TODO when the SDK will be using join parameters, use it
         Log.d(TAG, "join: joining as listener ? " + listener);
         if (!listener) {
             VoxeetSDK.conference()
-                    .join(conferenceId)
+                    .join(expected_conference)
                     .then(conference -> {
                         promise.resolve(ConferenceUtil.toMap(conference));
 
@@ -363,7 +371,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                     .error(promise::reject);
         } else {
             VoxeetSDK.conference()
-                    .listen(conferenceId)
+                    .listen(expected_conference)
                     .then(conference -> {
                         promise.resolve(ConferenceUtil.toMap(conference));
                     })
