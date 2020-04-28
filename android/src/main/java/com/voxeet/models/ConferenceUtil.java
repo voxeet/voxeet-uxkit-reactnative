@@ -18,6 +18,18 @@ import com.voxeet.sdk.models.v1.SubscribeConference;
 import java.util.List;
 
 public final class ConferenceUtil {
+
+    public static String CONFERENCE_ID = "conferenceId";
+    public static String CONFERENCE_ALIAS = "conferenceAlias";
+    public static String CONFERENCE_IS_NEW = "isNew";
+    public static String CONFERENCE_PARTICIPANTS = "conferenceUsers";
+    public static String CONFERENCE_TYPE = "conferenceType";
+    public static String CONFERENCE_OWNER_ID = "ownerId";
+    public static String CONFERENCE_DURATION = "conferenceDuration";
+    public static String CONFERENCE_RECORDING_DURATION = "recordingDuration";
+    public static String CONFERENCE_TIMESTAMP = "conferenceTimestamp";
+    public static String CONFERENCE_METADATA = "metadata";
+
     private ConferenceUtil() {
 
     }
@@ -26,9 +38,9 @@ public final class ConferenceUtil {
     public static WritableMap toMap(@Nullable CreateConferenceResult response) {
         WritableMap map = new WritableNativeMap();
         if(null != response) {
-            map.putString("conferenceId", response.conferenceId);
-            map.putString("conferenceAlias", response.conferenceAlias);
-            map.putBoolean("isNew", response.isNew);
+            map.putString(CONFERENCE_ID, response.conferenceId);
+            map.putString(CONFERENCE_ALIAS, response.conferenceAlias);
+            map.putBoolean(CONFERENCE_IS_NEW, response.isNew);
         }
         return map;
     }
@@ -36,31 +48,31 @@ public final class ConferenceUtil {
     @NonNull
     public static WritableMap toMap(@NonNull Conference conference) {
         WritableMap map = new WritableNativeMap();
-        map.putString("conferenceId", conference.getId());
-        map.putString("conferenceAlias", conference.getAlias());
+        map.putString(CONFERENCE_ID, conference.getId());
+        map.putString(CONFERENCE_ALIAS, conference.getAlias());
 
         WritableNativeArray array = new WritableNativeArray();
         List<Participant> users = conference.getParticipants();
         for (Participant user : users) {
             array.pushMap(ConferenceUserUtil.toMap(user));
         }
-        map.putArray("conferenceUsers", array);
+        map.putArray(CONFERENCE_PARTICIPANTS, array);
 
         return map;
     }
 
     public static WritableMap toMap(SubscribeConference conference) {
         WritableMap map = new WritableNativeMap();
-        map.putString("conferenceId", conference.getConferenceId());
-        map.putString("conferenceAlias", conference.getConferenceAlias());
-        map.putString("conferenceType", conference.getType());
+        map.putString(CONFERENCE_ID, conference.getConferenceId());
+        map.putString(CONFERENCE_ALIAS, conference.getConferenceAlias());
+        map.putString(CONFERENCE_TYPE, conference.getType());
 
         WritableNativeArray array = new WritableNativeArray();
         List<SdkParticipant> users = conference.getParticipants();
         for (SdkParticipant user : users) {
             array.pushMap(ConferenceUserUtil.toMap(user));
         }
-        map.putArray("conferenceUsers", array);
+        map.putArray(CONFERENCE_PARTICIPANTS, array);
 
         return map;
     }
@@ -77,24 +89,24 @@ public final class ConferenceUtil {
 
     private static WritableMap toMap(HistoryConference conference) {
         WritableMap map = new WritableNativeMap();
-        map.putString("conferenceId", conference.getConferenceId());
-        map.putString("conferenceAlias", conference.getConferenceAlias());
-        map.putString("conferenceType", conference.getConferenceType());
-        map.putString("ownerId", conference.getOwnerId());
-        map.putString("userId", conference.getUserId());
-        map.putDouble("conferenceDuration", conference.getConferenceDuration());
-        map.putDouble("recordingDuration", conference.getConferenceRecordingDuration());
-        map.putDouble("conferenceTimestamp", conference.getConferenceTimestamp());
-        map.putMap("metadata", toMap(conference.getMetadata()));
+        map.putString(CONFERENCE_ID, conference.getConferenceId());
+        map.putString(CONFERENCE_ALIAS, conference.getConferenceAlias());
+        map.putString(CONFERENCE_TYPE, conference.getConferenceType());
+        map.putString(CONFERENCE_OWNER_ID, conference.getOwnerId());
+        map.putString(ConferenceUserUtil.PARTICIPANT_ID, conference.getUserId());
+        map.putDouble(CONFERENCE_DURATION, conference.getConferenceDuration());
+        map.putDouble(CONFERENCE_RECORDING_DURATION, conference.getConferenceRecordingDuration());
+        map.putDouble(CONFERENCE_TIMESTAMP, conference.getConferenceTimestamp());
+        map.putMap(CONFERENCE_METADATA, toMap(conference.getMetadata()));
 
         return map;
     }
 
     private static WritableMap toMap(MetaData metadata) {
         WritableMap map = new WritableNativeMap();
-        map.putString("name", metadata.getExternalName());
-        map.putString("avatarUrl", metadata.getExternalPhotoUrl());
-        map.putString("externalId", metadata.getExternalId());
+        map.putString(ConferenceUserUtil.PARTICIPANT_NAME, metadata.getExternalName());
+        map.putString(ConferenceUserUtil.PARTICIPANT_AVATAR_URL, metadata.getExternalPhotoUrl());
+        map.putString(ConferenceUserUtil.PARTICIPANT_EXTERNAL_ID, metadata.getExternalId());
 
         return map;
     }

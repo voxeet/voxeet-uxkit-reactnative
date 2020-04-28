@@ -8,9 +8,17 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.Participant;
+import com.voxeet.sdk.models.v1.ConferenceParticipantStatus;
 import com.voxeet.sdk.models.v1.SdkParticipant;
+import com.voxeet.sdk.utils.Opt;
 
 public final class ConferenceUserUtil {
+    public final static String PARTICIPANT_ID = "userId";
+    public final static String PARTICIPANT_NAME = "name";
+    public final static String PARTICIPANT_EXTERNAL_ID = "externalId";
+    public final static String PARTICIPANT_AVATAR_URL = "avatarUrl";
+    public final static String CONFERENCE_STATUS = "conferenceStatus";
+
     private ConferenceUserUtil() {
 
     }
@@ -20,13 +28,19 @@ public final class ConferenceUserUtil {
         ParticipantInfo userInfo = user.getInfo();
 
         WritableMap map = new WritableNativeMap();
-        map.putString("userId", user.getId());
-        map.putString("conferenceStatus", user.getStatus().name());
+        map.putString(PARTICIPANT_ID, user.getId());
+        map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNWON).name());
 
-        if (null != user.getInfo()) {
-            map.putString("name", userInfo.getName());
-            map.putString("externalId", userInfo.getExternalId());
-            map.putString("avatarUrl", userInfo.getAvatarUrl());
+        if (null != userInfo) {
+            if (null != userInfo.getName()) {
+                map.putString(PARTICIPANT_NAME, userInfo.getName());
+            }
+            if (null != userInfo.getExternalId()) {
+                map.putString(PARTICIPANT_EXTERNAL_ID, userInfo.getExternalId());
+            }
+            if (null != userInfo.getAvatarUrl()) {
+                map.putString(PARTICIPANT_AVATAR_URL, userInfo.getAvatarUrl());
+            }
         }
 
         return map;
@@ -44,13 +58,19 @@ public final class ConferenceUserUtil {
 
     public static WritableMap toMap(SdkParticipant user) {
         WritableMap map = new WritableNativeMap();
-        map.putString("userId", user.getUserId());
-        map.putString("conferenceStatus", user.getStatus());
+        map.putString(PARTICIPANT_ID, user.getUserId());
+        map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNWON.toString()));
 
         if (null != user.getMetadata()) {
-            map.putString("name", user.getMetadata().getExternalName());
-            map.putString("externalId", user.getMetadata().getExternalId());
-            map.putString("avatarUrl", user.getMetadata().getExternalPhotoUrl());
+            if (null != user.getMetadata().getExternalName()) {
+                map.putString(PARTICIPANT_NAME, user.getMetadata().getExternalName());
+            }
+            if (null != user.getMetadata().getExternalId()) {
+                map.putString(PARTICIPANT_EXTERNAL_ID, user.getMetadata().getExternalId());
+            }
+            if (null != user.getMetadata().getExternalPhotoUrl()) {
+                map.putString(PARTICIPANT_AVATAR_URL, user.getMetadata().getExternalPhotoUrl());
+            }
         }
 
         return map;
