@@ -364,7 +364,9 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         } else {
             VoxeetSDK.conference()
                     .listen(conferenceId)
-                    .then(promise::resolve)
+                    .then(conference -> {
+                        promise.resolve(ConferenceUtil.toMap(conference));
+                    })
                     .error(promise::reject);
         }
     }
