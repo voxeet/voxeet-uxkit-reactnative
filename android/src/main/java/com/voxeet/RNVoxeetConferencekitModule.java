@@ -355,8 +355,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         if (!listener) {
             VoxeetSDK.conference()
                     .join(conferenceId)
-                    .then((PromiseExec<Boolean, Object>) (result, solver) -> {
-                        promise.resolve(result);
+                    .then(conference -> {
+                        promise.resolve(ConferenceUtil.toMap(conference));
 
                         checkStartVideo();
                     })
