@@ -15,6 +15,6 @@ Pod::Spec.new do |spec|
   spec.source_files  = "ios/**/*.{h,m}"
   spec.framework = "UIKit"
   spec.dependency "React"
-  spec.dependency "VoxeetUXKit", "1.3.3"
-  spec.dependency "VoxeetSDK", "2.2.1"
+  spec.dependency "VoxeetUXKit", "1.3.4"
+  spec.dependency "VoxeetSDK", "2.3.0"
 end
