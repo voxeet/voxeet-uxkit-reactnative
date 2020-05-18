@@ -13,8 +13,8 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
-import com.voxeet.sdk.VoxeetSdk;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.views.VideoView;
@@ -74,7 +74,7 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     @ReactProp(name = "attach")
     public void attach(@NonNull VideoView view,
                        @Nullable ReadableMap map) {
-        ConferenceService service = VoxeetSdk.conference();
+        ConferenceService service = VoxeetSDK.conference();
         if (null == service) {
             Log.d(TAG, "VideoView :: SDK NOT INITIALIZED");
         }
@@ -96,7 +96,7 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
 
     @Nullable
     private MediaStream tryToFindMediaStream(String peerId, String label) {
-        ConferenceService conferenceService = VoxeetSdk.conference();
+        ConferenceService conferenceService = VoxeetSDK.conference();
         if (null == conferenceService) return null;
 
         Participant user = conferenceService.findParticipantById(peerId);

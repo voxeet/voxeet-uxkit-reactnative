@@ -19,8 +19,8 @@ import com.voxeet.sdk.events.sdk.StopScreenShareAnswerEvent;
 import com.voxeet.sdk.events.sdk.StopVideoAnswerEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
+import com.voxeet.sdk.json.MediaResponse;
 import com.voxeet.sdk.json.RecordingStatusUpdatedEvent;
-import com.voxeet.sdk.json.StartVideoResponse;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -99,6 +99,12 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             void transform(@NonNull WritableMap map, @NonNull ConferenceEnded instance) {
                 map.putString("conferenceId", instance.conferenceId);
             }
+        }).register(new EventFormatterCallback<MediaResponse>(MediaResponse.class) {
+            @Override
+            void transform(@NonNull WritableMap map, @NonNull MediaResponse instance) {
+                map.putString("participantId", instance.participantId);
+                //TODO add all the other info?
+            }
         });
     }
 
@@ -118,7 +124,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         emit(event);
     }
 
-    public void onEvent(StartVideoResponse event) {
+    public void onEvent(MediaResponse event) {
         emit(event);
     }
 
