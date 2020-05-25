@@ -1,4 +1,8 @@
-# voxeet-uxkit-reactnative
+# Voxeet UXKit React Native
+
+## Documentation
+
+A full documentation can be found here: https://dolby.io/developers/interactivity-apis/client-ux-kit/uxkit-voxeet-react-native.
 
 ## Getting started
 
@@ -258,3 +262,5 @@ npm i -D @types/react ...
    See the License for the specific language governing permissions and
    limitations under the License.
 ```
+
+© Voxeet, 2020
