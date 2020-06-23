@@ -30,9 +30,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (VoxeetSDK.shared.notification.push.type != VTNotificationPushTypeCallKit) {
-            VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
-        }
+        VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
         VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
         [VoxeetSDK.shared initializeWithConsumerKey:consumerKey consumerSecret:consumerSecret];
@@ -46,9 +44,7 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (VoxeetSDK.shared.notification.push.type != VTNotificationPushTypeCallKit) {
-            VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
-        }
+        VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
         VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
         [VoxeetSDK.shared initializeWithAccessToken:accessToken refreshTokenClosure:^(void (^closure)(NSString *)) {
