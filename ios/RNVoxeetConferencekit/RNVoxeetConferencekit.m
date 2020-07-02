@@ -98,26 +98,28 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)options
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSMutableDictionary *nativeOptions = [[NSMutableDictionary alloc] init];
-    [nativeOptions setValue:[options valueForKey:@"alias"] forKey:@"conferenceAlias"];
-    
-    NSDictionary *params = [options valueForKey:@"params"];
-    if (params) {
-        NSMutableDictionary *nativeOptionsParams = [[NSMutableDictionary alloc] init];
-        [nativeOptionsParams setValue:[params valueForKey:@"ttl"] forKey:@"ttl"];
-        [nativeOptionsParams setValue:[params valueForKey:@"rtcpMode"] forKey:@"rtcpMode"];
-        [nativeOptionsParams setValue:[params valueForKey:@"mode"] forKey:@"mode"];
-        [nativeOptionsParams setValue:[params valueForKey:@"videoCodec"] forKey:@"videoCodec"];
-        [nativeOptions setValue:nativeOptionsParams forKey:@"params"];
-        
-        if ([params valueForKey:@"liveRecording"]) {
-            [nativeOptions setValue:@{@"liveRecording": [params valueForKey:@"liveRecording"]} forKey:@"metadata"];
-        }
+    // Retro compatibility with old params dictionary.
+    if ([options valueForKey:@"options"]) {
+        options = [options valueForKey:@"options"];
     }
     
+    // Create conference options.
+    VTConferenceOptions *conferenceOptions = [[VTConferenceOptions alloc] init];
+    conferenceOptions.alias = [options valueForKey:@"alias"];
+    conferenceOptions.pinCode = [options valueForKey:@"pinCode"];
+    NSDictionary *params = [options valueForKey:@"params"];
+    if (params) {
+        conferenceOptions.params.liveRecording = [params valueForKey:@"liveRecording"];
+        conferenceOptions.params.rtcpMode = [params valueForKey:@"rtcpMode"];
+        conferenceOptions.params.stats = [params valueForKey:@"stats"];
+        conferenceOptions.params.ttl = [params valueForKey:@"ttl"];
+        conferenceOptions.params.videoCodec = [params valueForKey:@"videoCodec"];
+    }
+    
+    // Create conference.
     dispatch_async(dispatch_get_main_queue(), ^{
-        [VoxeetSDK.shared.conference createWithParameters:nativeOptions success:^(NSDictionary<NSString *,id> *response) {
-            resolve(response);
+        [VoxeetSDK.shared.conference createWithOptions:conferenceOptions success:^(VTConference *conference) {
+            resolve(@{@"conferenceId": conference.id, @"conferenceAlias": conference.alias});
         } fail:^(NSError *error) {
             reject(@"create_error", [error localizedDescription], nil);
         }];
@@ -129,17 +131,23 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSMutableDictionary *nativeOptions = [[NSMutableDictionary alloc] init];
-    [nativeOptions setValue:[options valueForKey:@"alias"] forKey:@"conferenceAlias"];
-    
-    NSDictionary *user = [options valueForKey:@"user"];
-    if (user) {
-        [nativeOptions setValue:[user valueForKey:@"type"] forKey:@"participantType"];
+    // Retro compatibility with old params dictionary.
+    if ([options valueForKey:@"options"]) {
+        options = [options valueForKey:@"options"];
     }
     
+    // Join conference options.
+    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
+    [userInfo setValue:[options valueForKey:@"alias"] forKey:@"conferenceAlias"];
+    NSDictionary *user = [options valueForKey:@"user"];
+    if (user) {
+        [userInfo setValue:[user valueForKey:@"type"] forKey:@"participantType"];
+    }
+    
+    // Join conference.
     dispatch_async(dispatch_get_main_queue(), ^{
         BOOL video = VoxeetSDK.shared.conference.defaultVideo;
-        [VoxeetSDK.shared.conference joinWithConferenceID:conferenceID video:video userInfo:nativeOptions success:^(NSDictionary<NSString *,id> *response) {
+        [VoxeetSDK.shared.conference joinWithConferenceID:conferenceID video:video userInfo:userInfo success:^(NSDictionary<NSString *,id> *response) {
             resolve(response);
         } fail:^(NSError *error) {
             reject(@"join_error", [error localizedDescription], nil);
