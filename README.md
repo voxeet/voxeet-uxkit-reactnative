@@ -61,6 +61,10 @@ If you want to support CallKit (receiving incoming call when application is kill
 pod install
 ```
 
+##### Xcode 12 - additional step:
+
+Open your .xcworkspace project, select Product > Scheme > Edit scheme > Build > Uncheck "Parallelize Build"
+
 ### Android
 
 **Warning : those modification are not done automatically by `react-native link`. You must set them !**
