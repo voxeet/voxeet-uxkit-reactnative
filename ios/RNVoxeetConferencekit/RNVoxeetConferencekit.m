@@ -114,6 +114,7 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)options
         conferenceOptions.params.stats = [params valueForKey:@"stats"];
         conferenceOptions.params.ttl = [params valueForKey:@"ttl"];
         conferenceOptions.params.videoCodec = [params valueForKey:@"videoCodec"];
+        conferenceOptions.params.dolbyVoice = [params valueForKey:@"dolbyVoice"];
     }
     
     // Create conference.
@@ -146,11 +147,15 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
     
     // Join conference.
     dispatch_async(dispatch_get_main_queue(), ^{
-        BOOL video = VoxeetSDK.shared.conference.defaultVideo;
-        [VoxeetSDK.shared.conference joinWithConferenceID:conferenceID video:video userInfo:userInfo success:^(NSDictionary<NSString *,id> *response) {
-            resolve(response);
-        } fail:^(NSError *error) {
-            reject(@"join_error", [error localizedDescription], nil);
+        VTJoinOptions *options = [[VTJoinOptions alloc] init];
+        options.constraints.video = VoxeetSDK.shared.conference.defaultVideo;
+        
+        [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
+            [VoxeetSDK.shared.conference joinWithConference:conference options:options success:^(VTConference *conference2) {
+                resolve(@{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias});
+            } fail:^(NSError *error) {
+                reject(@"join_error", [error localizedDescription], nil);
+            }];
         }];
     });
 }
@@ -333,26 +338,33 @@ RCT_EXPORT_METHOD(startConference:(NSString *)conferenceID
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
+    NSMutableArray<VTParticipantInfo *> *participantInfos = [[NSMutableArray alloc] init];
+    
+    for (NSDictionary *participant in participants) {
+        NSString *externalID = [participant objectForKey:@"externalId"];
+        NSString *name = [participant objectForKey:@"name"];
+        NSString *avatarURL = [participant objectForKey:@"avatarUrl"];
+        
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+        [participantInfos addObject:participantInfo];
+    }
+    
+    // Create conference options.
+    VTConferenceOptions *conferenceOptions = [[VTConferenceOptions alloc] init];
+    conferenceOptions.alias = conferenceID;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSMutableArray *userIDs = [[NSMutableArray alloc] init];
-        
-        for (NSDictionary *participant in participants) {
-            [userIDs addObject:[participant objectForKey:@"externalId"]];
-        }
-        
-        [VoxeetSDK.shared.conference createWithParameters:@{@"conferenceAlias": conferenceID} success:^(NSDictionary<NSString *,id> *response) {
-            NSString *confID = response[@"conferenceId"];
-            BOOL isNew = response[@"isNew"];
-            BOOL video = VoxeetSDK.shared.conference.defaultVideo;
-            
-            [VoxeetSDK.shared.conference joinWithConferenceID:confID video:video userInfo:nil success:^(NSDictionary<NSString *,id> *response) {
-                resolve(response);
+        [VoxeetSDK.shared.conference createWithOptions:conferenceOptions success:^(VTConference *conference) {
+            VTJoinOptions *joinOptions = [[VTJoinOptions alloc] init];
+            joinOptions.constraints.video = VoxeetSDK.shared.conference.defaultVideo;
+            [VoxeetSDK.shared.conference joinWithConference:conference options:joinOptions success:^(VTConference *conference2) {
+                resolve(nil);
             } fail:^(NSError *error) {
                 reject(@"startConference_error", [error localizedDescription], nil);
             }];
             
-            if (isNew) {
-                [VoxeetSDK.shared.conference inviteWithConferenceID:confID externalIDs:userIDs completion:^(NSError *error) {}];
+            if (conference.isNew) {
+                [VoxeetSDK.shared.notification inviteWithConference:conference participantInfos:participantInfos completion:nil];
             }
         } fail:^(NSError *error) {
             reject(@"startConference_error", [error localizedDescription], nil);

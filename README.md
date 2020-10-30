@@ -65,6 +65,26 @@ pod install
 
 Open your .xcworkspace project, select Product > Scheme > Edit scheme > Build > Uncheck "Parallelize Build"
 
+##### Check your podfile:
+
+For v3.0.0, bitcode is currently unsupported. In your podfile, check that this block of code is present :
+```
+platform :ios, '11.0'
+use_frameworks!
+
+...
+
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      if target.name == "VoxeetSDK" || target.name == "VoxeetUXKit" || target.name == "voxeet-uxkit-reactnative"
+        target.build_configurations.each do |config|
+          config.build_settings["ENABLE_BITCODE"] = "NO"
+        end
+      end
+    end
+  end
+```
+
 ### Android
 
 **Warning : those modification are not done automatically by `react-native link`. You must set them !**
