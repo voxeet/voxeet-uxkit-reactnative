@@ -120,7 +120,10 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)options
     // Create conference.
     dispatch_async(dispatch_get_main_queue(), ^{
         [VoxeetSDK.shared.conference createWithOptions:conferenceOptions success:^(VTConference *conference) {
-            resolve(@{@"conferenceId": conference.id, @"conferenceAlias": conference.alias});
+            NSDictionary *result = @{@"conferenceId": conference.id,
+                                     @"conferenceAlias": conference.alias
+                                     @"isNew": [NSNumber numberWithBool:conference.isNew]};
+            resolve(result);
         } fail:^(NSError *error) {
             reject(@"create_error", [error localizedDescription], nil);
         }];
@@ -152,7 +155,8 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
         
         [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
             [VoxeetSDK.shared.conference joinWithConference:conference options:options success:^(VTConference *conference2) {
-                resolve(@{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias});
+                NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
+                resolve(result);
             } fail:^(NSError *error) {
                 reject(@"join_error", [error localizedDescription], nil);
             }];
