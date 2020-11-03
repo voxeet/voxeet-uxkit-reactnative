@@ -1,5 +1,10 @@
 # Voxeet UXKit React Native
 
+
+## SDK 3.0 License agreement
+
+Before using the latest version of the react-native plugin, please review and accept the [Dolby Software License Agreement](https://github.com/voxeet/voxeet-sdk-android/blob/main/LICENSE).
+
 ## Documentation
 
 A full documentation can be found here: https://dolby.io/developers/interactivity-apis/client-ux-kit/uxkit-voxeet-react-native.
@@ -90,60 +95,9 @@ use_frameworks!
 **Warning : those modification are not done automatically by `react-native link`. You must set them !**
 
 You must edit those files :
-- `build.gradle`
-- `app/build.gradle`
 - `app/src/main/AndroidManifest.xml`
 - `MainActivity`
 - `MainApplication`
-
-##### build.gradle
-
-At the end of the file, add this structure declaration :
-```
-ext {
-    buildToolsVersion = "28.0.3"
-    minSdkVersion = 16
-    compileSdkVersion = 28
-    targetSdkVersion = 27
-    supportLibVersion = "28.0.0"
-    voxeetSdkVersion = "1.4.12"
-    mediaSdkVersion = "0.8.2"
-}
-```
-
-##### app/build.gradle
-
-The SDK currently uses the 28.0.0 support libraries, you must add dependencies to those versions to prevent conflict with other non updated libraries
-
-Modify your app/build.gradle to add
-```
-    implementation "com.android.support:supportt-compat:${rootProject.ext.supportLibVersion}"
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
-
-    //possibly this one too
-    implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
-```
-
-Note that the following list is not limited to those but since the first 3 ones are directly dependance of the library, it's a best practice to use them.
-
-In case of library incompatibilities, you can also fork them, update them and report the use of the `rootProject.ext.someField` usage as describe in the Android Developer documentation.
-
-
-VoxeetSDK uses Java 8 instructions. Please edit the app/build.gradle to incorporate this compilation mode :
-
-```
-android {
-    ...
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    ...
-}
-```
 
 ##### MainApplication
 
