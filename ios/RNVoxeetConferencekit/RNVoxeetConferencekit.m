@@ -121,7 +121,7 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)options
     dispatch_async(dispatch_get_main_queue(), ^{
         [VoxeetSDK.shared.conference createWithOptions:conferenceOptions success:^(VTConference *conference) {
             NSDictionary *result = @{@"conferenceId": conference.id,
-                                     @"conferenceAlias": conference.alias
+                                     @"conferenceAlias": conference.alias,
                                      @"isNew": [NSNumber numberWithBool:conference.isNew]};
             resolve(result);
         } fail:^(NSError *error) {
