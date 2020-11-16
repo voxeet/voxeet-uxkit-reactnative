@@ -135,31 +135,45 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
+    BOOL isListener = NO;
+    BOOL defaultVideo = VoxeetSDK.shared.conference.defaultVideo; /* Monkey patch with listener mode */
+    
     // Retro compatibility with old params dictionary.
     if ([options valueForKey:@"options"]) {
         options = [options valueForKey:@"options"];
     }
     
     // Join conference options.
-    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
-    [userInfo setValue:[options valueForKey:@"alias"] forKey:@"conferenceAlias"];
     NSDictionary *user = [options valueForKey:@"user"];
     if (user) {
-        [userInfo setValue:[user valueForKey:@"type"] forKey:@"participantType"];
+        NSString *type = [user valueForKey:@"type"];
+        if (type && [type isEqual:@"listener"]) {
+            isListener = YES;
+        }
     }
     
     // Join conference.
     dispatch_async(dispatch_get_main_queue(), ^{
         VTJoinOptions *options = [[VTJoinOptions alloc] init];
         options.constraints.video = VoxeetSDK.shared.conference.defaultVideo;
-        
         [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
-            [VoxeetSDK.shared.conference joinWithConference:conference options:options success:^(VTConference *conference2) {
-                NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
-                resolve(result);
-            } fail:^(NSError *error) {
-                reject(@"join_error", [error localizedDescription], nil);
-            }];
+            if (!isListener) {
+                [VoxeetSDK.shared.conference joinWithConference:conference options:options success:^(VTConference *conference2) {
+                    NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
+                    resolve(result);
+                } fail:^(NSError *error) {
+                    reject(@"join_error", [error localizedDescription], nil);
+                }];
+            } else {
+                VoxeetSDK.shared.conference.defaultVideo = NO;
+                [VoxeetSDK.shared.conference listenWithConference:conference success:^(VTConference *conference2) {
+                    VoxeetSDK.shared.conference.defaultVideo = defaultVideo;
+                    NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
+                    resolve(result);
+                } fail:^(NSError *error) {
+                    reject(@"join_error", [error localizedDescription], nil);
+                }];
+            }
         }];
     });
 }
