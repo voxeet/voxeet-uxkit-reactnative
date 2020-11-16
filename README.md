@@ -94,10 +94,36 @@ use_frameworks!
 
 **Warning : those modification are not done automatically by `react-native link`. You must set them !**
 
+**Warning : the SDK is only compatible with the Hermes engine, you can use it using the following inside the app/build.gradle file :**
+
+```
+project.ext.react = [
+    enableHermes: true,  // clean and rebuild if changing
+]
+```
+
 You must edit those files :
+- `app/build.gradle`
 - `app/src/main/AndroidManifest.xml`
 - `MainActivity`
 - `MainApplication`
+
+##### build.gradle
+
+A pickFirst option must be used for the libc++ shared object:
+
+```
+android {
+  ...
+  packagingOptions {
+    pickFirst '**/armeabi-v7a/libc++_shared.so'
+    pickFirst '**/x86/libc++_shared.so'
+    pickFirst '**/arm64-v8a/libc++_shared.so'
+    pickFirst '**/x86_64/libc++_shared.so'
+  }
+  ...
+}
+```
 
 ##### MainApplication
 

@@ -61,4 +61,9 @@ dependencies {
     compile ('com.voxeet.sdk:uxkit:3.0.0') {
         transitive = true
     }
+    
+    //use sdk with 3.0.0 fixes
+    compile ('com.voxeet.sdk:uxkit:3.0.1') {
+        transitive = true
+    }
 }
