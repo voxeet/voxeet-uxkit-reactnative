@@ -450,6 +450,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void defaultBuiltInSpeaker(boolean activate) {
         VoxeetSDK.conference().ConferenceConfigurations.isDefaultOnSpeaker = activate;
+        VoxeetToolkit.instance().getConferenceToolkit().Configuration.Contextual.default_speaker_on = true;
     }
 
     @ReactMethod
