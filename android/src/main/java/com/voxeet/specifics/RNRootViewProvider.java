@@ -53,10 +53,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
         super.onActivityResumed(activity);
 
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
-
-            if (null != VoxeetSDK.instance()) {
-                VoxeetSDK.instance().register(this);
-            }
+            VoxeetSDK.instance().register(this);
 
             if (!EventBus.getDefault().isRegistered(this)) {
                 EventBus.getDefault().register(this); //registering this activity
@@ -65,7 +62,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
             RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
                 SessionService sessionService = VoxeetSDK.session();
-                if (null != sessionService && sessionService.isSocketOpen()) {
+                if (sessionService.isSocketOpen()) {
                     checker.onAccept();
                     RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE = null;
                 }

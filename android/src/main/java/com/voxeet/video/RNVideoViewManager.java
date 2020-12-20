@@ -75,10 +75,6 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public void attach(@NonNull VideoView view,
                        @Nullable ReadableMap map) {
         ConferenceService service = VoxeetSDK.conference();
-        if (null == service) {
-            Log.d(TAG, "VideoView :: SDK NOT INITIALIZED");
-        }
-
         if (null != map && map.hasKey(PEER_ID) && map.hasKey(LABEL)) {
             String peerId = map.getString(PEER_ID);
             String label = map.getString(LABEL);
