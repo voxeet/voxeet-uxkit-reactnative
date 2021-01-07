@@ -1,1 +1,1 @@
-{"version":3,"file":"JoinConference.js","sourceRoot":"","sources":["../../lib/types/JoinConference.ts"],"names":[],"mappings":"AAAA,MAAM,CAAN,IAAY,QAGX;AAHD,WAAY,QAAQ;IAClB,yBAAa,CAAA;IACb,iCAAqB,CAAA;AACvB,CAAC,EAHW,QAAQ,KAAR,QAAQ,QAGnB"}
+{"version":3,"file":"JoinConference.js","sourceRoot":"","sources":["../../lib/types/JoinConference.ts"],"names":[],"mappings":"AAEA,MAAM,CAAN,IAAY,QAGX;AAHD,WAAY,QAAQ;IAClB,yBAAa,CAAA;IACb,iCAAqB,CAAA;AACvB,CAAC,EAHW,QAAQ,KAAR,QAAQ,QAGnB"}

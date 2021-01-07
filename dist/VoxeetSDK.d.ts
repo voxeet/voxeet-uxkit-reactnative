@@ -1,6 +1,6 @@
 import ConferenceUser from './types/ConferenceUser';
-import CreateOptions from './types/CreateConference';
-import JoinOptions from './types/JoinConference';
+import { CreateOptions, CreateResult } from './types/CreateConference';
+import { JoinOptions, JoinResult } from './types/JoinConference';
 export interface RefreshCallback {
     (): void;
 }
@@ -34,13 +34,13 @@ export default class _VoxeetSDK {
      * Creates a conference
      * @param options Options to use to create the conference
      */
-    create(options: CreateOptions): Promise<any>;
+    create(options: CreateOptions): Promise<CreateResult>;
     /**
      * Joins a conference
      * @param conferenceId Id of the conference to join
      * @param options Options to use to join the conference
      */
-    join(conferenceId: string, options?: JoinOptions): Promise<any>;
+    join(conferenceId: string, options?: JoinOptions): Promise<JoinResult>;
     /**
      * Leaves the conference
      */

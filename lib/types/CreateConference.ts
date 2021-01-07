@@ -21,7 +21,13 @@ export interface CreateParameters {
   liveRecording?: boolean; //default false
 }
 
-export default interface CreateOptions {
+export interface CreateOptions {
   alias?: string;
   params?: CreateParameters;
+}
+
+export interface CreateResult {
+  conferenceId?: string;
+  conferenceAlias?: string;
+  isNew?: boolean
 }
