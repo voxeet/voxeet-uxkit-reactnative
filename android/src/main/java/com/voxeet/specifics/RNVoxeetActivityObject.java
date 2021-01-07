@@ -45,9 +45,7 @@ public class RNVoxeetActivityObject {
     }
 
     public void onResume(@NonNull Activity activity) {
-        if (null != VoxeetSDK.instance()) {
-            VoxeetSDK.instance().register(this);
-        }
+        VoxeetSDK.instance().register(this);
 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this); //registering this activity
@@ -59,17 +57,14 @@ public class RNVoxeetActivityObject {
         }
 
         if (mIncomingBundleChecker.isBundleValid()) {
-            if (null != VoxeetSDK.instance()) {
+            if (VoxeetSDK.instance().isInitialized()) {
                 mIncomingBundleChecker.onAccept();
             } else {
                 //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
             }
         }
 
-        ScreenShareService screenShareService = VoxeetSDK.screenShare();
-        if (null != screenShareService) {
-            screenShareService.consumeRightsToScreenShare();
-        }
+        VoxeetSDK.screenShare().consumeRightsToScreenShare();
     }
 
     @Nullable
@@ -79,12 +74,11 @@ public class RNVoxeetActivityObject {
 
     public void onPause(@NonNull Activity activity) {
         ConferenceService conferenceService = VoxeetSDK.conference();
-        if (null != conferenceService) {
-            //stop fetching stats if any pending
-            if (!conferenceService.isLive()) {
-                VoxeetSDK.localStats().stopAutoFetch();
-            }
+        //stop fetching stats if any pending
+        if (VoxeetSDK.instance().isInitialized() && !conferenceService.isLive()) {
+            VoxeetSDK.localStats().stopAutoFetch();
         }
+
         if (mActivity == activity) mActivity = null;
         if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
@@ -95,7 +89,7 @@ public class RNVoxeetActivityObject {
         switch (requestCode) {
             case PermissionRefusedEvent.RESULT_CAMERA: {
                 ConferenceService conferenceService = VoxeetSDK.conference();
-                if (null != conferenceService && conferenceService.isLive()) {
+                if (conferenceService.isLive()) {
                     VoxeetSDK.conference().startVideo()
                             .then(result -> {
 
@@ -124,7 +118,7 @@ public class RNVoxeetActivityObject {
     public void onNewIntent(Intent intent) {
         mIncomingBundleChecker = new IncomingBundleChecker(intent, null);
         if (mIncomingBundleChecker.isBundleValid()) {
-            if (null != VoxeetSDK.instance()) {
+            if (VoxeetSDK.instance().isInitialized()) {
                 mIncomingBundleChecker.onAccept();
             } else {
                 //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
@@ -133,11 +127,8 @@ public class RNVoxeetActivityObject {
     }
 
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-        boolean managed = false;
         ScreenShareService screenShareService = VoxeetSDK.screenShare();
-        if (null != screenShareService) {
-            managed = screenShareService.onActivityResult(requestCode, resultCode, data);
-        }
+        boolean managed = screenShareService.onActivityResult(requestCode, resultCode, data);
 
         return managed;
     }

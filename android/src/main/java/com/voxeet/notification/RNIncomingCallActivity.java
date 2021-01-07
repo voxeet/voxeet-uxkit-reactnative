@@ -102,10 +102,8 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
 
         if (mIncomingBundleChecker.isBundleValid()) {
             VoxeetSDK instance = VoxeetSDK.instance();
-            if (null != instance) {
-                mEventBus = instance.getEventBus();
-                if (null != mEventBus) mEventBus.register(this);
-            }
+            mEventBus = instance.getEventBus();
+            if (null != mEventBus) mEventBus.register(this);
 
             mUsername.setText(mIncomingBundleChecker.getUserName());
             Picasso.get()
@@ -141,7 +139,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         switch (requestCode) {
             case PermissionRefusedEvent.RESULT_CAMERA: {
                 ConferenceService conferenceService = VoxeetSDK.conference();
-                if (null != conferenceService && conferenceService.isLive()) {
+                if (conferenceService.isLive()) {
                     conferenceService.startVideo()
                             .then(result -> {
 
@@ -189,7 +187,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
 
     protected void onDecline() {
         ConferenceService conferenceService = VoxeetSDK.conference();
-        if (null != getConferenceId() && null != conferenceService) {
+        if (null != getConferenceId()) {
             conferenceService.decline(getConferenceId())
                     .then(result -> {
                         finish();

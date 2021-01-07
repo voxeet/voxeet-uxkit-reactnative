@@ -98,12 +98,11 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         promise.resolve("some string from Android");
     }
 
-
     @ReactMethod
     public void initializeToken(String accessToken, Promise promise) {
         Application application = (Application) reactContext.getApplicationContext();
 
-        if (null == VoxeetSDK.instance()) {
+        if (!VoxeetSDK.instance().isInitialized()) {
             //refreshAccessTokenCallbackInstance = callback;
 
             VoxeetSDK.setApplication(application);
@@ -127,7 +126,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void initialize(String consumerKey, String consumerSecret, Promise promise) {
         Application application = (Application) reactContext.getApplicationContext();
 
-        if (null == VoxeetSDK.instance()) {
+        if (!VoxeetSDK.instance().isInitialized()) {
             VoxeetSDK.setApplication(application);
             VoxeetSDK.initialize(consumerKey, consumerSecret);
 
@@ -333,7 +332,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         //TODO check for direct api call in react native to add listener in it
         if (!Validate.hasMicrophonePermissions(reactContext)) {
-            Log.d(TAG, "join: " + getActivity()+" does not have mic permission");
+            Log.d(TAG, "join: " + getActivity() + " does not have mic permission");
             if (null != getActivity()) {
                 sWaitingHolder = new WaitingJoinHolder(this, conferenceId, map, promise);
                 requestMicrophone();
@@ -445,6 +444,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void defaultBuiltInSpeaker(boolean activate) {
         VoxeetSDK.conference().ConferenceConfigurations.isDefaultOnSpeaker = activate;
+        VoxeetToolkit.instance().getConferenceToolkit().Configuration.Contextual.default_speaker_on = true;
     }
 
     @ReactMethod
@@ -538,7 +538,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private void checkStartVideo() {
         ConferenceService conferenceService = VoxeetSDK.conference();
-        if (startVideo && null != conferenceService) {
+        if (startVideo) {
             conferenceService
                     .startVideo()
                     .then(result -> {
@@ -554,8 +554,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     private boolean isConnected() {
-        SessionService sessionService = VoxeetSDK.session();
-        return null != sessionService && sessionService.isSocketOpen();
+        return VoxeetSDK.session().isSocketOpen();
     }
 
     private boolean isSameUser(@NonNull ParticipantInfo userInfo) {
