@@ -48,9 +48,9 @@ export default class VideoView extends Component<Props, State> {
     _requestMap: Map<number, Holder>;
     constructor(props: Props);
     componentDidMount(): void;
-    isAttached(): Promise<{}>;
-    isScreenShare(): Promise<{}>;
-    _sendCallReturn(command: any): Promise<{}>;
+    isAttached(): Promise<unknown>;
+    isScreenShare(): Promise<unknown>;
+    _sendCallReturn(command: any): Promise<unknown>;
     _onCallReturn: (event: any) => void;
     render(): JSX.Element;
 }
