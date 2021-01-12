@@ -50,14 +50,14 @@ var _VoxeetSDK = /** @class */ (function () {
         return RNVoxeetConferencekit.disconnect();
     };
     /**
-     * Creates a conference
+     * Creates a conference.
      * @param options Options to use to create the conference
      */
     _VoxeetSDK.prototype.create = function (options) {
         return RNVoxeetConferencekit.create(options);
     };
     /**
-     * Joins a conference
+     * Joins the conference.
      * @param conferenceId Id of the conference to join
      * @param options Options to use to join the conference
      */
@@ -66,13 +66,13 @@ var _VoxeetSDK = /** @class */ (function () {
         return RNVoxeetConferencekit.join(conferenceId, options);
     };
     /**
-     * Leaves the conference
+     * Leaves the conference.
      */
     _VoxeetSDK.prototype.leave = function () {
         return RNVoxeetConferencekit.leave();
     };
     /**
-     * Invite a participant to the conference
+     * Invite a participant to the conference.
      * @param conferenceId Id of the conference to invite the participant to
      * @param participants List of participants to invite
      */
@@ -80,26 +80,26 @@ var _VoxeetSDK = /** @class */ (function () {
         return RNVoxeetConferencekit.invite(conferenceId, participants);
     };
     /**
-     * Sends a broadcast message to the participants of the conference
+     * Sends a broadcast message to the participants of the conference.
      * @param message Message to send to the other participants
      */
     _VoxeetSDK.prototype.sendBroadcastMessage = function (message) {
         return RNVoxeetConferencekit.sendBroadcastMessage(message);
     };
     /**
-     * Is telecom mode enabled
+     * Is telecom mode enabled.
      */
     _VoxeetSDK.prototype.isTelecomMode = function () {
         return RNVoxeetConferencekit.isTelecomMode();
     };
     /**
-     * Is 3D audio enabled
+     * Is audio 3D enabled.
      */
     _VoxeetSDK.prototype.isAudio3DEnabled = function () {
         return RNVoxeetConferencekit.isAudio3DEnabled();
     };
     /**
-     * Sets if you want the UXKit to appear maximized or not
+     * Sets if you want the UXKit to appear maximized or not.
      * @param maximized True to have the UXKit to appear maximized
      */
     _VoxeetSDK.prototype.appearMaximized = function (maximized) {
@@ -107,16 +107,16 @@ var _VoxeetSDK = /** @class */ (function () {
         return true;
     };
     /**
-     * Use the built in speaker by default
-     * @param enable
+     * Use the built in speaker by default.
+     * @param enable True to use the built in speaker by default
      */
     _VoxeetSDK.prototype.defaultBuiltInSpeaker = function (enable) {
         RNVoxeetConferencekit.defaultBuiltInSpeaker(enable);
         return true;
     };
     /**
-     * Sets the video on by default
-     * @param enable
+     * Sets the video on by default.
+     * @param enable True to turn on the video by default
      */
     _VoxeetSDK.prototype.defaultVideo = function (enable) {
         RNVoxeetConferencekit.defaultVideo(enable);
@@ -124,48 +124,38 @@ var _VoxeetSDK = /** @class */ (function () {
     };
     /**
      * Activates or disable the screen auto lock. Android only.
-     * @param activate
+     * @param activate True to activate the screen auto lock
      */
     _VoxeetSDK.prototype.screenAutoLock = function (activate) {
         if (Platform.OS == "android") {
             RNVoxeetConferencekit.screenAutoLock(activate);
         }
     };
-    /**
-     * @deprecated
-     */
+    /** @deprecated */
     _VoxeetSDK.prototype.isUserLoggedIn = function () {
         return RNVoxeetConferencekit.isUserLoggedIn();
     };
     /**
-     * Checks if a conference is awaiting
+     * Checks if a conference is awaiting. Android only.
      */
     _VoxeetSDK.prototype.checkForAwaitingConference = function () {
         if (Platform.OS != "android")
-            return new Promise(function (r) { return r(); });
+            return new Promise(function (r) { return r(false); });
         return RNVoxeetConferencekit.checkForAwaitingConference();
     };
-    /**
-     * @deprecated Use join() instead.
-     */
+    /** @deprecated Use join() instead. */
     _VoxeetSDK.prototype.startConference = function (conferenceId, participants) {
         return RNVoxeetConferencekit.startConference(conferenceId, participants);
     };
-    /**
-     * @deprecated Use leave() instead.
-     */
+    /** @deprecated Use leave() instead. */
     _VoxeetSDK.prototype.stopConference = function () {
         return this.leave();
     };
-    /**
-     * @deprecated Use connect() instead.
-     */
+    /** @deprecated Use connect() instead. */
     _VoxeetSDK.prototype.openSession = function (userInfo) {
         return this.connect(userInfo);
     };
-    /**
-     * @deprecated Use disconnect() instead.
-     */
+    /** @deprecated Use disconnect() instead. */
     _VoxeetSDK.prototype.closeSession = function () {
         return this.disconnect();
     };

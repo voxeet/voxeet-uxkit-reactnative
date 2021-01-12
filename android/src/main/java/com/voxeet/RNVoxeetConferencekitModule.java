@@ -289,7 +289,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         if (null != options) {
             if (options.hasKey("alias"))
-            conferenceAlias = options.getString("alias");
+                conferenceAlias = options.getString("alias");
 
             if (options.hasKey("params")) {
                 params = options.getMap("params");
@@ -309,6 +309,12 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
                     if (valid(params, "liveRecording"))
                         paramsHolder.putValue("liveRecording", getString(params, "liveRecording"));
+
+                    if (valid(params, "dolbyVoice"))
+                        paramsHolder.setDolbyVoice(params.getBoolean("dolbyVoice"));
+
+                    if (valid(params, "simulcast"))
+                        paramsHolder.setSimulcast(params.getBoolean("simulcast"));
                 }
             }
         }

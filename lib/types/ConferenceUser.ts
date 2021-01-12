@@ -1,4 +1,5 @@
 export default class ConferenceUser {
+  
   public userId: string | undefined;
   public conferenceStatus: string | undefined;
   public externalId: string | undefined;
@@ -10,4 +11,5 @@ export default class ConferenceUser {
     this.name = name;
     this.avatarUrl = avatarUrl;
   }
-};
+
+}

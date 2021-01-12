@@ -1,5 +1,6 @@
 export enum RTCPMode {
   WORST = "worst",
+  AVERAGE = "average",
   BEST = "best"
 }
   
@@ -19,6 +20,8 @@ export interface CreateParameters {
   mode?: Mode; // push / standard, default => standard
   videoCodec?: Codec; //default VP8
   liveRecording?: boolean; //default false
+  dolbyVoice?: boolean;
+  simulcast?: boolean; //default false
 }
 
 export interface CreateOptions {

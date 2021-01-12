@@ -31,81 +31,71 @@ export default class _VoxeetSDK {
      */
     disconnect(): Promise<boolean>;
     /**
-     * Creates a conference
+     * Creates a conference.
      * @param options Options to use to create the conference
      */
     create(options: CreateOptions): Promise<CreateResult>;
     /**
-     * Joins a conference
+     * Joins the conference.
      * @param conferenceId Id of the conference to join
      * @param options Options to use to join the conference
      */
     join(conferenceId: string, options?: JoinOptions): Promise<JoinResult>;
     /**
-     * Leaves the conference
+     * Leaves the conference.
      */
     leave(): Promise<boolean>;
     /**
-     * Invite a participant to the conference
+     * Invite a participant to the conference.
      * @param conferenceId Id of the conference to invite the participant to
      * @param participants List of participants to invite
      */
     invite(conferenceId: string, participants: ConferenceUser[]): Promise<boolean>;
     /**
-     * Sends a broadcast message to the participants of the conference
+     * Sends a broadcast message to the participants of the conference.
      * @param message Message to send to the other participants
      */
     sendBroadcastMessage(message: string): Promise<boolean>;
     /**
-     * Is telecom mode enabled
+     * Is telecom mode enabled.
      */
     isTelecomMode(): Promise<boolean>;
     /**
-     * Is 3D audio enabled
+     * Is audio 3D enabled.
      */
     isAudio3DEnabled(): Promise<boolean>;
     /**
-     * Sets if you want the UXKit to appear maximized or not
+     * Sets if you want the UXKit to appear maximized or not.
      * @param maximized True to have the UXKit to appear maximized
      */
     appearMaximized(maximized: boolean): boolean;
     /**
-     * Use the built in speaker by default
-     * @param enable
+     * Use the built in speaker by default.
+     * @param enable True to use the built in speaker by default
      */
     defaultBuiltInSpeaker(enable: boolean): boolean;
     /**
-     * Sets the video on by default
-     * @param enable
+     * Sets the video on by default.
+     * @param enable True to turn on the video by default
      */
     defaultVideo(enable: boolean): boolean;
     /**
      * Activates or disable the screen auto lock. Android only.
-     * @param activate
+     * @param activate True to activate the screen auto lock
      */
     screenAutoLock(activate: boolean): void;
-    /**
-     * @deprecated
-     */
+    /** @deprecated */
     isUserLoggedIn(): Promise<boolean>;
     /**
-     * Checks if a conference is awaiting
+     * Checks if a conference is awaiting. Android only.
      */
     checkForAwaitingConference(): Promise<boolean>;
-    /**
-     * @deprecated Use join() instead.
-     */
+    /** @deprecated Use join() instead. */
     startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise<boolean>;
-    /**
-     * @deprecated Use leave() instead.
-     */
+    /** @deprecated Use leave() instead. */
     stopConference(): Promise<boolean>;
-    /**
-     * @deprecated Use connect() instead.
-     */
+    /** @deprecated Use connect() instead. */
     openSession(userInfo: ConferenceUser): Promise<boolean>;
-    /**
-     * @deprecated Use disconnect() instead.
-     */
+    /** @deprecated Use disconnect() instead. */
     closeSession(): Promise<boolean>;
 }

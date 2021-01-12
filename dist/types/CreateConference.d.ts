@@ -1,5 +1,6 @@
 export declare enum RTCPMode {
     WORST = "worst",
+    AVERAGE = "average",
     BEST = "best"
 }
 export declare enum Mode {
@@ -16,6 +17,8 @@ export interface CreateParameters {
     mode?: Mode;
     videoCodec?: Codec;
     liveRecording?: boolean;
+    dolbyVoice?: boolean;
+    simulcast?: boolean;
 }
 export interface CreateOptions {
     alias?: string;

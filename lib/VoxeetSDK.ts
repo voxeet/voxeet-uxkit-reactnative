@@ -64,7 +64,7 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Creates a conference
+   * Creates a conference.
    * @param options Options to use to create the conference
    */
   create(options: CreateOptions): Promise<CreateResult> {
@@ -72,7 +72,7 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Joins a conference
+   * Joins the conference.
    * @param conferenceId Id of the conference to join
    * @param options Options to use to join the conference
    */
@@ -81,14 +81,14 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Leaves the conference
+   * Leaves the conference.
    */
   leave(): Promise<boolean> {
     return RNVoxeetConferencekit.leave();
   }
 
   /**
-   * Invite a participant to the conference
+   * Invite a participant to the conference.
    * @param conferenceId Id of the conference to invite the participant to
    * @param participants List of participants to invite
    */
@@ -97,7 +97,7 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Sends a broadcast message to the participants of the conference
+   * Sends a broadcast message to the participants of the conference.
    * @param message Message to send to the other participants
    */
   sendBroadcastMessage(message: string): Promise<boolean> {
@@ -105,21 +105,21 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Is telecom mode enabled
+   * Is telecom mode enabled.
    */
   isTelecomMode(): Promise<boolean> {
     return RNVoxeetConferencekit.isTelecomMode();
   }
 
   /**
-   * Is 3D audio enabled
+   * Is audio 3D enabled.
    */
   isAudio3DEnabled(): Promise<boolean> {
     return RNVoxeetConferencekit.isAudio3DEnabled();
   }
 
   /**
-   * Sets if you want the UXKit to appear maximized or not
+   * Sets if you want the UXKit to appear maximized or not.
    * @param maximized True to have the UXKit to appear maximized
    */
   appearMaximized(maximized: boolean): boolean {
@@ -128,8 +128,8 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Use the built in speaker by default
-   * @param enable 
+   * Use the built in speaker by default.
+   * @param enable True to use the built in speaker by default
    */
   defaultBuiltInSpeaker(enable: boolean): boolean {
     RNVoxeetConferencekit.defaultBuiltInSpeaker(enable);
@@ -137,8 +137,8 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Sets the video on by default
-   * @param enable 
+   * Sets the video on by default.
+   * @param enable True to turn on the video by default
    */
   defaultVideo(enable: boolean): boolean {
     RNVoxeetConferencekit.defaultVideo(enable);
@@ -147,7 +147,7 @@ export default class _VoxeetSDK {
 
   /**
    * Activates or disable the screen auto lock. Android only.
-   * @param activate 
+   * @param activate True to activate the screen auto lock
    */
   screenAutoLock(activate: boolean) {
     if (Platform.OS == "android") {
@@ -155,46 +155,36 @@ export default class _VoxeetSDK {
     }
   }
 
-  /**
-   * @deprecated
-   */
+  /** @deprecated */
   isUserLoggedIn(): Promise<boolean> {
     return RNVoxeetConferencekit.isUserLoggedIn();
   }
 
   /**
-   * Checks if a conference is awaiting
+   * Checks if a conference is awaiting. Android only.
    */
   checkForAwaitingConference(): Promise<boolean> {
-    if (Platform.OS != "android") return new Promise<boolean>(r => r());
+    if (Platform.OS != "android") return new Promise<boolean>(r => r(false));
 
     return RNVoxeetConferencekit.checkForAwaitingConference();
   }
 
-  /**
-   * @deprecated Use join() instead.
-   */
+  /** @deprecated Use join() instead. */
   startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise<boolean> {
     return RNVoxeetConferencekit.startConference(conferenceId, participants);
   }
 
-  /**
-   * @deprecated Use leave() instead.
-   */
+  /** @deprecated Use leave() instead. */
   stopConference(): Promise<boolean> {
     return this.leave();
   }
 
-  /**
-   * @deprecated Use connect() instead.
-   */
+  /** @deprecated Use connect() instead. */
   openSession(userInfo: ConferenceUser): Promise<boolean> {
     return this.connect(userInfo);
   }
 
-  /**
-   * @deprecated Use disconnect() instead.
-   */
+  /** @deprecated Use disconnect() instead. */
   closeSession(): Promise<boolean> {
     return this.disconnect();
   }
