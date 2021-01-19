@@ -1,4 +1,3 @@
-
 package com.voxeet;
 
 import android.Manifest;
@@ -222,7 +221,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void checkForAwaitingConference(Promise promise) {
         SessionService sessionService = VoxeetSDK.session();
         if (null == sessionService) {
-            promise.reject(ERROR_SDK_NOT_INITIALIZED);
+            promise.reject("-1", ERROR_SDK_NOT_INITIALIZED);
         } else {
             RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
@@ -231,7 +230,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                     RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE = null;
                     promise.resolve(true);
                 } else {
-                    promise.reject(ERROR_SDK_NOT_LOGGED_IN);
+                    promise.reject("-1", ERROR_SDK_NOT_LOGGED_IN);
                 }
             } else {
                 promise.resolve(true);
@@ -241,11 +240,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void connect(ReadableMap userInfo, final Promise promise) {
-        openSession(userInfo, promise);
-    }
-
-    @ReactMethod
-    public void openSession(ReadableMap userInfo, final Promise promise) {
         final ParticipantInfo info = toUserInfo(userInfo);
 
         if (isConnected() && isSameUser(info)) {
@@ -253,6 +247,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             promise.resolve(true);
             return;
         }
+
         VoxeetSDK.session()
                 .open(info)
                 .then(result -> {
@@ -264,6 +259,11 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                     promise.reject(error);
                     cancelIncomingConference();
                 });
+    }
+
+    @ReactMethod
+    public void openSession(ReadableMap userInfo, final Promise promise) {
+        connect(userInfo, promise);
     }
 
     @ReactMethod
@@ -282,15 +282,15 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void create(@Nullable ReadableMap options, @NonNull final Promise promise) {
-        String conferenceId = null;
+        String conferenceAlias = null;
         ReadableMap params;
         MetadataHolder holder = new MetadataHolder();
         ParamsHolder paramsHolder = new ParamsHolder();
 
         if (null != options) {
-
             if (options.hasKey("alias"))
-                conferenceId = options.getString("alias");
+                conferenceAlias = options.getString("alias");
+
             if (options.hasKey("params")) {
                 params = options.getMap("params");
 
@@ -309,14 +309,19 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
                     if (valid(params, "liveRecording"))
                         paramsHolder.putValue("liveRecording", getString(params, "liveRecording"));
+
+                    if (valid(params, "dolbyVoice"))
+                        paramsHolder.setDolbyVoice(params.getBoolean("dolbyVoice"));
+
+                    if (valid(params, "simulcast"))
+                        paramsHolder.setSimulcast(params.getBoolean("simulcast"));
                 }
             }
-
         }
 
         VoxeetSDK.conference()
                 .create(new ConferenceCreateOptions.Builder()
-                        .setConferenceAlias(conferenceId)
+                        .setConferenceAlias(conferenceAlias)
                         .setMetadataHolder(holder)
                         .setParamsHolder(paramsHolder).build()
                 )
@@ -391,38 +396,34 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         //TODO expose in the SDK the ability to use the conferenceId
         Log.d(TAG, "invite: WARNING :: the provided conferenceId is not yet managed, please make sure you have joined the conference before trying to invite users");
 
-        List<ParticipantInfo> users = null;
-
-        if (null != participants) {
-            users = toUserInfos(participants);
+        if (participants == null) {
+            promise.resolve(true);
+            return;
         }
 
+        List<ParticipantInfo> users = toUserInfos(participants);
+
         VoxeetSDK.conference()
-                .invite(conferenceId, users)
-                .then(participants1 -> {
-                    promise.resolve(true);
+                .fetchConference(conferenceId)
+                .then(conference -> {
+                    VoxeetSDK.notification()
+                            .invite(conference, users)
+                            .then(ps -> {
+                                promise.resolve(true);
+                            })
+                            .error(promise::reject);
                 })
                 .error(promise::reject);
-
     }
 
     @ReactMethod
     public void sendBroadcastMessage(String message, final Promise promise) {
         String conferenceId = VoxeetSDK.conference().getConferenceId();
 
-        VoxeetSDK.command().send(conferenceId, message)
+        VoxeetSDK.command()
+                .send(conferenceId, message)
                 .then(promise::resolve)
                 .error(promise::reject);
-    }
-
-    @ReactMethod
-    public void setAudio3DEnabled(boolean enabled) {
-        VoxeetSDK.mediaDevice().setAudio3DEnabled(enabled);
-    }
-
-    @ReactMethod
-    public void setTelecomMode(boolean enabled) {
-        VoxeetSDK.conference().ConferenceConfigurations.telecomMode = enabled;
     }
 
     @ReactMethod
@@ -506,7 +507,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         if (null != event.getPermission()) {
             switch (event.getPermission()) {
                 case CAMERA:
-                    //Validate.requestMandatoryPermissions(VoxeetToolkit.getInstance().getCurrentActivity(),
+                    //Validate.requestMandatoryPermissions(VoxeetToolkit.instance().getCurrentActivity(),
                     //        new String[]{Manifest.permission.CAMERA},
                     //        PermissionRefusedEvent.RESULT_CAMERA);
                     Activity activity = getCurrentActivity();
