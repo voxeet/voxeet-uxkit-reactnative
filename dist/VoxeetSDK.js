@@ -107,6 +107,20 @@ var _VoxeetSDK = /** @class */ (function () {
         return true;
     };
     /**
+     * Minimize the overlay.
+     */
+    _VoxeetSDK.prototype.minimize = function () {
+        RNVoxeetConferencekit.minimize();
+        return true;
+    };
+    /**
+     * Maximize the overlay.
+     */
+    _VoxeetSDK.prototype.maximize = function () {
+        RNVoxeetConferencekit.maximize();
+        return true;
+    };
+    /**
      * Use the built in speaker by default.
      * @param enable True to use the built in speaker by default
      */

@@ -243,6 +243,20 @@ RCT_EXPORT_METHOD(appearMaximized:(BOOL)enable)
     });
 }
 
+RCT_EXPORT_METHOD(minimize)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [VoxeetUXKit.shared.conferenceController minimize];
+    });
+}
+
+RCT_EXPORT_METHOD(maximize)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [VoxeetUXKit.shared.conferenceController maximize];
+    });
+}
+
 RCT_EXPORT_METHOD(defaultBuiltInSpeaker:(BOOL)enable)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
