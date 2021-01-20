@@ -70,6 +70,14 @@ export default class _VoxeetSDK {
      */
     appearMaximized(maximized: boolean): boolean;
     /**
+     * Minimize the overlay.
+     */
+    minimize(): boolean;
+    /**
+     * Maximize the overlay.
+     */
+    maximize(): boolean;
+    /**
      * Use the built in speaker by default.
      * @param enable True to use the built in speaker by default
      */

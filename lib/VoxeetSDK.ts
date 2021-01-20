@@ -128,6 +128,23 @@ export default class _VoxeetSDK {
   }
 
   /**
+   * Minimize the overlay.
+   */
+  minimize(): boolean {
+    RNVoxeetConferencekit.minimize();
+    return true;
+  }
+
+  /**
+   * Maximize the overlay.
+   */
+  maximize(): boolean {
+    RNVoxeetConferencekit.maximize();
+    return true;
+  }
+
+
+  /**
    * Use the built in speaker by default.
    * @param enable True to use the built in speaker by default
    */

@@ -443,6 +443,16 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void minimize() {
+        VoxeetToolkit.instance().getConferenceToolkit().minimize();
+    }
+
+    @ReactMethod
+    public void maximize() {
+        VoxeetToolkit.instance().getConferenceToolkit().maximize();
+    }
+
+    @ReactMethod
     public void screenAutoLock(boolean activate) {
         Log.d(TAG, "screenAutoLock: warning, method not implemented");
     }
