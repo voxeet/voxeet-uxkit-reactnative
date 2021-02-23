@@ -41,7 +41,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
 
         VoxeetToolkit.initialize(application, EventBus.getDefault());
 
-        RNVoxeetManifestComponent.root_view_provider = new RNRootViewProvider(application, VoxeetToolkit.getInstance());
+        RNVoxeetManifestComponent.root_view_provider = new RNRootViewProvider(application, VoxeetToolkit.instance());
         VoxeetToolkit.instance().setProvider(RNVoxeetManifestComponent.root_view_provider);
 
         VoxeetToolkit.instance().enableOverlay(true);

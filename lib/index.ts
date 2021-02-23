@@ -7,8 +7,8 @@ const VoxeetSDK = new _VoxeetSDK();
 
 export {
   ConferenceUser,
-  CreateConference,
-  JoinConference,
+  CreateOptions, CreateResult,
+  JoinOptions, JoinResult,
   MediaStream
 } from "./types";
 
