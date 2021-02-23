@@ -105,10 +105,10 @@ export default class _VoxeetSDK {
   }
 
   /**
-   * Is telecom mode enabled.
+   * Sets the audio 3D.
    */
-  isTelecomMode(): Promise<boolean> {
-    return RNVoxeetConferencekit.isTelecomMode();
+  setAudio3DEnabled(enable: boolean): void {
+    RNVoxeetConferencekit.setAudio3DEnabled(enable);
   }
 
   /**
@@ -116,6 +116,20 @@ export default class _VoxeetSDK {
    */
   isAudio3DEnabled(): Promise<boolean> {
     return RNVoxeetConferencekit.isAudio3DEnabled();
+  }
+
+  /**
+   * Sets the telecom mode.
+   */
+  setTelecomMode(enable: boolean): void {
+    RNVoxeetConferencekit.setTelecomMode(enable);
+  }
+
+  /**
+   * Is telecom mode enabled.
+   */
+  isTelecomMode(): Promise<boolean> {
+    return RNVoxeetConferencekit.isTelecomMode();
   }
 
   /**

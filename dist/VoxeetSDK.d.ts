@@ -57,13 +57,21 @@ export default class _VoxeetSDK {
      */
     sendBroadcastMessage(message: string): Promise<boolean>;
     /**
-     * Is telecom mode enabled.
+     * Sets the audio 3D.
      */
-    isTelecomMode(): Promise<boolean>;
+    setAudio3DEnabled(enable: boolean): void;
     /**
      * Is audio 3D enabled.
      */
     isAudio3DEnabled(): Promise<boolean>;
+    /**
+     * Sets the telecom mode.
+     */
+    setTelecomMode(enable: boolean): void;
+    /**
+     * Is telecom mode enabled.
+     */
+    isTelecomMode(): Promise<boolean>;
     /**
      * Sets if you want the UXKit to appear maximized or not.
      * @param maximized True to have the UXKit to appear maximized
