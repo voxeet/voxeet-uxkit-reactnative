@@ -250,10 +250,24 @@ RCT_EXPORT_METHOD(defaultBuiltInSpeaker:(BOOL)enable)
     });
 }
 
+RCT_EXPORT_METHOD(setAudio3DEnabled:(BOOL)enable)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VoxeetSDK.shared.conference.audio3D = enable;
+    });
+}
+
 RCT_EXPORT_METHOD(isAudio3DEnabled:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     resolve([NSNumber numberWithBool:VoxeetSDK.shared.conference.audio3D]);
+}
+
+RCT_EXPORT_METHOD(setTelecomMode:(BOOL)enable)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VoxeetUXKit.shared.telecom = enable;
+    });
 }
 
 RCT_EXPORT_METHOD(isTelecomMode:(RCTPromiseResolveBlock)resolve

@@ -87,16 +87,28 @@ var _VoxeetSDK = /** @class */ (function () {
         return RNVoxeetConferencekit.sendBroadcastMessage(message);
     };
     /**
-     * Is telecom mode enabled.
+     * Sets the audio 3D.
      */
-    _VoxeetSDK.prototype.isTelecomMode = function () {
-        return RNVoxeetConferencekit.isTelecomMode();
+    _VoxeetSDK.prototype.setAudio3DEnabled = function (enable) {
+        RNVoxeetConferencekit.setAudio3DEnabled(enable);
     };
     /**
      * Is audio 3D enabled.
      */
     _VoxeetSDK.prototype.isAudio3DEnabled = function () {
         return RNVoxeetConferencekit.isAudio3DEnabled();
+    };
+    /**
+     * Sets the telecom mode.
+     */
+    _VoxeetSDK.prototype.setTelecomMode = function (enable) {
+        RNVoxeetConferencekit.setTelecomMode(enable);
+    };
+    /**
+     * Is telecom mode enabled.
+     */
+    _VoxeetSDK.prototype.isTelecomMode = function () {
+        return RNVoxeetConferencekit.isTelecomMode();
     };
     /**
      * Sets if you want the UXKit to appear maximized or not.
