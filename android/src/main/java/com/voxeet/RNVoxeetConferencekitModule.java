@@ -108,7 +108,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             VoxeetSDK.setApplication(application);
             VoxeetSDK.initialize(
                     accessToken,
-                    callback -> {
+                    (required, callback) -> {
                         lock(lockAwaitingToken);
                         if (!mAwaitingTokenCallback.contains(callback)) {
                             mAwaitingTokenCallback.add(callback);

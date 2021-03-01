@@ -29,7 +29,7 @@ public final class ConferenceUserUtil {
 
         WritableMap map = new WritableNativeMap();
         map.putString(PARTICIPANT_ID, user.getId());
-        map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNWON).name());
+        map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNOWN).name());
 
         if (null != userInfo) {
             if (null != userInfo.getName()) {
@@ -59,7 +59,7 @@ public final class ConferenceUserUtil {
     public static WritableMap toMap(SdkParticipant user) {
         WritableMap map = new WritableNativeMap();
         map.putString(PARTICIPANT_ID, user.getUserId());
-        map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNWON.toString()));
+        map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNOWN.toString()));
 
         if (null != user.getMetadata()) {
             if (null != user.getMetadata().getExternalName()) {
