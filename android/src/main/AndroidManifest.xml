@@ -10,6 +10,8 @@
 
         <activity android:name=".notification.RNIncomingCallActivity" />
         <activity android:name=".specifics.BounceVoxeetActivity" />
+
+        <meta-data android:name="voxeet_incoming_class" android:value="com.voxeet.notification.RNIncomingCallActivity" />
     </application>
 
 </manifest>

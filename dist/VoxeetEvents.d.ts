@@ -1,4 +1,5 @@
+import { NativeEventEmitter } from 'react-native';
 export default class VoxeetEvents {
-    events: import("react-native").EventEmitter;
+    events: NativeEventEmitter;
     constructor();
 }

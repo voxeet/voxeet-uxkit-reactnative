@@ -24,10 +24,10 @@ apply plugin: 'com.android.library'
 def ext = rootProject.ext
 def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 28
 def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "28.0.3"
-def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 16
+def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 21
 def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 28
 
-if(_minSdk < 16) _minSdk = 16
+if(_minSdk < 21) _minSdk = 21
 
 android {
     compileSdkVersion _compile
@@ -55,15 +55,10 @@ dependencies {
     implementation "androidx.annotation:annotation:1.1.0"
 
     //add by default the optional firebase dependency
-    compile ('com.voxeet.sdk:uxkit-firebase:3.0.0')
+    compile ('com.voxeet.sdk:uxkit-firebase:3.0.3-BETA3')
 
     //use the latest toolkit
-    compile ('com.voxeet.sdk:uxkit:3.0.0') {
-        transitive = true
-    }
-    
-    //use sdk with 3.0.0 fixes
-    compile ('com.voxeet.sdk:uxkit:3.0.1') {
+    compile ('com.voxeet.sdk:uxkit:3.0.3-BETA3') {
         transitive = true
     }
 }

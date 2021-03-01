@@ -1,5 +1,6 @@
 package com.voxeet.notification;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,7 @@ import com.voxeet.sdk.services.AudioService;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.AudioType;
+import com.voxeet.sdk.utils.Validate;
 import com.voxeet.uxkit.views.internal.rounded.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -102,10 +104,8 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
 
         if (mIncomingBundleChecker.isBundleValid()) {
             VoxeetSDK instance = VoxeetSDK.instance();
-            if (null != instance) {
-                mEventBus = instance.getEventBus();
-                if (null != mEventBus) mEventBus.register(this);
-            }
+            mEventBus = instance.getEventBus();
+            if (null != mEventBus) mEventBus.register(this);
 
             mUsername.setText(mIncomingBundleChecker.getUserName());
             Picasso.get()
@@ -141,7 +141,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         switch (requestCode) {
             case PermissionRefusedEvent.RESULT_CAMERA: {
                 ConferenceService conferenceService = VoxeetSDK.conference();
-                if (null != conferenceService && conferenceService.isLive()) {
+                if (conferenceService.isLive()) {
                     conferenceService.startVideo()
                             .then(result -> {
 
@@ -189,7 +189,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
 
     protected void onDecline() {
         ConferenceService conferenceService = VoxeetSDK.conference();
-        if (null != getConferenceId() && null != conferenceService) {
+        if (null != getConferenceId()) {
             conferenceService.decline(getConferenceId())
                     .then(result -> {
                         finish();
@@ -201,6 +201,15 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
     }
 
     protected void onAccept() {
+
+        if (!Validate.hasMicrophonePermissions(this)) {
+            Validate.requestMandatoryPermissions(this, new String[]{
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.CAMERA
+            }, 42);
+            return;
+        }
+
         if (mIncomingBundleChecker.isBundleValid()) {
             REACT_NATIVE_ROOT_BUNDLE = mIncomingBundleChecker;
 

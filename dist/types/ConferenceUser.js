@@ -7,5 +7,4 @@ var ConferenceUser = /** @class */ (function () {
     return ConferenceUser;
 }());
 export default ConferenceUser;
-;
 //# sourceMappingURL=ConferenceUser.js.map
