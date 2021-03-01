@@ -40,24 +40,9 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 ### Android
 
-> Note: to enable Firebase on Android (for Push Notification), please add the [react-native-voxeet-firebase](https://github.com/voxeet/react-native-voxeet-firebase) library.
-
-1. In `build.gradle`, add the maven repository and set the `minSdkVersion` to at least 21.
-    ```gradle
-    allprojects {
-        repositories {
-            maven { url "https://android-sdk.voxeet.com/release" }
-        }
-    }
-    ```
+1. In `android/app/build.gradle`, add the maven repository and set the `minSdkVersion` to at least **21**.
 
 2. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```gradle
-    implementation (project(':@voxeet_react-native-voxeet-conferencekit')) {
-        transitive = true
-    }
-  	```
-
     **Warning: the SDK is only compatible with the Hermes engine**
 
     ```gradle
@@ -84,26 +69,6 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     If you are using `Expo` you can skip this step.
     
     If your `MainActivity` extends `ReactActivity`, change from `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`. With the following import: `import com.voxeet.specifics.RNVoxeetActivity`
-
-4. Update the `app/src/main/AndroidManifest.xml` file with the following permissions:
-
-    ```xml
-    <!-- VOXEET PERMISSIONS - WARNING: THERE MAY BE DUPLICATES - no expected issues -->
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    ```
 
 
 ## Usage
