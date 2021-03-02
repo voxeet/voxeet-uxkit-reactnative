@@ -15,8 +15,8 @@ Pod::Spec.new do |spec|
   spec.source_files  = "ios/**/*.{h,m}"
   spec.framework = "UIKit"
   spec.dependency "React"
-  spec.dependency "VoxeetUXKit", "1.4.0"
-  spec.dependency "VoxeetSDK", "3.0.3"
+  spec.dependency "VoxeetUXKit", "1.4.2"
+  spec.dependency "VoxeetSDK", "3.1.0"
 
   # MacBook arm simulator isn't supported.
   spec.pod_target_xcconfig = {

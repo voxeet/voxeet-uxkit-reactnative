@@ -47,7 +47,7 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
         VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
         VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
-        [VoxeetSDK.shared initializeWithAccessToken:accessToken refreshTokenClosure:^(void (^closure)(NSString *)) {
+        [VoxeetSDK.shared initializeWithAccessToken:accessToken refreshTokenClosureWithParam:^(void (^closure)(NSString *), BOOL isExpired) {
             self.refreshAccessTokenClosure = closure;
             if (self->_hasListeners) {
                 [self sendEventWithName:@"refreshToken" body:nil];
@@ -166,7 +166,7 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
                 }];
             } else {
                 VoxeetSDK.shared.conference.defaultVideo = NO;
-                [VoxeetSDK.shared.conference listenWithConference:conference success:^(VTConference *conference2) {
+                [VoxeetSDK.shared.conference listenWithConference:conference options:nil success:^(VTConference *conference2) {
                     VoxeetSDK.shared.conference.defaultVideo = defaultVideo;
                     NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
                     resolve(result);
