@@ -25,7 +25,6 @@ public class RNVoxeetConferenceEventModule extends ReactContextBaseJavaModule {
         super(reactContext);
         this.reactContext = reactContext;
 
-
         eventEmitters = new ArrayList<>();
         eventEmitters.add(new ConferenceStatusEventEmitter(reactContext,
                 EventBus.getDefault()));

@@ -1,6 +1,7 @@
 export var RTCPMode;
 (function (RTCPMode) {
     RTCPMode["WORST"] = "worst";
+    RTCPMode["AVERAGE"] = "average";
     RTCPMode["BEST"] = "best";
 })(RTCPMode || (RTCPMode = {}));
 export var Mode;

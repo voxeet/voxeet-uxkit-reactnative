@@ -2,11 +2,14 @@ package com.voxeet.rn.manifests;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.ProviderInfo;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.voxeet.RNVoxeetConferencekitModule;
+import com.voxeet.VoxeetSDK;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
@@ -26,16 +29,21 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
     private static final String TAG = RNVoxeetManifestComponent.class.getSimpleName();
 
     @Override
-    protected void init(@NonNull Context context) {
+    protected void init(@NonNull Context context, @Nullable ProviderInfo providerInfo) {
         if (!(context instanceof Application)) {
             Log.d(TAG, "init: ISSUE CONTEXT IS NOT AN Application");
             return;
         }
 
         Application application = (Application) context;
+
+        //Set the context to the SDK to ensure that all the required components are available
+        //(call made here in case that the RNVoxeetManifestComponent class is called before the SDK)
+        VoxeetSDK.setApplication(context);
+
         VoxeetToolkit.initialize(application, EventBus.getDefault());
 
-        RNVoxeetManifestComponent.root_view_provider = new RNRootViewProvider(application, VoxeetToolkit.getInstance());
+        RNVoxeetManifestComponent.root_view_provider = new RNRootViewProvider(application, VoxeetToolkit.instance());
         VoxeetToolkit.instance().setProvider(RNVoxeetManifestComponent.root_view_provider);
 
         VoxeetToolkit.instance().enableOverlay(true);
