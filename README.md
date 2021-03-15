@@ -75,7 +75,54 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 ```javascript
 import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
+
+const sdk = new VoxeetSDK();
 ```
+
+### initialization
+
+```
+sdk.initialize(appKey, appSecret);
+```
+
+or 
+
+```
+sdk.initializeToken(accessToken, () => {
+    return new Promise((resolve, reject) => {
+        ... //get the new accessToken
+        resolve(theNewAccessToken);
+    });
+});
+```
+
+### Open a session (+ check for conference to join)
+
+
+Once the SDK is initialized, try to connect your current user as soon as possible.
+
+```
+await sdk.connect(new UserInfo("externalId", "name", "optAvatarUrl"));
+```
+
+Once the session has been started, if an incoming call has been accepted by the user, it will be initiated right away.
+
+### Join and leave conferences
+
+Use the corresponding method to perform the action :
+
+```
+const conference = await sdk.create({ alias: "yourConferenceAlias" });
+await sdk.join(conference.conferenceId);
+```
+
+To leave, use the following
+
+```
+await sdk.leave(conferenceId);
+```
+
+### Invite participants
 
 ## Configuration
 
