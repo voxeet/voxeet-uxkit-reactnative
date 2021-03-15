@@ -1,6 +1,6 @@
 {
   "name": "@voxeet/react-native-voxeet-conferencekit",
-  "version": "0.2.9-BETA1",
+  "version": "0.2.9",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
