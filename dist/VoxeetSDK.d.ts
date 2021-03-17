@@ -8,6 +8,9 @@ export interface TokenRefreshCallback {
     (): Promise<string>;
 }
 export default class _VoxeetSDK {
+    #private;
+    get events(): any;
+    set events(any: any);
     refreshAccessTokenCallback: RefreshCallback | null;
     /**
      * Initializes the SDK using the customer key and secret.
@@ -99,3 +102,4 @@ export default class _VoxeetSDK {
     /** @deprecated Use disconnect() instead. */
     closeSession(): Promise<boolean>;
 }
+export declare const VoxeetSDK: _VoxeetSDK;

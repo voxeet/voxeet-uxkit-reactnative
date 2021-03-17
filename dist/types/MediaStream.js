@@ -1,9 +1,7 @@
-var MediaStream = /** @class */ (function () {
-    function MediaStream(peerId, label) {
+export default class MediaStream {
+    constructor(peerId, label) {
         this.peerId = peerId;
         this.label = label;
     }
-    return MediaStream;
-}());
-export default MediaStream;
+}
 //# sourceMappingURL=MediaStream.js.map

@@ -2,7 +2,6 @@ import VoxeetEvents from "./VoxeetEvents";
 import VideoView from "./VideoView";
 import { default as _VoxeetSDK } from "./VoxeetSDK";
 
-
 const VoxeetSDK = new _VoxeetSDK();
 
 export {
@@ -14,7 +13,7 @@ export {
 
 
 export {
-    VoxeetSDK,
-    VoxeetEvents,
-    VideoView
+  VoxeetSDK,
+  VoxeetEvents,
+  VideoView
 };

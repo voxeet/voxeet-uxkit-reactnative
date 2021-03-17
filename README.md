@@ -75,20 +75,20 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 ```javascript
 import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
-
-const sdk = new VoxeetSDK();
 ```
+
+Note: the VoxeetEvents is now deprecated and will disappear from the library itself.
 
 ### initialization
 
 ```
-sdk.initialize(appKey, appSecret);
+VoxeetSDK.initialize(appKey, appSecret);
 ```
 
 or 
 
 ```
-sdk.initializeToken(accessToken, () => {
+VoxeetSDK.initializeToken(accessToken, () => {
     return new Promise((resolve, reject) => {
         ... //get the new accessToken
         resolve(theNewAccessToken);
@@ -102,7 +102,7 @@ sdk.initializeToken(accessToken, () => {
 Once the SDK is initialized, try to connect your current user as soon as possible.
 
 ```
-await sdk.connect(new UserInfo("externalId", "name", "optAvatarUrl"));
+await VoxeetSDK.connect(new UserInfo("externalId", "name", "optAvatarUrl"));
 ```
 
 Once the session has been started, if an incoming call has been accepted by the user, it will be initiated right away.
@@ -112,17 +112,41 @@ Once the session has been started, if an incoming call has been accepted by the 
 Use the corresponding method to perform the action :
 
 ```
-const conference = await sdk.create({ alias: "yourConferenceAlias" });
-await sdk.join(conference.conferenceId);
+const conference = await VoxeetSDK.create({ alias: "yourConferenceAlias" });
+await VoxeetSDK.join(conference.conferenceId);
 ```
 
 To leave, use the following
 
 ```
-await sdk.leave(conferenceId);
+await VoxeetSDK.leave(conferenceId);
 ```
 
 ### Invite participants
+
+
+## Events
+
+You can subscribe to events via the `addListener` (and unsubscribe via the corresponding `removeListener`) method in `VoxeetSDK.events`
+
+### Example
+
+```
+import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
+import { ConferenceStatusUpdatedEvent } from "@voxeet/react-native-voxeet-conferencekit/events";
+
+const onConferenceStatus = (event: ConferenceStatusUpdatedEvent) => {
+  console.warn("event received", event);
+}
+
+VoxeetSDK.events.addListener("ConferenceStatusUpdatedEvent, onConferenceStatus);
+```
+
+### ConferenceStatusUpdatedEvent
+
+- conferenceId: `string`
+- conferenceAlias: `string|undefined`
+- status: `ConferenceStatus`
 
 ## Configuration
 
