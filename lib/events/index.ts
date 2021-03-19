@@ -1,1 +1,1 @@
-export { default as ConferenceStatusUpdatedEvent } from "./ConferenceStatusUpdatedEvent";
+export { ConferenceStatusUpdatedEvent } from "./ConferenceStatusUpdatedEvent";

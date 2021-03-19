@@ -14,7 +14,7 @@ export declare enum ConferenceStatus {
     DESTROYED = "DESTROYED",
     ENDED = "ENDED"
 }
-export default interface ConferenceStatusUpdatedEvent {
+export interface ConferenceStatusUpdatedEvent {
     conferenceId: string;
     conferenceAlias: string;
     status: ConferenceStatus;
