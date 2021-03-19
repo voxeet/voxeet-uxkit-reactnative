@@ -1,4 +1,5 @@
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import VoxeetEvents from './VoxeetEvents';
 import ConferenceUser from './types/ConferenceUser';
 import { CreateOptions, CreateResult } from './types/CreateConference';
 import { JoinOptions, JoinResult } from './types/JoinConference';
@@ -14,6 +15,11 @@ export interface TokenRefreshCallback {
 };
 
 export default class _VoxeetSDK {
+
+  #events = new VoxeetEvents();
+  get events() { return this.#events; }
+  set events(any: any) { }
+
   refreshAccessTokenCallback: RefreshCallback | null = null;
 
   /**
@@ -22,7 +28,7 @@ export default class _VoxeetSDK {
    * @param consumerSecret Consumer Secret
    */
   initialize(consumerKey: string, consumerSecret: string): Promise<boolean> {
-      return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
   }
 
   /**
@@ -189,3 +195,5 @@ export default class _VoxeetSDK {
     return this.disconnect();
   }
 }
+
+export const VoxeetSDK = new _VoxeetSDK();

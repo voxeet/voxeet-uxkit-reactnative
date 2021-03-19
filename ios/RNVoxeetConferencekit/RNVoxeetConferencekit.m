@@ -275,19 +275,23 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"refreshToken"];
+    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent"];
 }
 
 // Will be called when this module's first listener is added.
 - (void)startObserving
 {
     _hasListeners = YES;
+    // Observers.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conferenceStatusUpdated:) name:@"VTConferenceStatusUpdated" object:nil];
 }
 
 // Will be called when this module's last listener is removed, or on dealloc.
 - (void)stopObserving
 {
     _hasListeners = NO;
+    // Observers.
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 RCT_EXPORT_METHOD(onAccessTokenOk:(NSString *)accessToken
@@ -330,6 +334,58 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     resolve(nil);
+}
+
+/*
+ *  MARK: Observers
+ */
+
+- (void)conferenceStatusUpdated:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSNumber *rawStatus = notification.userInfo[@"status"];
+        VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
+        NSString *statusStr = @"DEFAULT";
+        
+        switch (status) {
+            case VTConferenceStatusCreating:
+                statusStr = @"CREATING";
+                break;
+            case VTConferenceStatusCreated:
+                statusStr = @"CREATED";
+                break;
+            case VTConferenceStatusJoining:
+                statusStr = @"JOINING";
+                break;
+            case VTConferenceStatusJoined:
+                statusStr = @"JOINED";
+                break;
+            case VTConferenceStatusLeaving:
+                statusStr = @"LEAVING";
+                break;
+            case VTConferenceStatusLeft:
+                statusStr = @"LEFT";
+                break;
+            case VTConferenceStatusEnded:
+                statusStr = @"ENDED";
+                break;
+            case VTConferenceStatusDestroyed:
+                statusStr = @"DESTROYED";
+                break;
+            case VTConferenceStatusError:
+                statusStr = @"ERROR";
+                break;
+            default:
+                break;
+        }
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *statusDict = @{@"status": statusStr,
+                                         @"conferenceId": conference.id,
+                                         @"conferenceAlias": conference.alias};
+            [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
+        }
+    });
 }
 
 /*

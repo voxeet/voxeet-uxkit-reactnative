@@ -25,18 +25,19 @@ import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.AudioType;
 import com.voxeet.sdk.utils.Validate;
+import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.uxkit.views.internal.rounded.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class RNIncomingCallActivity extends AppCompatActivity implements RNIncomingBundleChecker.IExtraBundleFillerListener {
+public class RNIncomingCallActivity extends AppCompatActivity implements IncomingBundleChecker.IExtraBundleFillerListener {
 
     private final static String TAG = RNIncomingCallActivity.class.getSimpleName();
     private static final String DEFAULT_VOXEET_INCOMING_CALL_DURATION_KEY = "voxeet_incoming_call_duration";
     private static final int DEFAULT_VOXEET_INCOMING_CALL_DURATION_VALUE = 40 * 1000;
-    public static RNIncomingBundleChecker REACT_NATIVE_ROOT_BUNDLE = null;
+    public static IncomingBundleChecker REACT_NATIVE_ROOT_BUNDLE = null;
 
     protected TextView mUsername;
     protected TextView mStateTextView;
@@ -213,7 +214,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements RNIncom
         if (mIncomingBundleChecker.isBundleValid()) {
             REACT_NATIVE_ROOT_BUNDLE = mIncomingBundleChecker;
 
-            Intent intent = mIncomingBundleChecker.createActivityAccepted(this);
+            Intent intent = mIncomingBundleChecker.createRNActivityAccepted(this);
             //start the accepted call activity
             startActivity(intent);
 

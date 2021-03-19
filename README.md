@@ -35,6 +35,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ```bash
     pod install
     ```
+    If you are using react-native 0.64, there is a known bug from the library FBReactNativeSpec. You have to go into your Pods project in Xcode workspace, select FBReactNativeSpec target, "Build Phases" section, drag and drop "[CP-User] Generate Specs" step just under "Dependencies" step (2nd position). You have to do this step after every pod install or pod update.
 
 5. Open your .xcworkspace project, select Product > Scheme > Edit scheme > Build > Uncheck "Parallelize Build".
 
@@ -76,6 +77,77 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 ```javascript
 import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
 ```
+
+Note: the VoxeetEvents is now deprecated and will disappear from the library itself.
+
+### initialization
+
+```
+VoxeetSDK.initialize(appKey, appSecret);
+```
+
+or 
+
+```
+VoxeetSDK.initializeToken(accessToken, () => {
+    return new Promise((resolve, reject) => {
+        ... //get the new accessToken
+        resolve(theNewAccessToken);
+    });
+});
+```
+
+### Open a session (+ check for conference to join)
+
+
+Once the SDK is initialized, try to connect your current user as soon as possible.
+
+```
+await VoxeetSDK.connect(new UserInfo("externalId", "name", "optAvatarUrl"));
+```
+
+Once the session has been started, if an incoming call has been accepted by the user, it will be initiated right away.
+
+### Join and leave conferences
+
+Use the corresponding method to perform the action :
+
+```
+const conference = await VoxeetSDK.create({ alias: "yourConferenceAlias" });
+await VoxeetSDK.join(conference.conferenceId);
+```
+
+To leave, use the following
+
+```
+await VoxeetSDK.leave(conferenceId);
+```
+
+### Invite participants
+
+
+## Events
+
+You can subscribe to events via the `addListener` (and unsubscribe via the corresponding `removeListener`) method in `VoxeetSDK.events`
+
+### Example
+
+```
+import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
+import { ConferenceStatusUpdatedEvent } from "@voxeet/react-native-voxeet-conferencekit";
+
+const onConferenceStatus = (event: ConferenceStatusUpdatedEvent) => {
+  console.warn("event received", event);
+}
+
+VoxeetSDK.events.addListener("ConferenceStatusUpdatedEvent", onConferenceStatus);
+```
+
+### ConferenceStatusUpdatedEvent
+
+- conferenceId: `string`
+- conferenceAlias: `string|undefined`
+- status: `ConferenceStatus`
 
 ## Configuration
 

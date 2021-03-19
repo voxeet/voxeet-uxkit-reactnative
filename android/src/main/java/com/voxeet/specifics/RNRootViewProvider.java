@@ -12,6 +12,7 @@ import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.services.SessionService;
+import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
 import com.voxeet.uxkit.providers.rootview.DefaultRootViewProvider;
 
@@ -39,7 +40,6 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
             mRNIncomingBundleChecker = new RNIncomingBundleChecker(mApplication, activity.getIntent(), null);
-            mRNIncomingBundleChecker.createActivityAccepted(activity);
         }
     }
 
@@ -59,7 +59,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
                 EventBus.getDefault().register(this); //registering this activity
             }
 
-            RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
+            IncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
                 SessionService sessionService = VoxeetSDK.session();
                 if (sessionService.isSocketOpen()) {
@@ -67,12 +67,6 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
                     RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE = null;
                 }
             }
-            //TODO next steps, fix this call here
-            /*mRNIncomingBundleChecker = new CordovaIncomingBundleChecker(mApplication, activity.getIntent(), null);
-
-            if (mRNIncomingBundleChecker.isBundleValid()) {
-                mRNIncomingBundleChecker.onAccept();
-            }*/
         }
     }
 

@@ -10,154 +10,26 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.voxeet.RNVoxeetConferencekitModule;
-import com.voxeet.VoxeetSDK;
-import com.voxeet.promise.solve.ErrorPromise;
-import com.voxeet.promise.solve.PromiseExec;
-import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.push.center.management.Constants;
-import com.voxeet.sdk.services.ConferenceService;
-import com.voxeet.uxkit.controllers.ConferenceToolkitController;
-import com.voxeet.uxkit.controllers.VoxeetToolkit;
+import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
 
-public class RNIncomingBundleChecker {
+public class RNIncomingBundleChecker extends IncomingBundleChecker {
 
     private final static String BUNDLE_EXTRA_BUNDLE = "BUNDLE_EXTRA_BUNDLE";
+
     private Context mContext;
 
-    @Nullable
-    private IExtraBundleFillerListener mFillerListener;
-
-    @NonNull
-    private Intent mIntent;
-
-    @Nullable
-    private String mUserName;
-
-    @Nullable
-    private String mUserId;
-
-    @Nullable
-    private String mExternalUserId;
-
-    @Nullable
-    private String mAvatarUrl;
-
-    @Nullable
-    private String mConferenceId;
-
-    private RNIncomingBundleChecker() {
-        mIntent = new Intent();
-    }
-
     public RNIncomingBundleChecker(Context context, @NonNull Intent intent, @Nullable IExtraBundleFillerListener filler_listener) {
-        this();
+        super(intent, filler_listener);
 
         mContext = context;
-        mFillerListener = filler_listener;
-        mIntent = intent;
-
-        if (null != mIntent) {
-            mUserName = mIntent.getStringExtra(Constants.INVITER_NAME);
-            mExternalUserId = mIntent.getStringExtra(Constants.INVITER_EXTERNAL_ID);
-            mUserId = mIntent.getStringExtra(Constants.INVITER_ID);
-            mAvatarUrl = mIntent.getStringExtra(Constants.INVITER_URL);
-            mConferenceId = mIntent.getStringExtra(Constants.CONF_ID);
-        }
-    }
-
-    /**
-     * Call accepted invitation
-     * <p>
-     * this must be called from the activity launched
-     * not from the incoming call activity (!)
-     */
-    public void onAccept() {
-        if (mConferenceId != null) {
-            ParticipantInfo info = new ParticipantInfo(getUserName(),
-                    getExternalUserId(),
-                    getAvatarUrl());
-
-            final ConferenceService conferenceService = VoxeetSDK.conference();
-
-            VoxeetToolkit.instance().enable(ConferenceToolkitController.class);
-
-            //TODO add inviter
-            conferenceService.join(mConferenceId) //, info)
-                    .then((PromiseExec<Boolean, Boolean>) (result, solver) -> {
-                        //possible callback to set ?
-                        if (RNVoxeetConferencekitModule.startVideo) {
-                            solver.resolve(conferenceService.startVideo());
-                        } else {
-                            solver.resolve(result);
-                        }
-                    })
-                    .then(booleanBooleanPromiseExec -> {
-
-                    })
-                    .error(new ErrorPromise() {
-                        @Override
-                        public void onError(Throwable error) {
-                            error.printStackTrace();
-                        }
-                    });
-        }
-    }
-
-    /**
-     * Check the current intent
-     *
-     * @return true if the intent has notification keys
-     */
-    final public boolean isBundleValid() {
-        return null != mIntent
-                && mIntent.hasExtra(Constants.INVITER_NAME)
-                && mIntent.hasExtra(Constants.INVITER_EXTERNAL_ID)
-                && mIntent.hasExtra(Constants.INVITER_ID)
-                && mIntent.hasExtra(Constants.INVITER_URL)
-                && mIntent.hasExtra(Constants.CONF_ID);
-    }
-
-    @Nullable
-    final public String getExternalUserId() {
-        return mExternalUserId;
-    }
-
-    @Nullable
-    final public String getUserId() {
-        return mUserId;
-    }
-
-    @Nullable
-    final public String getUserName() {
-        return mUserName;
-    }
-
-    @Nullable
-    final public String getAvatarUrl() {
-        return mAvatarUrl;
-    }
-
-    @Nullable
-    final public String getConferenceId() {
-        return mConferenceId;
-    }
-
-    @Nullable
-    final public Bundle getExtraBundle() {
-        return null != mIntent ? mIntent.getBundleExtra(BUNDLE_EXTRA_BUNDLE) : null;
     }
 
     final public boolean isSameConference(@Nullable Conference conference) {
         if (null == conference) return false;
         return isSameConference(conference.getId());
     }
-
-    final public boolean isSameConference(@Nullable String conferenceId) {
-        return mConferenceId != null && mConferenceId.equals(conferenceId);
-    }
-
 
     /**
      * Create an intent to start the activity you want after an "accept" call
@@ -167,7 +39,7 @@ public class RNIncomingBundleChecker {
      */
     @SuppressLint("WrongConstant")
     @NonNull
-    final public Intent createActivityAccepted(@NonNull Activity caller) {
+    final public Intent createRNActivityAccepted(@NonNull Activity caller) {
         Class to_call = createClassToCall();
 
         //if call is disabled
@@ -201,38 +73,6 @@ public class RNIncomingBundleChecker {
         );
 
         return intent;
-    }
-
-    /**
-     * Remove the specific bundle call keys from the intent
-     * Needed if you do not want to pass over and over in this method
-     * in onResume/onPause lifecycle
-     */
-    public void flushIntent() {
-        if (null != mIntent) {
-            mIntent.removeExtra(Constants.INVITER_ID);
-            mIntent.removeExtra(Constants.INVITER_EXTERNAL_ID);
-            mIntent.removeExtra(Constants.CONF_ID);
-            mIntent.removeExtra(Constants.INVITER_URL);
-            mIntent.removeExtra(Constants.INVITER_NAME);
-        }
-    }
-
-    @NonNull
-    public Bundle createExtraBundle() {
-        Bundle extra = null;
-
-        if (null != mFillerListener)
-            extra = mFillerListener.createExtraBundle();
-
-        if (null == extra) extra = new Bundle();
-        return extra;
-    }
-
-    public static interface IExtraBundleFillerListener {
-
-        @Nullable
-        Bundle createExtraBundle();
     }
 
     private Class createClassToCall() {

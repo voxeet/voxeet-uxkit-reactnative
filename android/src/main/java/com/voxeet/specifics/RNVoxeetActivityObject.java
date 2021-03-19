@@ -3,19 +3,21 @@ package com.voxeet.specifics;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.voxeet.VoxeetSDK;
+import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.ScreenShareService;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.utils.Validate;
-import com.voxeet.toolkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.toolkit.incoming.factory.IncomingCallFactory;
+import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -60,7 +62,7 @@ public class RNVoxeetActivityObject {
             if (VoxeetSDK.instance().isInitialized()) {
                 mIncomingBundleChecker.onAccept();
             } else {
-                //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
+                RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE = mIncomingBundleChecker;
             }
         }
 
@@ -121,7 +123,7 @@ public class RNVoxeetActivityObject {
             if (VoxeetSDK.instance().isInitialized()) {
                 mIncomingBundleChecker.onAccept();
             } else {
-                //RNVoxeetConferencekitModule.AWAITING_OBJECT = this;
+                Log.d(RNVoxeetActivity.class.getSimpleName(), "onNewIntent: discard call to register incoming bundle");
             }
         }
     }

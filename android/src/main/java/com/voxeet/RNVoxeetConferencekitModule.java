@@ -17,7 +17,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.models.ConferenceUtil;
-import com.voxeet.notification.RNIncomingBundleChecker;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.sdk.authent.token.TokenCallback;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
@@ -44,6 +43,7 @@ import com.voxeet.specifics.RNVoxeetActivity;
 import com.voxeet.specifics.waiting.WaitingAbstractHolder;
 import com.voxeet.specifics.waiting.WaitingJoinHolder;
 import com.voxeet.specifics.waiting.WaitingStartConferenceHolder;
+import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.uxkit.controllers.ConferenceToolkitController;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
 import com.voxeet.uxkit.implementation.overlays.OverlayState;
@@ -223,7 +223,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         if (null == sessionService) {
             promise.reject("-1", ERROR_SDK_NOT_INITIALIZED);
         } else {
-            RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
+            IncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
                 if (sessionService.isSocketOpen()) {
                     checker.onAccept();
@@ -568,7 +568,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     private boolean checkForIncomingConference() {
-        RNIncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
+        IncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
         if (null != checker && checker.isBundleValid()) {
             if (VoxeetSDK.session().isSocketOpen()) {
                 checker.onAccept();
