@@ -133,7 +133,7 @@ You can subscribe to events via the `addListener` (and unsubscribe via the corre
 
 ```
 import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
-import { ConferenceStatusUpdatedEvent } from "@voxeet/react-native-voxeet-conferencekit/events";
+import { ConferenceStatusUpdatedEvent } from "@voxeet/react-native-voxeet-conferencekit/dist/events";
 
 const onConferenceStatus = (event: ConferenceStatusUpdatedEvent) => {
   console.warn("event received", event);
