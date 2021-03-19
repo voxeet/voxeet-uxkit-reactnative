@@ -1,5 +1,5 @@
 import { NativeModules, NativeEventEmitter } from 'react-native';
-import ConferenceStatusUpdatedEvent from "./events/ConferenceStatusUpdatedEvent";
+import { ConferenceStatusUpdatedEvent } from "./events/ConferenceStatusUpdatedEvent";
 const { RNVoxeetConferencekit } = NativeModules;
 
 interface EventMap {

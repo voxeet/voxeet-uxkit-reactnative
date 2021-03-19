@@ -1,4 +1,4 @@
-import ConferenceStatusUpdatedEvent from "./events/ConferenceStatusUpdatedEvent";
+import { ConferenceStatusUpdatedEvent } from "./events/ConferenceStatusUpdatedEvent";
 interface EventMap {
     ["ConferenceStatusUpdatedEvent"]: ConferenceStatusUpdatedEvent;
 }
