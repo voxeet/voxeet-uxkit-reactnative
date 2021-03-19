@@ -35,6 +35,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ```bash
     pod install
     ```
+    If you are using react-native 0.64, there is a known bug from the library FBReactNativeSpec. You have to go into your Pods project in Xcode workspace, select FBReactNativeSpec target, "Build Phases" section, drag and drop "[CP-User] Generate Specs" step just under "Dependencies" step (2nd position). You have to do this step after every pod install or pod update.
 
 5. Open your .xcworkspace project, select Product > Scheme > Edit scheme > Build > Uncheck "Parallelize Build".
 
