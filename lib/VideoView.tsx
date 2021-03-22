@@ -3,7 +3,8 @@
 
 
 import React, {Component} from 'react';
-import { requireNativeComponent, findNodeHandle, UIManager } from 'react-native';
+import { requireNativeComponent, findNodeHandle, UIManager, Platform, NativeModules } from 'react-native';
+import { ConferenceUser } from './types';
 
 import MediaStream from "./types/MediaStream";
 
@@ -43,12 +44,19 @@ export interface Holder {
 /**
  * Composes `View`.
  *
- * - attach: MediaStream
  * - cornerRadius: number
  * - isCircle: boolean
  * - hasFlip: boolean
  * - isAutoUnAttach: boolean
  * - scaleType: 'fit' | 'fill'
+ * 
+ * 
+ * Public methods :
+ * 
+ * attach(participant: Participant, mediaStream: MediaStream): Promise<void>
+ * unattach(): Promise<void>
+ * isAttached(): Promise<boolean>
+ * isScreenShare(): Promise<boolean>
  */
 export default class VideoView extends Component<Props, State> {
   static defaultProps = {
@@ -58,12 +66,12 @@ export default class VideoView extends Component<Props, State> {
     scaleType: 'fill'
   }
 
-  _UiManager:any = UIManager;
+  private _UiManager:any = UIManager;
 
-  _videoView: React.Component|null;
-  _videoViewHandler: null | number;
-  _nextRequestId = 1;
-  _requestMap: Map<number, Holder> = new Map();
+  private _videoView: React.Component|null;
+  private _videoViewHandler: null | number;
+  private _nextRequestId = 1;
+  private _requestMap: Map<number, Holder> = new Map();
 
   constructor(props: Props) {
     super(props);
@@ -75,17 +83,35 @@ export default class VideoView extends Component<Props, State> {
     this._videoViewHandler = findNodeHandle(this._videoView);
   }
 
-  //android
-  isAttached() {
+  attach(participant: ConferenceUser, mediaStream: MediaStream): Promise<void> {
+    if(Platform.OS == "ios") {
+      return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler, participant.userId, mediaStream.label);
+    }
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.userId, mediaStream.label);
+  }
+
+  unattach(): Promise<void> {
+    if(Platform.OS == "ios") {
+      return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler);
+    }
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach);
+  }
+
+  isAttached(): Promise<boolean> {
+    if(Platform.OS == "ios") {
+      return NativeModules.RCTVoxeetVideoView.isAttached(this._videoViewHandler);
+    }
     return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached);
   }
 
-  //android
-  isScreenShare() {
+  isScreenShare(): Promise<boolean> {
+    if(Platform.OS == "ios") {
+      return NativeModules.RCTVoxeetVideoView.isScreenShare(this._videoViewHandler);
+    }
     return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare);
   }
 
-  _sendCallReturn(command: any) {
+  _sendCallReturn(command: any, param1?: any, param2?: any): Promise<any> {
     const requestId: number = this._nextRequestId++;
     const requestMap: Map<number, Holder> = this._requestMap;
 
@@ -96,7 +122,7 @@ export default class VideoView extends Component<Props, State> {
     this._UiManager.dispatchViewManagerCommand(
       this._videoViewHandler,
       command,
-      [ requestId ]
+      [ requestId, param1, param2]
     );
 
     return promise;

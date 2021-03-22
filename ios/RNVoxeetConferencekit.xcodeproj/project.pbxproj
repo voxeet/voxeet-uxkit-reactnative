@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5764B6632608983700072243 /* RNVoxeetConferencekitVideoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5764B6622608983700072243 /* RNVoxeetConferencekitVideoView.m */; };
 		CCD4B4CC219F0A7300713806 /* RNVoxeetConferencekit.m in Sources */ = {isa = PBXBuildFile; fileRef = CCD4B4CB219F0A7300713806 /* RNVoxeetConferencekit.m */; };
 		CCD4B4CD219F0A7300713806 /* RNVoxeetConferencekit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = CCD4B4CA219F0A7300713806 /* RNVoxeetConferencekit.h */; };
 /* End PBXBuildFile section */
@@ -25,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5764B6622608983700072243 /* RNVoxeetConferencekitVideoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNVoxeetConferencekitVideoView.m; sourceTree = "<group>"; };
 		CCD4B4C7219F0A7300713806 /* libRNVoxeetConferencekit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNVoxeetConferencekit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		CCD4B4CA219F0A7300713806 /* RNVoxeetConferencekit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNVoxeetConferencekit.h; sourceTree = "<group>"; };
 		CCD4B4CB219F0A7300713806 /* RNVoxeetConferencekit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNVoxeetConferencekit.m; sourceTree = "<group>"; };
@@ -60,6 +62,7 @@
 		CCD4B4C9219F0A7300713806 /* RNVoxeetConferencekit */ = {
 			isa = PBXGroup;
 			children = (
+				5764B6622608983700072243 /* RNVoxeetConferencekitVideoView.m */,
 				CCD4B4CA219F0A7300713806 /* RNVoxeetConferencekit.h */,
 				CCD4B4CB219F0A7300713806 /* RNVoxeetConferencekit.m */,
 			);
@@ -122,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5764B6632608983700072243 /* RNVoxeetConferencekitVideoView.m in Sources */,
 				CCD4B4CC219F0A7300713806 /* RNVoxeetConferencekit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

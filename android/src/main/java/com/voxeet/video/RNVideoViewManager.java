@@ -1,7 +1,5 @@
 package com.voxeet.video;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -25,6 +23,8 @@ import java.util.Map;
 public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public static final int IS_ATTACHED = 1;
     public static final int IS_SCREENSHARE = 2;
+    public static final int ATTACH = 3;
+    public static final int UNATTACH = 4;
 
     public static final String PEER_ID = "peerId";
     public static final String LABEL = "label";
@@ -74,17 +74,8 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     @ReactProp(name = "attach")
     public void attach(@NonNull VideoView view,
                        @Nullable ReadableMap map) {
-        ConferenceService service = VoxeetSDK.conference();
         if (null != map && map.hasKey(PEER_ID) && map.hasKey(LABEL)) {
-            String peerId = map.getString(PEER_ID);
-            String label = map.getString(LABEL);
-
-            if (null == peerId) peerId = "";
-            if (null == label) label = "";
-
-            MediaStream mediaStream = tryToFindMediaStream(peerId, label);
-
-            if (null != mediaStream) view.attach(peerId, mediaStream);
+            attach(view, map.getString(PEER_ID), map.getString(LABEL));
         } else {
             view.unAttach();
         }
@@ -132,7 +123,9 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
                 "isAttached", IS_ATTACHED,
-                "isScreenShare", IS_SCREENSHARE
+                "isScreenShare", IS_SCREENSHARE,
+                "attach", ATTACH,
+                "unattach", UNATTACH
         );
     }
 
@@ -143,10 +136,31 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
             case IS_ATTACHED:
                 boolean attached = view.isAttached();
                 eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), attached));
-                break;
+                return;
             case IS_SCREENSHARE:
                 boolean screenshare = view.isScreenShare();
                 eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), screenshare));
+                return;
+            case ATTACH:
+                try {
+                    if (null != args && args.size() >= 3) {
+                        String peerId = args.getString(1);
+                        String labelId = args.getString(2);
+
+                        attach(view, peerId, labelId);
+                        eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), true));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), false));
+                return;
+            case UNATTACH:
+                unattach(view);
+                eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), true));
+                return;
+            default:
         }
     }
 
@@ -154,5 +168,26 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     @Override
     public Map getExportedCustomDirectEventTypeConstants() {
         return MapBuilder.of(RCTVideoViewBooleanEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCallReturn"));
+    }
+
+    private void attach(@NonNull VideoView view, @Nullable String peerId, @Nullable String label) {
+        try {
+            if (null == peerId) peerId = "";
+            if (null == label) label = "";
+
+            MediaStream mediaStream = tryToFindMediaStream(peerId, label);
+
+            if (null != mediaStream) view.attach(peerId, mediaStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void unattach(@Nullable VideoView view) {
+        try {
+            view.unAttach();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
