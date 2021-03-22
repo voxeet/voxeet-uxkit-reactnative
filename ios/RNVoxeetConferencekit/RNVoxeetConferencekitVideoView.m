@@ -39,13 +39,16 @@ RCT_EXPORT_METHOD(attach: (nonnull NSNumber *)reactTag
 }
 
 RCT_EXPORT_METHOD(unattach: (nonnull NSNumber *)reactTag
-                  peerId: (NSString*) peerId
-                  streamId: (NSString*) streamId
                   resolver: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        //TODO
-        resolve(nil);
+        VTVideoView *view = (VTVideoView *)[self.bridge.uiManager viewForReactTag: reactTag];
+        if (!view) {
+            reject(@"ERROR_INVALID_REACT_TAG", [NSString stringWithFormat: @"ReactTag passed: %@", reactTag], nil);
+            return;
+        }
+        
+        [VoxeetSDK.shared.mediaDevice unattachMediaStream:nil renderer:view];
     });
 }
 
