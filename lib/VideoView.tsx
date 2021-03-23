@@ -4,9 +4,9 @@
 
 import React, {Component} from 'react';
 import { requireNativeComponent, findNodeHandle, UIManager, Platform, NativeModules } from 'react-native';
-import { ConferenceUser } from './types';
 
 import MediaStream from "./types/MediaStream";
+import Participant from './types/Participant';
 
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 
@@ -83,16 +83,16 @@ export default class VideoView extends Component<Props, State> {
     this._videoViewHandler = findNodeHandle(this._videoView);
   }
 
-  attach(participant: ConferenceUser, mediaStream: MediaStream): Promise<void> {
+  attach(participant: Participant, mediaStream: MediaStream): Promise<void> {
     if(Platform.OS == "ios") {
-      return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler, participant.userId, mediaStream.label);
+      return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler, participant.participantId, mediaStream.streamId);
     }
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.userId, mediaStream.label);
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId);
   }
 
   unattach(): Promise<void> {
     if(Platform.OS == "ios") {
-      return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler);
+      return NativeModules.RCTVoxeetVideoView.unattach(this._videoViewHandler);
     }
     return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach);
   }

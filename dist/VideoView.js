@@ -1,17 +1,24 @@
 //promise call done using https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/
 //TODO lock call ?
 import React, { Component } from 'react';
-import { requireNativeComponent, findNodeHandle, UIManager } from 'react-native';
+import { requireNativeComponent, findNodeHandle, UIManager, Platform, NativeModules } from 'react-native';
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 /**
  * Composes `View`.
  *
- * - attach: MediaStream
  * - cornerRadius: number
  * - isCircle: boolean
  * - hasFlip: boolean
  * - isAutoUnAttach: boolean
  * - scaleType: 'fit' | 'fill'
+ *
+ *
+ * Public methods :
+ *
+ * attach(participant: Participant, mediaStream: MediaStream): Promise<void>
+ * unattach(): Promise<void>
+ * isAttached(): Promise<boolean>
+ * isScreenShare(): Promise<boolean>
  */
 export default class VideoView extends Component {
     constructor(props) {
@@ -36,21 +43,37 @@ export default class VideoView extends Component {
     componentDidMount() {
         this._videoViewHandler = findNodeHandle(this._videoView);
     }
-    //android
+    attach(participant, mediaStream) {
+        if (Platform.OS == "ios") {
+            return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler, participant.participantId, mediaStream.streamId);
+        }
+        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId);
+    }
+    unattach() {
+        if (Platform.OS == "ios") {
+            return NativeModules.RCTVoxeetVideoView.unattach(this._videoViewHandler);
+        }
+        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach);
+    }
     isAttached() {
+        if (Platform.OS == "ios") {
+            return NativeModules.RCTVoxeetVideoView.isAttached(this._videoViewHandler);
+        }
         return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached);
     }
-    //android
     isScreenShare() {
+        if (Platform.OS == "ios") {
+            return NativeModules.RCTVoxeetVideoView.isScreenShare(this._videoViewHandler);
+        }
         return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare);
     }
-    _sendCallReturn(command) {
+    _sendCallReturn(command, param1, param2) {
         const requestId = this._nextRequestId++;
         const requestMap = this._requestMap;
         const promise = new Promise((resolve, reject) => {
             requestMap[requestId] = { resolve, reject };
         });
-        this._UiManager.dispatchViewManagerCommand(this._videoViewHandler, command, [requestId]);
+        this._UiManager.dispatchViewManagerCommand(this._videoViewHandler, command, [requestId, param1, param2]);
         return promise;
     }
     render() {

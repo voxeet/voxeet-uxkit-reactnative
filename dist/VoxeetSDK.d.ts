@@ -1,4 +1,6 @@
 import ConferenceUser from './types/ConferenceUser';
+import Participant from './types/Participant';
+import MediaStream from './types/MediaStream';
 import { CreateOptions, CreateResult } from './types/CreateConference';
 import { JoinOptions, JoinResult } from './types/JoinConference';
 export interface RefreshCallback {
@@ -54,6 +56,18 @@ export default class _VoxeetSDK {
      * @param participants List of participants to invite
      */
     invite(conferenceId: string, participants: ConferenceUser[]): Promise<boolean>;
+    /**
+     * Get the list of participants
+     * @param conferenceId Id of the conference to get the participants from
+     * @returns List of participants in the conference
+     */
+    participants(conferenceId: string): Promise<Participant[]>;
+    /**
+     * Get the list of streams for a given participant
+     * @param participantId Id of the participant to get the streams from
+     * @returns List of streams for this participant
+     */
+    streams(participantId: string): Promise<MediaStream[]>;
     /**
      * Sends a broadcast message to the participants of the conference.
      * @param message Message to send to the other participants

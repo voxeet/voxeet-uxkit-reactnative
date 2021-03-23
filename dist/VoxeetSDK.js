@@ -7,6 +7,8 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var _events;
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import VoxeetEvents from './VoxeetEvents';
+import Participant from './types/Participant';
+import { MediaStreamType } from './types/MediaStream';
 const { RNVoxeetConferencekit } = NativeModules;
 ;
 ;
@@ -87,6 +89,30 @@ export default class _VoxeetSDK {
      */
     invite(conferenceId, participants) {
         return RNVoxeetConferencekit.invite(conferenceId, participants);
+    }
+    /**
+     * Get the list of participants
+     * @param conferenceId Id of the conference to get the participants from
+     * @returns List of participants in the conference
+     */
+    participants(conferenceId) {
+        return RNVoxeetConferencekit.participants(conferenceId)
+            .then((result) => result.map(r => new Participant(r.participantId || "", r.status, r.externalId, r.name, r.avatarUrl)));
+    }
+    /**
+     * Get the list of streams for a given participant
+     * @param participantId Id of the participant to get the streams from
+     * @returns List of streams for this participant
+     */
+    streams(participantId) {
+        return RNVoxeetConferencekit.streams(participantId)
+            .then((result) => result.map(r => ({
+            peerId: participantId,
+            streamId: r.streamId,
+            hasVideoTracks: r.hasVideoTracks,
+            hasAudioTracks: r.hasAudioTracks,
+            type: MediaStreamType[r.type] || MediaStreamType.Camera
+        })));
     }
     /**
      * Sends a broadcast message to the participants of the conference.

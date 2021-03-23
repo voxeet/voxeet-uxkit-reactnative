@@ -2,8 +2,8 @@
 //  RNVoxeetConferencekit.m
 //  RNVoxeetConferencekit
 //
-//  Created by Corentin Larroque on 11/16/18.
-//  Copyright © 2018 Voxeet. All rights reserved.
+//  Created by Kevin Le PErf on 22/03/21.
+//  Copyright © 2021 Voxeet. All rights reserved.
 //
 
 #import "RNVoxeetConferencekit.h"
@@ -218,6 +218,75 @@ RCT_EXPORT_METHOD(invite:(NSString *)conferenceID
                 }
             }];
         }];
+    });
+}
+
+RCT_EXPORT_METHOD(participants:(NSString *)conferenceID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
+
+            NSArray<VTParticipant *> participants = conference.participants;
+            NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+            for (VTParticipant *participant in participants) {
+                VTParticipantInfo* info = participant.info;
+
+                NSDictionary *result = @{@"participantId": participant.id,
+                                         @"externalId": info.externalID,
+                                         @"name": info.name,
+                                         @"avatarUrl": info.avatarURL};
+
+                [output addObject:result];
+            }
+            
+            resolve(output);
+        }];
+    });
+}
+
+RCT_EXPORT_METHOD(streams:(NSString *)participantID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        VTConference* conference = VoxeetSDK.shared.conference.current;
+        
+        if (!conference) {
+            resolve(nil);
+            return;
+        }
+
+        NSArray<VTParticipant *> participants = conference.participants;
+        NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+        for (VTParticipant *participant in participants) {
+            
+            if ([participant.id isEqualToString: participantID]) {
+                NSArray<MediaStream *> streams = participant.streams;
+                for (MediaStream *stream in streams) {
+                    NSString* type = @"Camera";
+                    switch(stream.type) {
+                        case ScreenShare: type = @"ScreenShare"; break;
+                        case Custom: type = @"Custom"; break;
+                        case Camera: default: type = @"Camera"; break;
+                    }
+
+                    NSDictionary *result = @{@"hasAudioTracks": stream.audioTracks.count > 0,
+                                             @"hasVideoTracks": stream.videoTracks.count > 0,
+                                             @"streamId": stream.streamId,
+                                             @"type": stream.type};
+
+                    [output addObject:result];
+                }
+                resolve(output);
+            }
+        }
+        resolve(nil);
     });
 }
 

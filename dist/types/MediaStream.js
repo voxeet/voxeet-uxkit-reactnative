@@ -1,7 +1,7 @@
-export default class MediaStream {
-    constructor(peerId, label) {
-        this.peerId = peerId;
-        this.label = label;
-    }
-}
+export var MediaStreamType;
+(function (MediaStreamType) {
+    MediaStreamType["Camera"] = "Camera";
+    MediaStreamType["ScreenShare"] = "ScreenShare";
+    MediaStreamType["Custom"] = "Custom";
+})(MediaStreamType || (MediaStreamType = {}));
 //# sourceMappingURL=MediaStream.js.map

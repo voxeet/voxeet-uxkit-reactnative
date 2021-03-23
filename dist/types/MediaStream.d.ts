@@ -1,5 +1,12 @@
-export default class MediaStream {
+export declare enum MediaStreamType {
+    Camera = "Camera",
+    ScreenShare = "ScreenShare",
+    Custom = "Custom"
+}
+export default interface MediaStream {
     peerId: string;
-    label: string;
-    constructor(peerId: string, label: string);
+    streamId: string;
+    hasVideoTracks: boolean;
+    hasAudioTracks: boolean;
+    type: MediaStreamType;
 }

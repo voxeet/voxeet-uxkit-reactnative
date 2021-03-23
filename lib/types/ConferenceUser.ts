@@ -1,7 +1,5 @@
 export default class ConferenceUser {
   
-  public userId: string | undefined;
-  public conferenceStatus: string | undefined;
   public externalId: string | undefined;
   public name: string;
   public avatarUrl: string | undefined;

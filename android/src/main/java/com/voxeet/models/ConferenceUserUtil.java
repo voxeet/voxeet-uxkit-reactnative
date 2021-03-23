@@ -1,11 +1,13 @@
 package com.voxeet.models;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.voxeet.android.media.MediaStream;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.ConferenceParticipantStatus;
@@ -13,7 +15,9 @@ import com.voxeet.sdk.models.v1.SdkParticipant;
 import com.voxeet.sdk.utils.Opt;
 
 public final class ConferenceUserUtil {
-    public final static String PARTICIPANT_ID = "userId";
+    @Deprecated
+    public final static String USER_ID = "userId";
+    public final static String PARTICIPANT_ID = "participantId";
     public final static String PARTICIPANT_NAME = "name";
     public final static String PARTICIPANT_EXTERNAL_ID = "externalId";
     public final static String PARTICIPANT_AVATAR_URL = "avatarUrl";
@@ -28,6 +32,7 @@ public final class ConferenceUserUtil {
         ParticipantInfo userInfo = user.getInfo();
 
         WritableMap map = new WritableNativeMap();
+        map.putString(USER_ID, user.getId());
         map.putString(PARTICIPANT_ID, user.getId());
         map.putString(CONFERENCE_STATUS, Opt.of(user.getStatus()).or(ConferenceParticipantStatus.UNKNOWN).name());
 

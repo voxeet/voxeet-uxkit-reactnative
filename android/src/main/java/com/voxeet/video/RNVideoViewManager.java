@@ -27,8 +27,10 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public static final int UNATTACH = 4;
 
     public static final String PEER_ID = "peerId";
-    public static final String LABEL = "label";
+    public static final String LABEL = "streamId";
     public static final String STREAM_TYPE = "type";
+    public static final String HAS_VIDEO_TRACKS = "hasVideoTracks";
+    public static final String HAS_AUDIO_TRACKS = "hasAudioTracks";
 
     private static final String SCALE_FIT = "fit";
     private static final String SCALE_FILL = "fill";

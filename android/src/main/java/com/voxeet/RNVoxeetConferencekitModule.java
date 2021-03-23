@@ -15,8 +15,12 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.voxeet.android.media.MediaStream;
+import com.voxeet.models.ConferenceUserUtil;
 import com.voxeet.models.ConferenceUtil;
+import com.voxeet.models.MediaStreamUtil;
 import com.voxeet.notification.RNIncomingCallActivity;
 import com.voxeet.sdk.authent.token.TokenCallback;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
@@ -25,6 +29,7 @@ import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.MetadataHolder;
 import com.voxeet.sdk.json.internal.ParamsHolder;
 import com.voxeet.sdk.models.Conference;
+import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.push.center.NotificationCenter;
 import com.voxeet.sdk.push.center.management.EnforcedNotificationMode;
@@ -35,7 +40,9 @@ import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.SessionService;
 import com.voxeet.sdk.services.TelemetryService;
 import com.voxeet.sdk.services.builders.ConferenceCreateOptions;
+import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.telemetry.SdkEnvironment;
+import com.voxeet.sdk.utils.Opt;
 import com.voxeet.sdk.utils.Validate;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
 import com.voxeet.specifics.RNRootViewProvider;
@@ -414,6 +421,30 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                             .error(promise::reject);
                 })
                 .error(promise::reject);
+    }
+
+    @ReactMethod
+    public void participants(String conferenceId, final Promise promise) {
+        VoxeetSDK.conference()
+                .fetchConference(conferenceId)
+                .then(conference -> {
+                    promise.resolve(ConferenceUserUtil.toMap(conference.getParticipants()));
+                })
+                .error(promise::reject);
+    }
+
+    @ReactMethod
+    public void streams(String participantId, final Promise promise) {
+        ConferenceInformation conferenceInformation = VoxeetSDK.conference().getCurrentConference();
+        WritableNativeArray array = new WritableNativeArray();
+        if (null == conferenceInformation) {
+            promise.resolve(array);
+            return;
+        }
+        List<MediaStream> streams = Opt.of(VoxeetSDK.conference().findParticipantById(participantId))
+                .then(Participant::streams).orNull();
+
+        promise.resolve(MediaStreamUtil.toMap(streams));
     }
 
     @ReactMethod

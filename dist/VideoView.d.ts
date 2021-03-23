@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import MediaStream from "./types/MediaStream";
+import Participant from './types/Participant';
 export interface Stream {
     peerId: string;
     label: string;
@@ -27,12 +28,19 @@ export interface Holder {
 /**
  * Composes `View`.
  *
- * - attach: MediaStream
  * - cornerRadius: number
  * - isCircle: boolean
  * - hasFlip: boolean
  * - isAutoUnAttach: boolean
  * - scaleType: 'fit' | 'fill'
+ *
+ *
+ * Public methods :
+ *
+ * attach(participant: Participant, mediaStream: MediaStream): Promise<void>
+ * unattach(): Promise<void>
+ * isAttached(): Promise<boolean>
+ * isScreenShare(): Promise<boolean>
  */
 export default class VideoView extends Component<Props, State> {
     static defaultProps: {
@@ -41,16 +49,18 @@ export default class VideoView extends Component<Props, State> {
         isAutoUnAttach: boolean;
         scaleType: string;
     };
-    _UiManager: any;
-    _videoView: React.Component | null;
-    _videoViewHandler: null | number;
-    _nextRequestId: number;
-    _requestMap: Map<number, Holder>;
+    private _UiManager;
+    private _videoView;
+    private _videoViewHandler;
+    private _nextRequestId;
+    private _requestMap;
     constructor(props: Props);
     componentDidMount(): void;
-    isAttached(): Promise<unknown>;
-    isScreenShare(): Promise<unknown>;
-    _sendCallReturn(command: any): Promise<unknown>;
+    attach(participant: Participant, mediaStream: MediaStream): Promise<void>;
+    unattach(): Promise<void>;
+    isAttached(): Promise<boolean>;
+    isScreenShare(): Promise<boolean>;
+    _sendCallReturn(command: any, param1?: any, param2?: any): Promise<any>;
     _onCallReturn: (event: any) => void;
     render(): JSX.Element;
 }
