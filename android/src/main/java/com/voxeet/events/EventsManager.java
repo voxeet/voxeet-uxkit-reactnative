@@ -19,5 +19,7 @@ public class EventsManager {
     public void init(@NonNull EventBus eventBus, @NonNull ReactApplicationContext reactContext) {
         eventEmitters.add(new ConferenceStatusEventEmitter(reactContext, eventBus));
         eventEmitters.add(new ConferenceUserEventEmitter(reactContext, eventBus));
+        eventEmitters.add(new FilePresentationEventEmitter(reactContext, eventBus));
+        eventEmitters.add(new VideoPresentationEventEmitter(reactContext, eventBus));
     }
 }

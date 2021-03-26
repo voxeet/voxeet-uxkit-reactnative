@@ -87,7 +87,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
             @Override
             void transform(@NonNull WritableMap map, @NonNull RecordingStatusUpdatedEvent instance) {
                 map.putString("conferenceId", instance.conferenceId);
-                map.putString("userId", instance.participantId);
+                map.putString("participantId", instance.participantId);
                 map.putString("recordingStatus", instance.recordingStatus);
                 map.putString("type", instance.getType());
             }

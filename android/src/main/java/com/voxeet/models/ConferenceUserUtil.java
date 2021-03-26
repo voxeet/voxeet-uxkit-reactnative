@@ -1,13 +1,11 @@
 package com.voxeet.models;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.voxeet.android.media.MediaStream;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.models.v1.ConferenceParticipantStatus;
