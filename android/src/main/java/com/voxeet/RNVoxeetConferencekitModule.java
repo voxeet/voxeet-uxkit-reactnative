@@ -18,6 +18,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.android.media.MediaStream;
+import com.voxeet.events.EventsManager;
 import com.voxeet.models.ConferenceUserUtil;
 import com.voxeet.models.ConferenceUtil;
 import com.voxeet.models.MediaStreamUtil;
@@ -79,6 +80,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
     private final RNRootViewProvider mRootViewProvider;
+    private final EventsManager eventsManager;
     private ParticipantInfo _current_user;
     private ReentrantLock lockAwaitingToken = new ReentrantLock();
     private List<TokenCallback> mAwaitingTokenCallback;
@@ -93,6 +95,11 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         VoxeetPreferences.init(reactContext, new VoxeetEnvironmentHolder(reactContext));
         TelemetryService.register(SdkEnvironment.REACT_NATIVE, "____REACT_NATIVE_VERSION____");
+
+        //properly init the events
+        EventBus eventBus = VoxeetSDK.instance().getEventBus();
+        eventsManager = new EventsManager();
+        eventsManager.init(eventBus, reactContext);
     }
 
     @Override
