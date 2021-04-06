@@ -233,13 +233,7 @@ RCT_EXPORT_METHOD(participants:(NSString *)conferenceID
             NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
 
             for (VTParticipant *participant in participants) {
-                VTParticipantInfo* info = participant.info;
-
-                NSDictionary *result = @{@"participantId": participant.id,
-                                         @"externalId": info.externalID,
-                                         @"name": info.name,
-                                         @"avatarUrl": info.avatarURL};
-
+                NSDictionary *result = [self convertFromParticipant:participant];
                 [output addObject:result];
             }
             
@@ -268,14 +262,7 @@ RCT_EXPORT_METHOD(streams:(NSString *)participantID
             
             if ([participant.id isEqualToString: participantID]) {
                 for (MediaStream *stream in participant.streams) {
-                    NSString *type = [self streamType:stream.type];
-                    BOOL hasAudioTracks = stream.audioTracks.count > 0;
-                    BOOL hasVideoTracks = stream.videoTracks.count > 0;
-                    
-                    NSDictionary *result = @{@"streamId": stream.streamId,
-                                             @"type": type,
-                                             @"hasAudioTracks": @(hasAudioTracks),
-                                             @"hasVideoTracks": @(hasVideoTracks)};
+                    NSDictionary *result = [self convertFromStream:stream];
                     [output addObject:result];
                 }
                 resolve(output);
@@ -339,13 +326,41 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent", @"StreamAddedEvent", @"StreamRemovedEvent"];
+    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent", @"StreamAddedEvent", @"StreamUpdatedEvent", @"StreamRemovedEvent", @"ParticipantAddedEvent", @"ParticipantUpdatedEvent"];
+}
+/*
+ *  MARK: Convert helpers
+ */
+- (NSDictionary *)convertFromParticipant:(VTParticipant *)participant {
+    VTConference *conference = VoxeetSDK.shared.conference.current;
+    if (conference != nil) {
+        NSString *conferenceStatus = [self convertFromStatus:conference.status];
+        
+        return @{
+            @"participantId": participant.id,
+            @"conferenceStatus": conferenceStatus,
+            @"externalId": participant.info.externalID,
+            @"name": participant.info.name,
+            @"avatarUrl": participant.info.avatarURL,
+        };
+    }
+    return nil;
 }
 
-/*
- *  MARK: Enum helpers
- */
-- (NSString *)conferenceStatus:(VTConferenceStatus)status {
+- (NSDictionary *)convertFromStream:(MediaStream *)stream {
+    BOOL hasAudioTracks = stream.audioTracks.count > 0;
+    BOOL hasVideoTracks = stream.videoTracks.count > 0;
+    NSString *streamType = [self convertFromStreamType:stream.type];
+    
+    return @{
+        @"streamId": stream.streamId,
+        @"type": streamType,
+        @"hasAudioTracks": @(hasAudioTracks),
+        @"hasVideoTracks": @(hasVideoTracks)
+    };
+}
+
+- (NSString *)convertFromStatus:(VTConferenceStatus)status {
     switch (status) {
         case VTConferenceStatusCreating:
             return @"CREATING";
@@ -368,7 +383,7 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
     }
 }
 
-- (NSString *)streamType:(MediaStreamType)type {
+- (NSString *)convertFromStreamType:(MediaStreamType)type {
     switch(type) {
         case ScreenShare:
             return @"ScreenShare";
@@ -377,24 +392,6 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
         case Camera:
             return @"Camera";
     }
-}
-
-// Will be called when this module's first listener is added.
-- (void)startObserving
-{
-    _hasListeners = YES;
-    // Observers.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conferenceStatusUpdated:) name:@"VTConferenceStatusUpdated" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamAdded:) name:@"VTStreamAdded" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamRemoved:) name:@"VTStreamRemoved" object:nil];
-}
-
-// Will be called when this module's last listener is removed, or on dealloc.
-- (void)stopObserving
-{
-    _hasListeners = NO;
-    // Observers.
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 RCT_EXPORT_METHOD(onAccessTokenOk:(NSString *)accessToken
@@ -442,18 +439,68 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
 /*
  *  MARK: Observers
  */
+// Will be called when this module's first listener is added.
+- (void)startObserving
+{
+    _hasListeners = YES;
+    // Observers.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conferenceStatusUpdated:) name:@"VTConferenceStatusUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamAdded:) name:@"VTStreamAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamUpdated:) name:@"VTStreamUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamRemoved:) name:@"VTStreamRemoved" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(participantAdded:) name:@"VTParticipantAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(participantUpdated:) name:@"VTParticipantUpdated" object:nil];
+}
+
+// Will be called when this module's last listener is removed, or on dealloc.
+- (void)stopObserving
+{
+    _hasListeners = NO;
+    // Observers.
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)participantAdded:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"Participant": [self convertFromParticipant:participant]
+            };
+            [self sendEventWithName:@"ParticipantAddedEvent" body:result];
+        }
+    });
+}
+
+- (void)participantUpdated:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"Participant": [self convertFromParticipant:participant]
+            };
+            [self sendEventWithName:@"ParticipantUpdatedEvent" body:result];
+        }
+    });
+}
 
 - (void)conferenceStatusUpdated:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSNumber *rawStatus = notification.userInfo[@"status"];
         VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
-        NSString *statusStr = [self conferenceStatus:status];
+        NSString *statusStr = [self convertFromStatus:status];
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
-            NSDictionary *statusDict = @{@"status": statusStr,
-                                         @"conferenceId": conference.id,
-                                         @"conferenceAlias": conference.alias};
+            NSDictionary *statusDict = @{
+                @"status": statusStr,
+                @"conferenceId": conference.id,
+                @"conferenceAlias": conference.alias
+            };
             [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
         }
     });
@@ -466,28 +513,27 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
-            NSString *conferenceStatus = [self conferenceStatus:conference.status];
-            
-            NSString *streamType = [self streamType:stream.type];
-            BOOL hasAudioTracks = stream.audioTracks.count > 0;
-            BOOL hasVideoTracks = stream.videoTracks.count > 0;
-            
             NSDictionary *result = @{
-                @"Participant": @{
-                    @"participantId": participant.id,
-                    @"conferenceStatus": conferenceStatus,
-                    @"externalId": participant.info.externalID,
-                    @"name": participant.info.name,
-                    @"avatarUrl": participant.info.avatarURL,
-                },
-                @"MediaStream": @{
-                    @"streamId": stream.streamId,
-                    @"type": streamType,
-                    @"hasAudioTracks": @(hasAudioTracks),
-                    @"hasVideoTracks": @(hasVideoTracks)
-                }
+                @"Participant": [self convertFromParticipant:participant],
+                @"MediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamAddedEvent" body:result];
+        }
+    });
+}
+
+- (void)streamUpdated:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"Participant": [self convertFromParticipant:participant],
+                @"MediaStream": [self convertFromStream:stream]
+            };
+            [self sendEventWithName:@"StreamUpdatedEvent" body:result];
         }
     });
 }
@@ -499,26 +545,9 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
-            NSString *conferenceStatus = [self conferenceStatus:conference.status];
-            
-            NSString *streamType = [self streamType:stream.type];
-            BOOL hasAudioTracks = stream.audioTracks.count > 0;
-            BOOL hasVideoTracks = stream.videoTracks.count > 0;
-            
             NSDictionary *result = @{
-                @"Participant": @{
-                    @"participantId": participant.id,
-                    @"conferenceStatus": conferenceStatus,
-                    @"externalId": participant.info.externalID,
-                    @"name": participant.info.name,
-                    @"avatarUrl": participant.info.avatarURL,
-                },
-                @"MediaStream": @{
-                    @"streamId": stream.streamId,
-                    @"type": streamType,
-                    @"hasAudioTracks": @(hasAudioTracks),
-                    @"hasVideoTracks": @(hasVideoTracks)
-                }
+                @"Participant": [self convertFromParticipant:participant],
+                @"MediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamRemovedEvent" body:result];
         }
