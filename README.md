@@ -41,7 +41,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 ### Android
 
-1. In `android/app/build.gradle`, add the maven repository and set the `minSdkVersion` to at least **21**.
+1. In `android/build.gradle`, add the maven repository and set the `minSdkVersion` to at least **21**.
 
 2. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
     **Warning: the SDK is only compatible with the Hermes engine**
@@ -52,10 +52,22 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ]
     ```
 
-    A pickFirst option must be used for the libc++ shared object:
+3. Two possibilities regarding the libraries of libc++_shared here :
+
+    - **Option 1**
+
+    Patch the AAR directly to remove the outdated libc++_shared using :
+
+    ```
+    bash ./node_modules/@voxeet/react-native-voxeet-conferenceki/patch.react.aar.sh
+    ```
+
+    - **Option 2**
+
+    If patching is an issue for you, a pickFirst option must be used for the libc++ shared object but it may introduce some issues in some versions of React-Native due to different ABIs :
 
     ```gradle
-    android {
+    android { //WARNING : don't use it if you already patched the react native env using above script
         packagingOptions {
             pickFirst '**/armeabi-v7a/libc++_shared.so'
             pickFirst '**/x86/libc++_shared.so'
