@@ -346,7 +346,7 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent"];
+    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent", @"StreamAddedEvent", @"StreamRemovedEvent"];
 }
 
 // Will be called when this module's first listener is added.
@@ -355,6 +355,8 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
     _hasListeners = YES;
     // Observers.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conferenceStatusUpdated:) name:@"VTConferenceStatusUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamAdded:) name:@"VTStreamAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamRemoved:) name:@"VTStreamRemoved" object:nil];
 }
 
 // Will be called when this module's last listener is removed, or on dealloc.
@@ -455,6 +457,72 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
                                          @"conferenceId": conference.id,
                                          @"conferenceAlias": conference.alias};
             [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
+        }
+    });
+}
+
+- (void)streamAdded:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSString *conferenceStatus = [self conferenceStatus:conference.status];
+            
+            NSString *streamType = [self streamType:stream.type];
+            BOOL hasAudioTracks = stream.audioTracks.count > 0;
+            BOOL hasVideoTracks = stream.videoTracks.count > 0;
+            
+            NSDictionary *result = @{
+                @"Participant": @{
+                    @"participantId": participant.id,
+                    @"conferenceStatus": conferenceStatus,
+                    @"externalId": participant.info.externalID,
+                    @"name": participant.info.name,
+                    @"avatarUrl": participant.info.avatarURL,
+                },
+                @"MediaStream": @{
+                    @"streamId": stream.streamId,
+                    @"type": streamType,
+                    @"hasAudioTracks": @(hasAudioTracks),
+                    @"hasVideoTracks": @(hasVideoTracks)
+                }
+            };
+            [self sendEventWithName:@"StreamAddedEvent" body:result];
+        }
+    });
+}
+
+- (void)streamRemoved:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSString *conferenceStatus = [self conferenceStatus:conference.status];
+            
+            NSString *streamType = [self streamType:stream.type];
+            BOOL hasAudioTracks = stream.audioTracks.count > 0;
+            BOOL hasVideoTracks = stream.videoTracks.count > 0;
+            
+            NSDictionary *result = @{
+                @"Participant": @{
+                    @"participantId": participant.id,
+                    @"conferenceStatus": conferenceStatus,
+                    @"externalId": participant.info.externalID,
+                    @"name": participant.info.name,
+                    @"avatarUrl": participant.info.avatarURL,
+                },
+                @"MediaStream": @{
+                    @"streamId": stream.streamId,
+                    @"type": streamType,
+                    @"hasAudioTracks": @(hasAudioTracks),
+                    @"hasVideoTracks": @(hasVideoTracks)
+                }
+            };
+            [self sendEventWithName:@"StreamRemovedEvent" body:result];
         }
     });
 }
