@@ -318,10 +318,9 @@ RCT_EXPORT_METHOD(streams:(NSString *)participantID
                     NSDictionary *result = [self convertFromStream:stream];
                     [output addObject:result];
                 }
-                resolve(output);
             }
         }
-        resolve(nil);
+        resolve(output);
     });
 }
 
