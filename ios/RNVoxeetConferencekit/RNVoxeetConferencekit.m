@@ -571,23 +571,6 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
-            NSDictionary *statusDict = @{
-                @"status": statusStr,
-                @"conferenceId": conference.id,
-                @"conferenceAlias": conference.alias
-            };
-            [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
-        }
-    });
-}
-
-- (void)streamAdded:(NSNotification *)notification {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VTParticipant *participant = notification.userInfo[@"participant"];
-        MediaStream *stream = notification.userInfo[@"stream"];
-        
-        VTConference *conference = VoxeetSDK.shared.conference.current;
-        if (conference != nil) {
             NSDictionary *result = @{
                 @"Participant": [self convertFromParticipant:participant],
                 @"MediaStream": [self convertFromStream:stream]
