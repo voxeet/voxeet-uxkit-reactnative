@@ -1,8 +1,4 @@
-export enum MediaStreamType {
-  Camera = "Camera",
-  ScreenShare = "ScreenShare",
-  Custom = "Custom"
-}
+export type MediaStreamType = "Camera" | "ScreenShare" | "Custom";
 
 export default interface MediaStream {
   peerId: string;
