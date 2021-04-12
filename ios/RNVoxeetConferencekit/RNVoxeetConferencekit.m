@@ -552,37 +552,22 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
         NSString *statusStr = [self convertFromStatus:status];
         
-        switch (status) {
-            case VTConferenceStatusCreating:
-                statusStr = @"CREATING";
-                break;
-            case VTConferenceStatusCreated:
-                statusStr = @"CREATED";
-                break;
-            case VTConferenceStatusJoining:
-                statusStr = @"JOINING";
-                break;
-            case VTConferenceStatusJoined:
-                statusStr = @"JOINED";
-                break;
-            case VTConferenceStatusLeaving:
-                statusStr = @"LEAVING";
-                break;
-            case VTConferenceStatusLeft:
-                statusStr = @"LEFT";
-                break;
-            case VTConferenceStatusEnded:
-                statusStr = @"ENDED";
-                break;
-            case VTConferenceStatusDestroyed:
-                statusStr = @"DESTROYED";
-                break;
-            case VTConferenceStatusError:
-                statusStr = @"ERROR";
-                break;
-            default:
-                break;
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *statusDict = @{
+                @"status": statusStr,
+                @"conferenceId": conference.id,
+                @"conferenceAlias": conference.alias
+            };
+            [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
         }
+    });
+}
+
+- (void)streamAdded:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
