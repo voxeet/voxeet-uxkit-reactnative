@@ -1,7 +1,7 @@
 import { ConferenceStatusUpdatedEvent, PermissionRefusedEvent, CameraSwitchSuccessEvent, CameraSwitchErrorEvent, QualityIndicators, RecordingStatusUpdatedEvent, ConferenceDestroyedPush, ConferenceEnded } from "./events/ConferenceStatusUpdatedEvent";
 import { FilePresentationConverted, FilePresentationStarted, FilePresentationStopped, FilePresentationUpdated } from "./events/FilePresentationEvents";
 import { VideoPresentationSeek, VideoPresentationPlay, VideoPresentationStopped, VideoPresentationPaused, VideoPresentationStarted } from "./events/VideoPresentationEvents";
-import { ParticipantAddedEvent, ParticipantUpdatedEvent, StreamAddedEvent, StreamRemovedEvent, ConferenceParticipantQualityUpdatedEvent } from "./events/ConferenceUsersEvent";
+import { ParticipantAddedEvent, ParticipantUpdatedEvent, StreamAddedEvent, StreamRemovedEvent, ConferenceParticipantQualityUpdatedEvent, StreamUpdatedEvent } from "./events/ConferenceUsersEvent";
 interface EventMap {
     ["ConferenceStatusUpdatedEvent"]: ConferenceStatusUpdatedEvent;
     ["VideoPresentationSeek"]: VideoPresentationSeek;
@@ -28,6 +28,7 @@ interface EventMap {
     ["ParticipantAddedEvent"]: ParticipantAddedEvent;
     ["ParticipantUpdatedEvent"]: ParticipantUpdatedEvent;
     ["StreamAddedEvent"]: StreamAddedEvent;
+    ["StreamUpdatedEvent"]: StreamUpdatedEvent;
     ["StreamRemovedEvent"]: StreamRemovedEvent;
     ["ConferenceParticipantQualityUpdatedEvent"]: ConferenceParticipantQualityUpdatedEvent;
 }

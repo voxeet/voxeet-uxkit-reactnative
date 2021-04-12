@@ -19,6 +19,11 @@ export interface StreamRemovedEvent {
   mediaStream: MediaStream
 }
 
+export interface StreamUpdatedEvent {
+  user: Participant,
+  mediaStream: MediaStream
+}
+
 export interface ConferenceParticipantQualityUpdatedEvent {
   user: Participant
 }

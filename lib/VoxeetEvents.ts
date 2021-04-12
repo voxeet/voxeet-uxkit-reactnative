@@ -24,6 +24,7 @@ import { FilePresentationConverted,
   StreamAddedEvent,
   StreamRemovedEvent,
   ConferenceParticipantQualityUpdatedEvent,
+  StreamUpdatedEvent,
  } from "./events/ConferenceUsersEvent";
 const { RNVoxeetConferencekit } = NativeModules;
 
@@ -56,6 +57,7 @@ interface EventMap {
   ["ParticipantAddedEvent"]: ParticipantAddedEvent;
   ["ParticipantUpdatedEvent"]: ParticipantUpdatedEvent;
   ["StreamAddedEvent"]: StreamAddedEvent;
+  ["StreamUpdatedEvent"]: StreamUpdatedEvent;
   ["StreamRemovedEvent"]: StreamRemovedEvent;
   ["ConferenceParticipantQualityUpdatedEvent"]: ConferenceParticipantQualityUpdatedEvent;
 }

@@ -572,8 +572,8 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
             NSDictionary *result = @{
-                @"Participant": [self convertFromParticipant:participant],
-                @"MediaStream": [self convertFromStream:stream]
+                @"user": [self convertFromParticipant:participant],
+                @"mediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamAddedEvent" body:result];
         }
@@ -586,10 +586,11 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         MediaStream *stream = notification.userInfo[@"stream"];
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
+        NSLog(@"updating streams %@", notification.userInfo);
         if (conference != nil) {
             NSDictionary *result = @{
-                @"Participant": [self convertFromParticipant:participant],
-                @"MediaStream": [self convertFromStream:stream]
+                @"user": [self convertFromParticipant:participant],
+                @"mediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamUpdatedEvent" body:result];
         }
@@ -604,8 +605,8 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
             NSDictionary *result = @{
-                @"Participant": [self convertFromParticipant:participant],
-                @"MediaStream": [self convertFromStream:stream]
+                @"user": [self convertFromParticipant:participant],
+                @"mediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamRemovedEvent" body:result];
         }
