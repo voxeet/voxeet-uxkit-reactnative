@@ -16,7 +16,7 @@ export interface TokenRefreshCallback {
   (): Promise<string>
 };
 
-export default class _VoxeetSDK {
+class RNVoxeetSDK {
 
   #events = new VoxeetEvents();
   get events() { return this.#events; }
@@ -28,17 +28,19 @@ export default class _VoxeetSDK {
    * Initializes the SDK using the customer key and secret.
    * @param consumerKey Consumer Key
    * @param consumerSecret Consumer Secret
+   * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
    */
-  initialize(consumerKey: string, consumerSecret: string): Promise<boolean> {
-    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+  initialize(consumerKey: string, consumerSecret: string, deactivateOverlay?: boolean): Promise<boolean> {
+    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret, !!deactivateOverlay);
   }
 
   /**
    * Initializes the SDK with an access token that is provided by the customer backend communicating with Voxeet servers.
    * @param accessToken Access token
    * @param refreshToken Callback to get a new access token after it expires
+   * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
    */
-  initializeToken(accessToken: string | undefined, refreshToken: TokenRefreshCallback): Promise<boolean> {
+  initializeToken(accessToken: string | undefined, refreshToken: TokenRefreshCallback, deactivateOverlay?: boolean): Promise<boolean> {
     if (!this.refreshAccessTokenCallback) {
       this.refreshAccessTokenCallback = () => {
         refreshToken()
@@ -53,7 +55,7 @@ export default class _VoxeetSDK {
       });
     }
 
-    return RNVoxeetConferencekit.initializeToken(accessToken);
+    return RNVoxeetConferencekit.initializeToken(accessToken, !!deactivateOverlay);
   }
 
   /**
@@ -224,6 +226,8 @@ export default class _VoxeetSDK {
   closeSession(): Promise<boolean> {
     return this.disconnect();
   }
+
+  public static VoxeetSDK = new RNVoxeetSDK();
 }
 
-export const VoxeetSDK = new _VoxeetSDK();
+export default new RNVoxeetSDK();

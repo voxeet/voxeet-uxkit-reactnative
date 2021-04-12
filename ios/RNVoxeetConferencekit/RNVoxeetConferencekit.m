@@ -20,12 +20,14 @@
 @implementation RNVoxeetConferencekit
 {
     BOOL _hasListeners;
+    BOOL _deactivatedOverlay;
 }
 
 RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
                   consumerSecret:(NSString *)consumerSecret
+                  deactivateOverlay:(BOOL) deactivateOverlay
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -34,12 +36,18 @@ RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
         VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
         [VoxeetSDK.shared initializeWithConsumerKey:consumerKey consumerSecret:consumerSecret];
-        [VoxeetUXKit.shared initialize];
+
+        self->_deactivatedOverlay = deactivateOverlay;
+        if (!deactivateOverlay) {
+            [VoxeetUXKit.shared initialize];
+        }
+
         resolve(nil);
     });
 }
 
 RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
+                  deactivateOverlay:(BOOL) deactivateOverlay
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -53,7 +61,11 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
                 [self sendEventWithName:@"refreshToken" body:nil];
             }
         }];
-        [VoxeetUXKit.shared initialize];
+
+        self->_deactivatedOverlay = deactivateOverlay;
+        if (!deactivateOverlay) {
+            [VoxeetUXKit.shared initialize];
+        }
         
         resolve(nil);
     });
@@ -290,6 +302,7 @@ RCT_EXPORT_METHOD(sendBroadcastMessage:(NSString *)message
 RCT_EXPORT_METHOD(appearMaximized:(BOOL)enable)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self->_deactivatedOverlay) return;
         [VoxeetUXKit.shared setAppearMaximized:enable];
     });
 }
@@ -310,6 +323,10 @@ RCT_EXPORT_METHOD(isAudio3DEnabled:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(isTelecomMode:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
+    if (self->_deactivatedOverlay) {
+        resolve([NSNumber numberWithBool:FALSE]);
+        return;
+    }
     resolve([NSNumber numberWithBool:VoxeetUXKit.shared.telecom]);
 }
 

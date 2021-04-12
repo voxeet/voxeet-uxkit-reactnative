@@ -9,7 +9,7 @@ export interface RefreshCallback {
 export interface TokenRefreshCallback {
     (): Promise<string>;
 }
-export default class _VoxeetSDK {
+declare class RNVoxeetSDK {
     #private;
     get events(): any;
     set events(any: any);
@@ -18,14 +18,16 @@ export default class _VoxeetSDK {
      * Initializes the SDK using the customer key and secret.
      * @param consumerKey Consumer Key
      * @param consumerSecret Consumer Secret
+     * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
      */
-    initialize(consumerKey: string, consumerSecret: string): Promise<boolean>;
+    initialize(consumerKey: string, consumerSecret: string, deactivateOverlay?: boolean): Promise<boolean>;
     /**
      * Initializes the SDK with an access token that is provided by the customer backend communicating with Voxeet servers.
      * @param accessToken Access token
      * @param refreshToken Callback to get a new access token after it expires
+     * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
      */
-    initializeToken(accessToken: string | undefined, refreshToken: TokenRefreshCallback): Promise<boolean>;
+    initializeToken(accessToken: string | undefined, refreshToken: TokenRefreshCallback, deactivateOverlay?: boolean): Promise<boolean>;
     /**
      * Opens a new session.
      * @param userInfo Participant information
@@ -115,5 +117,7 @@ export default class _VoxeetSDK {
     openSession(userInfo: ConferenceUser): Promise<boolean>;
     /** @deprecated Use disconnect() instead. */
     closeSession(): Promise<boolean>;
+    static VoxeetSDK: RNVoxeetSDK;
 }
-export declare const VoxeetSDK: _VoxeetSDK;
+declare const _default: RNVoxeetSDK;
+export default _default;

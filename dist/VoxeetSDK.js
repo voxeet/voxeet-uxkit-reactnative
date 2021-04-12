@@ -12,7 +12,7 @@ import { MediaStreamType } from './types/MediaStream';
 const { RNVoxeetConferencekit } = NativeModules;
 ;
 ;
-export default class _VoxeetSDK {
+class RNVoxeetSDK {
     constructor() {
         _events.set(this, new VoxeetEvents());
         this.refreshAccessTokenCallback = null;
@@ -23,16 +23,18 @@ export default class _VoxeetSDK {
      * Initializes the SDK using the customer key and secret.
      * @param consumerKey Consumer Key
      * @param consumerSecret Consumer Secret
+     * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
      */
-    initialize(consumerKey, consumerSecret) {
-        return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+    initialize(consumerKey, consumerSecret, deactivateOverlay) {
+        return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret, !!deactivateOverlay);
     }
     /**
      * Initializes the SDK with an access token that is provided by the customer backend communicating with Voxeet servers.
      * @param accessToken Access token
      * @param refreshToken Callback to get a new access token after it expires
+     * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
      */
-    initializeToken(accessToken, refreshToken) {
+    initializeToken(accessToken, refreshToken, deactivateOverlay) {
         if (!this.refreshAccessTokenCallback) {
             this.refreshAccessTokenCallback = () => {
                 refreshToken()
@@ -46,7 +48,7 @@ export default class _VoxeetSDK {
                 this.refreshAccessTokenCallback && this.refreshAccessTokenCallback();
             });
         }
-        return RNVoxeetConferencekit.initializeToken(accessToken);
+        return RNVoxeetConferencekit.initializeToken(accessToken, !!deactivateOverlay);
     }
     /**
      * Opens a new session.
@@ -196,5 +198,6 @@ export default class _VoxeetSDK {
     }
 }
 _events = new WeakMap();
-export const VoxeetSDK = new _VoxeetSDK();
+RNVoxeetSDK.VoxeetSDK = new RNVoxeetSDK();
+export default new RNVoxeetSDK();
 //# sourceMappingURL=VoxeetSDK.js.map
