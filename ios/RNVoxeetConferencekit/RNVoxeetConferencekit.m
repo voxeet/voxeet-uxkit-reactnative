@@ -238,7 +238,20 @@ RCT_EXPORT_METHOD(participants:(NSString *)conferenceID
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if(conference) {
+            NSArray<VTParticipant *> *participants = conference.participants;
+            NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+            for (VTParticipant *participant in participants) {
+                NSDictionary *result = [self convertFromParticipant:participant];
+                [output addObject:result];
+            }
+            
+            resolve(output);
+            return;
+        }
+
         [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
 
             NSArray<VTParticipant *> *participants = conference.participants;
@@ -354,11 +367,11 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
         NSString *conferenceStatus = [self convertFromStatus:conference.status];
         
         return @{
-            @"participantId": participant.id,
-            @"conferenceStatus": conferenceStatus,
-            @"externalId": participant.info.externalID,
-            @"name": participant.info.name,
-            @"avatarUrl": participant.info.avatarURL,
+            @"participantId": participant.id ? participant.id : @"",
+            @"conferenceStatus": conferenceStatus ? conferenceStatus : @"",
+            @"externalId": participant.info.externalID ? participant.info.externalID : @"",
+            @"name": participant.info.name ? participant.info.name, @"",
+            @"avatarUrl": participant.info.avatarURL ? participant.info.avatarURL : @"",
         };
     }
     return nil;
