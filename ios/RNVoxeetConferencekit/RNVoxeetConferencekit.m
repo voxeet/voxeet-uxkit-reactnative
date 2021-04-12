@@ -233,8 +233,7 @@ RCT_EXPORT_METHOD(invite:(NSString *)conferenceID
     });
 }
 
-RCT_EXPORT_METHOD(startVideo:(NSString *)conferenceID
-                  resolve:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(startVideo:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -248,14 +247,13 @@ RCT_EXPORT_METHOD(startVideo:(NSString *)conferenceID
     });
 }
 
-RCT_EXPORT_METHOD(stopVideo:(NSString *)conferenceID
-                  resolve:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(stopVideo:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [VoxeetSDK.shared.conference startVideoWithParticipant:nil completion:^(NSError *error) {
+        [VoxeetSDK.shared.conference stopVideoWithParticipant:nil completion:^(NSError *error) {
             if (error != nil) {
-                reject(@"startVideo_error", [error localizedDescription], nil);
+                reject(@"stopVideo_error", [error localizedDescription], nil);
             } else {
                 resolve([NSNumber numberWithBool:TRUE]);
             }
