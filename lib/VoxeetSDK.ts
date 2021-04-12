@@ -98,6 +98,20 @@ class RNVoxeetSDK {
   }
 
   /**
+   * Starts the local video
+   */
+  startVideo(): Promise<boolean> {
+    return RNVoxeetConferencekit.startVideo();
+  }
+
+  /**
+   * Stops the local video
+   */
+  stopVideo(): Promise<boolean> {
+    return RNVoxeetConferencekit.stopVideo();
+  }
+
+  /**
    * Invite a participant to the conference.
    * @param conferenceId Id of the conference to invite the participant to
    * @param participants List of participants to invite

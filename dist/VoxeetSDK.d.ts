@@ -53,6 +53,14 @@ declare class RNVoxeetSDK {
      */
     leave(): Promise<boolean>;
     /**
+     * Starts the local video
+     */
+    startVideo(): Promise<boolean>;
+    /**
+     * Stops the local video
+     */
+    stopVideo(): Promise<boolean>;
+    /**
      * Invite a participant to the conference.
      * @param conferenceId Id of the conference to invite the participant to
      * @param participants List of participants to invite

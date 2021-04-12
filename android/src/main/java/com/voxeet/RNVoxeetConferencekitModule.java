@@ -406,6 +406,22 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void startVideo(final Promise promise) {
+        VoxeetSDK.conference()
+                .startVideo()
+                .then(promise::resolve)
+                .error(promise::reject);
+    }
+
+    @ReactMethod
+    public void stopVideo(final Promise promise) {
+        VoxeetSDK.conference()
+                .stopVideo()
+                .then(promise::resolve)
+                .error(promise::reject);
+    }
+
+    @ReactMethod
     public void invite(String conferenceId, ReadableArray participants, final Promise promise) {
         //TODO expose in the SDK the ability to use the conferenceId
         Log.d(TAG, "invite: WARNING :: the provided conferenceId is not yet managed, please make sure you have joined the conference before trying to invite users");
