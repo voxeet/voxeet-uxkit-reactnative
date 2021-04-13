@@ -41,9 +41,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 ### Android
 
-1. In `android/build.gradle`, add the maven repository and set the `minSdkVersion` to at least **21**.
-
-2. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
+1. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
     **Warning: the SDK is only compatible with the Hermes engine**
 
     ```gradle
@@ -52,7 +50,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ]
     ```
 
-3. Two possibilities regarding the libraries of libc++_shared here :
+2. Two possibilities regarding the libc++_shared :
 
     - **Option 1**
 

@@ -3,6 +3,7 @@ package com.voxeet.specifics;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -21,6 +22,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class RNRootViewProvider extends DefaultRootViewProvider {
+    private final static String TAG = RNRootViewProvider.class.getSimpleName();
+
     private final Application mApplication;
     private RNIncomingBundleChecker mRNIncomingBundleChecker;
 
@@ -31,6 +34,8 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
     public RNRootViewProvider(@NonNull Application application, @NonNull VoxeetToolkit toolkit) {
         super(application, toolkit);
 
+        log("creating RNRootViewProvider");
+
         mApplication = application;
     }
 
@@ -38,27 +43,35 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
     public void onActivityCreated(Activity activity, Bundle bundle) {
         super.onActivityCreated(activity, bundle);
 
+        log("onActivityCreated :: creating checker");
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
             mRNIncomingBundleChecker = new RNIncomingBundleChecker(mApplication, activity.getIntent(), null);
+            log("onActivityCreated :: creating checker done");
+        } else {
+            log("onActivityCreated :: creating checker canceled");
         }
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
+        log("onActivityStarted");
         super.onActivityStarted(activity);
     }
 
     @Override
     public void onActivityResumed(Activity activity) {
+        log("onActivityResumed");
         super.onActivityResumed(activity);
 
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
+            log("onActivityResumed :: subscribe to events");
             VoxeetSDK.instance().register(this);
 
             if (!EventBus.getDefault().isRegistered(this)) {
                 EventBus.getDefault().register(this); //registering this activity
             }
 
+            log("onActivityResumed :: check and manage incoming call");
             IncomingBundleChecker checker = RNIncomingCallActivity.REACT_NATIVE_ROOT_BUNDLE;
             if (null != checker && checker.isBundleValid()) {
                 SessionService sessionService = VoxeetSDK.session();
@@ -72,6 +85,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
     @Override
     public void onActivityPaused(Activity activity) {
+        log("onActivityPaused");
         super.onActivityPaused(activity);
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
@@ -79,16 +93,19 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
     @Override
     public void onActivityStopped(Activity activity) {
+        log("onActivityStopped");
         super.onActivityStopped(activity);
     }
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+        log("onActivitySaveInstanceState");
         super.onActivitySaveInstanceState(activity, bundle);
     }
 
     @Override
     public void onActivityDestroyed(Activity activity) {
+        log("onActivityDestroyed");
         super.onActivityDestroyed(activity);
     }
 
@@ -99,6 +116,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ConferenceStatusUpdatedEvent event) {
+        log("ConferenceStatusUpdatedEvent");
         switch (event.state) {
             case JOINING:
             case JOINED:
@@ -111,7 +129,12 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ConferenceDestroyedPush event) {
+        log("ConferenceDestroyedPush");
         if (mRNIncomingBundleChecker != null)
             mRNIncomingBundleChecker.flushIntent();
+    }
+
+    private final void log(@NonNull String text) {
+        Log.d(TAG, "log: " + text);
     }
 }
