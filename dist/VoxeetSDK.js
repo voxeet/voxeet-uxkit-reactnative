@@ -8,7 +8,6 @@ var _events;
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import VoxeetEvents from './VoxeetEvents';
 import Participant from './types/Participant';
-import { MediaStreamType } from './types/MediaStream';
 const { RNVoxeetConferencekit } = NativeModules;
 ;
 ;
@@ -119,14 +118,7 @@ class RNVoxeetSDK {
      * @returns List of streams for this participant
      */
     streams(participantId) {
-        return RNVoxeetConferencekit.streams(participantId)
-            .then((result) => result.map(r => ({
-            peerId: participantId,
-            streamId: r.streamId,
-            hasVideoTracks: r.hasVideoTracks,
-            hasAudioTracks: r.hasAudioTracks,
-            type: MediaStreamType[r.type] || MediaStreamType.Camera
-        })));
+        return RNVoxeetConferencekit.streams(participantId);
     }
     /**
      * Sends a broadcast message to the participants of the conference.

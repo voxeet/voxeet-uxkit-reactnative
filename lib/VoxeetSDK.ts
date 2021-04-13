@@ -2,7 +2,7 @@ import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 
 import VoxeetEvents from './VoxeetEvents';
 import ConferenceUser from './types/ConferenceUser';
 import Participant from './types/Participant';
-import MediaStream, { MediaStreamType } from './types/MediaStream';
+import MediaStream from './types/MediaStream';
 import { CreateOptions, CreateResult } from './types/CreateConference';
 import { JoinOptions, JoinResult } from './types/JoinConference';
 
@@ -138,14 +138,7 @@ class RNVoxeetSDK {
    * @returns List of streams for this participant
    */
   streams(participantId: string): Promise<MediaStream[]> {
-    return RNVoxeetConferencekit.streams(participantId)
-    .then((result: any[]) => result.map(r => ({
-      peerId: participantId,
-      streamId: r.streamId,
-      hasVideoTracks: r.hasVideoTracks,
-      hasAudioTracks: r.hasAudioTracks,
-      type: MediaStreamType[r.type] || MediaStreamType.Camera
-    })));
+    return RNVoxeetConferencekit.streams(participantId);
   }
 
   /**
