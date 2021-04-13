@@ -25,6 +25,16 @@ export interface Holder {
     resolve: Resolve;
     reject: Reject;
 }
+interface VideoViewAsyncCallResult {
+    requestId: number;
+    error?: string;
+    message?: string;
+    peerId?: string;
+    streamId?: string;
+    attach?: number;
+    isAttached?: number;
+    isScreenShare?: number;
+}
 /**
  * Composes `View`.
  *
@@ -52,15 +62,18 @@ export default class VideoView extends Component<Props, State> {
     private _UiManager;
     private _videoView;
     private _videoViewHandler;
-    private _nextRequestId;
+    private static _nextRequestId;
     private _requestMap;
     constructor(props: Props);
     componentDidMount(): void;
+    componentWillUnmount(): void;
     attach(participant: Participant, mediaStream: MediaStream): Promise<void>;
     unattach(): Promise<void>;
     isAttached(): Promise<boolean>;
     isScreenShare(): Promise<boolean>;
-    _sendCallReturn(command: any, param1?: any, param2?: any): Promise<any>;
+    _sendCallReturn(command: any, param1?: any, param2?: any): Promise<VideoViewAsyncCallResult>;
     _onCallReturn: (event: any) => void;
+    _onEvent: (event: VideoViewAsyncCallResult) => void;
     render(): JSX.Element;
 }
+export {};

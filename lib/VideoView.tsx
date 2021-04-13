@@ -7,6 +7,7 @@ import { requireNativeComponent, findNodeHandle, UIManager, Platform, NativeModu
 
 import MediaStream from "./types/MediaStream";
 import Participant from './types/Participant';
+import VoxeetSDK from './VoxeetSDK';
 
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 
@@ -41,6 +42,17 @@ export interface Holder {
   reject: Reject;
 }
 
+interface VideoViewAsyncCallResult {
+  requestId: number,
+  error?: string,
+  message?: string,
+  peerId?: string,
+  streamId?: string,
+  attach?: number,
+  isAttached?: number,
+  isScreenShare?: number
+}
+
 /**
  * Composes `View`.
  *
@@ -70,7 +82,7 @@ export default class VideoView extends Component<Props, State> {
 
   private _videoView: React.Component|null;
   private _videoViewHandler: null | number;
-  private _nextRequestId = 1;
+  private static _nextRequestId = 1;
   private _requestMap: Map<number, Holder> = new Map();
 
   constructor(props: Props) {
@@ -80,42 +92,37 @@ export default class VideoView extends Component<Props, State> {
   }
 
   componentDidMount() {
+    VoxeetSDK.events.addListener("VoxeetConferencekitVideoView", this._onEvent);
     this._videoViewHandler = findNodeHandle(this._videoView);
   }
 
+  componentWillUnmount() {
+    VoxeetSDK.events.removeListener("VoxeetConferencekitVideoView", this._onEvent);
+  }
+
   attach(participant: Participant, mediaStream: MediaStream): Promise<void> {
-    if(Platform.OS == "ios") {
-      return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler, participant.participantId, mediaStream.streamId);
-    }
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId);
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId).then(() => {});
   }
 
   unattach(): Promise<void> {
-    if(Platform.OS == "ios") {
-      return NativeModules.RCTVoxeetVideoView.unattach(this._videoViewHandler);
-    }
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach);
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach).then(() => {});
   }
 
   isAttached(): Promise<boolean> {
-    if(Platform.OS == "ios") {
-      return NativeModules.RCTVoxeetVideoView.isAttached(this._videoViewHandler);
-    }
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached);
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached)
+    .then(r => !!r.isAttached);
   }
 
   isScreenShare(): Promise<boolean> {
-    if(Platform.OS == "ios") {
-      return NativeModules.RCTVoxeetVideoView.isScreenShare(this._videoViewHandler);
-    }
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare);
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare)
+    .then(r => !!r.isScreenShare);
   }
 
-  _sendCallReturn(command: any, param1?: any, param2?: any): Promise<any> {
-    const requestId: number = this._nextRequestId++;
+  _sendCallReturn(command: any, param1?: any, param2?: any): Promise<VideoViewAsyncCallResult> {
+    const requestId: number = VideoView._nextRequestId++;
     const requestMap: Map<number, Holder> = this._requestMap;
 
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<VideoViewAsyncCallResult>((resolve, reject) => {
       requestMap[requestId] = { resolve, reject };
     });
 
@@ -129,14 +136,22 @@ export default class VideoView extends Component<Props, State> {
   }
 
   _onCallReturn = (event: any) => {
-    const { requestId, result, error } = event.nativeEvent;
-    const promise: Holder = this._requestMap[requestId];
-    if (result) {
-      promise.resolve(result);
-    } else {
-      promise.reject(error);
-    }
+    !!event.nativeEvent && this._onEvent(event.nativeEvent);
+  }
+  
+  _onEvent = (event: VideoViewAsyncCallResult) => {
+    console.warn("event is", event);
+    if(!event) return;
+    const { requestId, error, message, peerId, streamId, attach, isAttached} = event;
+    const promise = this._requestMap[requestId];
+
     this._requestMap.delete(requestId);
+
+    if(error && message) {
+        promise.reject(`${error} ${message}`);
+    } else {
+        promise.resolve(event);
+    }
   }
 
   render() {

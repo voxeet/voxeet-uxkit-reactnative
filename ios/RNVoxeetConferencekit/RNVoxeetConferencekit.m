@@ -383,7 +383,7 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent", @"StreamAddedEvent", @"StreamUpdatedEvent", @"StreamRemovedEvent", @"ParticipantAddedEvent", @"ParticipantUpdatedEvent"];
+    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent", @"StreamAddedEvent", @"StreamUpdatedEvent", @"StreamRemovedEvent", @"ParticipantAddedEvent", @"ParticipantUpdatedEvent", @"VoxeetConferencekitVideoView"];
 }
 /*
  *  MARK: Convert helpers
@@ -507,6 +507,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamRemoved:) name:@"VTStreamRemoved" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(participantAdded:) name:@"VTParticipantAdded" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(participantUpdated:) name:@"VTParticipantUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(VoxeetConferencekitVideoView:) name:@"VoxeetConferencekitVideoView" object:nil];
 }
 
 // Will be called when this module's last listener is removed, or on dealloc.
@@ -560,6 +561,13 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
             };
             [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
         }
+    });
+}
+
+
+- (void)VoxeetConferencekitVideoView:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendEventWithName:@"VoxeetConferencekitVideoView" body:notification.userInfo];
     });
 }
 

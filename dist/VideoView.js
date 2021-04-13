@@ -1,7 +1,8 @@
 //promise call done using https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/
 //TODO lock call ?
 import React, { Component } from 'react';
-import { requireNativeComponent, findNodeHandle, UIManager, Platform, NativeModules } from 'react-native';
+import { requireNativeComponent, findNodeHandle, UIManager } from 'react-native';
+import VoxeetSDK from './VoxeetSDK';
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 /**
  * Composes `View`.
@@ -24,51 +25,50 @@ export default class VideoView extends Component {
     constructor(props) {
         super(props);
         this._UiManager = UIManager;
-        this._nextRequestId = 1;
         this._requestMap = new Map();
         this._onCallReturn = (event) => {
-            const { requestId, result, error } = event.nativeEvent;
+            !!event.nativeEvent && this._onEvent(event.nativeEvent);
+        };
+        this._onEvent = (event) => {
+            console.warn("event is", event);
+            if (!event)
+                return;
+            const { requestId, error, message, peerId, streamId, attach, isAttached } = event;
             const promise = this._requestMap[requestId];
-            if (result) {
-                promise.resolve(result);
+            this._requestMap.delete(requestId);
+            if (error && message) {
+                promise.reject(`${error} ${message}`);
             }
             else {
-                promise.reject(error);
+                promise.resolve(event);
             }
-            this._requestMap.delete(requestId);
         };
         this._videoViewHandler = null;
         this._videoView = null;
     }
     componentDidMount() {
+        VoxeetSDK.events.addListener("VoxeetConferencekitVideoView", this._onEvent);
         this._videoViewHandler = findNodeHandle(this._videoView);
     }
+    componentWillUnmount() {
+        VoxeetSDK.events.removeListener("VoxeetConferencekitVideoView", this._onEvent);
+    }
     attach(participant, mediaStream) {
-        if (Platform.OS == "ios") {
-            return NativeModules.RCTVoxeetVideoView.attach(this._videoViewHandler, participant.participantId, mediaStream.streamId);
-        }
-        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId);
+        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId).then(() => { });
     }
     unattach() {
-        if (Platform.OS == "ios") {
-            return NativeModules.RCTVoxeetVideoView.unattach(this._videoViewHandler);
-        }
-        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach);
+        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach).then(() => { });
     }
     isAttached() {
-        if (Platform.OS == "ios") {
-            return NativeModules.RCTVoxeetVideoView.isAttached(this._videoViewHandler);
-        }
-        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached);
+        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached)
+            .then(r => !!r.isAttached);
     }
     isScreenShare() {
-        if (Platform.OS == "ios") {
-            return NativeModules.RCTVoxeetVideoView.isScreenShare(this._videoViewHandler);
-        }
-        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare);
+        return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare)
+            .then(r => !!r.isScreenShare);
     }
     _sendCallReturn(command, param1, param2) {
-        const requestId = this._nextRequestId++;
+        const requestId = VideoView._nextRequestId++;
         const requestMap = this._requestMap;
         const promise = new Promise((resolve, reject) => {
             requestMap[requestId] = { resolve, reject };
@@ -86,4 +86,5 @@ VideoView.defaultProps = {
     isAutoUnAttach: true,
     scaleType: 'fill'
 };
+VideoView._nextRequestId = 1;
 //# sourceMappingURL=VideoView.js.map

@@ -11,14 +11,15 @@
 #import <React/RCTViewManager.h>
 #import <React/RCTUIManager.h>
 
-@interface RNVVideoViewManager : RCTViewManager
+@interface RNVideoViewManager : RCTViewManager
 
 @property (nonatomic, copy) NSMutableDictionary* refsIsScreenShare;
 @property (nonatomic, copy) NSMutableDictionary* refsIsAttached;
 
+
 @end
 
-@implementation RNVVideoViewManager
+@implementation RNVideoViewManager
 
 RCT_EXPORT_MODULE(RCTVoxeetVideoView);
 
@@ -28,31 +29,56 @@ RCT_EXPORT_MODULE(RCTVoxeetVideoView);
 }
 
 RCT_EXPORT_METHOD(attach: (nonnull NSNumber *)reactTag
+                  requestId: (nonnull NSNumber*) requestId
                   peerId: (NSString*) peerId
-                  streamId: (NSString*) streamId
-                  resolver: (RCTPromiseResolveBlock)resolve
-                  rejecter: (RCTPromiseRejectBlock)reject) {
+                  streamId: (NSString*) streamId) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        //TODO
-        resolve(nil);
+        VTVideoView *view = (VTVideoView *)[self.bridge.uiManager viewForReactTag: reactTag];
+        if (!view) {
+            [self sendError:view reactTag:reactTag requestId:requestId];
+            return;
+        }
+
+        NSDictionary *userInfo = @{
+            @"peerId": peerId ? peerId : @"",
+            @"requestId": requestId,
+            @"streamId": streamId ? streamId : @"",
+            @"attach": @(false),
+        };
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:
+                               @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
     });
 }
 
 RCT_EXPORT_METHOD(unattach: (nonnull NSNumber *)reactTag
-                  resolver: (RCTPromiseResolveBlock)resolve
-                  rejecter: (RCTPromiseRejectBlock)reject) {
+                  requestId: (nonnull NSNumber*) requestId
+                  peerId: (NSString*) peerId
+                  streamId: (NSString*) streamId) {
     dispatch_async(dispatch_get_main_queue(), ^{
         VTVideoView *view = (VTVideoView *)[self.bridge.uiManager viewForReactTag: reactTag];
         if (!view) {
-            reject(@"ERROR_INVALID_REACT_TAG", [NSString stringWithFormat: @"ReactTag passed: %@", reactTag], nil);
+            [self sendError:view reactTag:reactTag requestId:requestId];
             return;
         }
         
         [VoxeetSDK.shared.mediaDevice unattachMediaStream:nil renderer:view];
+        
+        
+        NSDictionary *userInfo = @{
+            @"peerId": peerId ? peerId : @"",
+            @"requestId": requestId,
+            @"streamId": streamId ? streamId : @"",
+            @"attach": @(false),
+        };
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:
+                               @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
     });
 }
 
-RCT_EXPORT_METHOD(isAttached: (nonnull NSNumber *)reactTag resolver: (RCTPromiseResolveBlock)resolve rejecter: (RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(isAttached: (nonnull NSNumber *)reactTag
+                  requestId: (nonnull NSNumber*) requestId) {
     dispatch_async(dispatch_get_main_queue(), ^{
         
         if (!self.refsIsAttached) {
@@ -61,16 +87,24 @@ RCT_EXPORT_METHOD(isAttached: (nonnull NSNumber *)reactTag resolver: (RCTPromise
 
         VTVideoView *view = (VTVideoView *)[self.bridge.uiManager viewForReactTag: reactTag];
         if (!view) {
-            reject(@"ERROR_INVALID_REACT_TAG", [NSString stringWithFormat: @"ReactTag passed: %@", reactTag], nil);
+            [self sendError:view reactTag:reactTag requestId:requestId];
             return;
         }
         
         BOOL isAttached = [self.refsIsAttached valueForKey:[NSValue valueWithNonretainedObject:view]];
-        resolve(@(isAttached));
+        
+        NSDictionary *userInfo = @{
+            @"requestId": requestId,
+            @"isAttached": @(isAttached),
+        };
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:
+                               @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
     });
 }
 
-RCT_EXPORT_METHOD(isScreenShare: (nonnull NSNumber *)reactTag resolver: (RCTPromiseResolveBlock)resolve rejecter: (RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(isScreenShare: (nonnull NSNumber *)reactTag
+                  requestId: (nonnull NSNumber*) requestId) {
     dispatch_async(dispatch_get_main_queue(), ^{
         
         if (!self.refsIsScreenShare) {
@@ -79,13 +113,33 @@ RCT_EXPORT_METHOD(isScreenShare: (nonnull NSNumber *)reactTag resolver: (RCTProm
 
         VTVideoView *view = (VTVideoView *)[self.bridge.uiManager viewForReactTag: reactTag];
         if (!view) {
-            reject(@"ERROR_INVALID_REACT_TAG", [NSString stringWithFormat: @"ReactTag passed: %@", reactTag], nil);
+            [self sendError:view reactTag:reactTag requestId:requestId];
             return;
         }
         
         BOOL isScreenShare = [self.refsIsScreenShare valueForKey:[NSValue valueWithNonretainedObject:view]];
-        resolve(@(isScreenShare));
+        
+        NSDictionary *userInfo = @{
+            @"requestId": requestId,
+            @"isScreenShare": @(isScreenShare),
+        };
+
+        [[NSNotificationCenter defaultCenter] postNotificationName:
+                               @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
     });
+}
+
+- (void) sendError: (VTVideoView *)view
+          reactTag: (NSNumber *)reactTag
+         requestId: (nonnull NSNumber*) requestId {
+    NSDictionary *userInfo = @{
+        @"requestId": requestId,
+        @"error": @"ERROR_INVALID_REACT_TAG",
+        @"message": [NSString stringWithFormat: @"ReactTag passed: %@", reactTag],
+    };
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:
+                           @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
 }
 
 @end
