@@ -38,12 +38,17 @@ RCT_EXPORT_METHOD(attach: (nonnull NSNumber *)reactTag
             [self sendError:view reactTag:reactTag requestId:requestId];
             return;
         }
+        
+        MediaStream *found = [self findFor:peerId streamId:streamId];
+        if (found) {
+            [VoxeetSDK.shared.mediaDevice attachMediaStream:found renderer:view];
+        }
 
         NSDictionary *userInfo = @{
             @"peerId": peerId ? peerId : @"",
             @"requestId": requestId,
             @"streamId": streamId ? streamId : @"",
-            @"attach": @(false),
+            @"attach": found ? @(true) : @(false),
         };
 
         [[NSNotificationCenter defaultCenter] postNotificationName:
@@ -62,8 +67,10 @@ RCT_EXPORT_METHOD(unattach: (nonnull NSNumber *)reactTag
             return;
         }
         
-        [VoxeetSDK.shared.mediaDevice unattachMediaStream:nil renderer:view];
-        
+        MediaStream *found = [self findFor:peerId streamId:streamId];
+        if (found) {
+            [VoxeetSDK.shared.mediaDevice unattachMediaStream:found renderer:view];
+        }
         
         NSDictionary *userInfo = @{
             @"peerId": peerId ? peerId : @"",
@@ -140,6 +147,40 @@ RCT_EXPORT_METHOD(isScreenShare: (nonnull NSNumber *)reactTag
 
     [[NSNotificationCenter defaultCenter] postNotificationName:
                            @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
+}
+
+- (void) sendNotInConference: (BOOL)sendNotInConference
+          reactTag: (NSNumber *)reactTag
+         requestId: (nonnull NSNumber*) requestId {
+    NSDictionary *userInfo = @{
+        @"requestId": requestId,
+        @"error": @"NOT_IN_CONFERENCE",
+        @"message": @"Not available outside of a conference"
+    };
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:
+                           @"VoxeetConferencekitVideoView" object:nil userInfo:userInfo];
+}
+
+
+- (MediaStream *) findFor: (NSString *)peerId
+                 streamId: (NSString *)streamId {
+    VTConference *conference = VoxeetSDK.shared.conference.current;
+    if(!conference) {
+        return nil;
+    }
+
+    for (VTParticipant *participant in conference.participants) {
+        if( participant && [participant.id isEqualToString:peerId]) {
+            for (MediaStream *stream in participant.streams) {
+                if (stream && stream.streamId && [stream.streamId isEqualToString:streamId]) {
+                    return stream;
+                }
+            }
+            return nil;
+        }
+    }
+    return nil;
 }
 
 @end
