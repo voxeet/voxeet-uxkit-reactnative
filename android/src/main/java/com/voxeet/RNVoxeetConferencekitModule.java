@@ -113,7 +113,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void initializeToken(String accessToken, Promise promise) {
+    public void initializeToken(String accessToken, boolean deactivateOverlay, Promise promise) {
         Application application = (Application) reactContext.getApplicationContext();
 
         if (!VoxeetSDK.instance().isInitialized()) {
@@ -131,26 +131,26 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                         postRefreshAccessToken();
                     });
 
-            internalInitialize();
+            internalInitialize(deactivateOverlay);
         }
         promise.resolve(true);
     }
 
     @ReactMethod
-    public void initialize(String consumerKey, String consumerSecret, Promise promise) {
+    public void initialize(String consumerKey, String consumerSecret, boolean deactivateOverlay, Promise promise) {
         Application application = (Application) reactContext.getApplicationContext();
 
         if (!VoxeetSDK.instance().isInitialized()) {
             VoxeetSDK.setApplication(application);
             VoxeetSDK.initialize(consumerKey, consumerSecret);
 
-            internalInitialize();
+            internalInitialize(deactivateOverlay);
         }
 
         promise.resolve(true);
     }
 
-    private void internalInitialize() {
+    private void internalInitialize(boolean deactivateOverlay) {
         Application application = (Application) reactContext.getApplicationContext();
         VoxeetSDK.conference().ConferenceConfigurations.TelecomWaitingForParticipantTimeout = 30 * 1000; //30s
 
@@ -162,7 +162,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
         VoxeetToolkit
                 .initialize(application, EventBus.getDefault())
-                .enableOverlay(true);
+                .enableOverlay(!deactivateOverlay);
 
         VoxeetSDK.instance().register(this);
     }
