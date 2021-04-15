@@ -5,8 +5,9 @@ export * from "./events";
 
 export {
   ConferenceUser,
-  CreateOptions, CreateResult,
-  JoinOptions, JoinResult,
+  CreateOptions,
+  JoinOptions,
+  Conference,
   MediaStream
 } from "./types";
 

@@ -132,10 +132,7 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)options
     // Create conference.
     dispatch_async(dispatch_get_main_queue(), ^{
         [VoxeetSDK.shared.conference createWithOptions:conferenceOptions success:^(VTConference *conference) {
-            NSDictionary *result = @{@"conferenceId": conference.id,
-                                     @"conferenceAlias": conference.alias,
-                                     @"isNew": [NSNumber numberWithBool:conference.isNew]};
-            resolve(result);
+            resolve([self convertFromConference:conference]);
         } fail:^(NSError *error) {
             reject(@"create_error", [error localizedDescription], nil);
         }];
@@ -171,8 +168,8 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
         [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
             if (!isListener) {
                 [VoxeetSDK.shared.conference joinWithConference:conference options:options success:^(VTConference *conference2) {
-                    NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
-                    resolve(result);
+
+                    resolve([self convertFromConference:conference2]);
                 } fail:^(NSError *error) {
                     reject(@"join_error", [error localizedDescription], nil);
                 }];
@@ -180,8 +177,8 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
                 VoxeetSDK.shared.conference.defaultVideo = NO;
                 [VoxeetSDK.shared.conference listenWithConference:conference options:nil success:^(VTConference *conference2) {
                     VoxeetSDK.shared.conference.defaultVideo = defaultVideo;
-                    NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
-                    resolve(result);
+
+                    resolve([self convertFromConference:conference2]);
                 } fail:^(NSError *error) {
                     reject(@"join_error", [error localizedDescription], nil);
                 }];
@@ -260,6 +257,21 @@ RCT_EXPORT_METHOD(stopVideo:(RCTPromiseResolveBlock)resolve
         }];
     });
 }
+
+RCT_EXPORT_METHOD(current:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if(conference) {
+            resolve([self convertFromConference:conference]);
+            return;
+        }
+        
+        resolve(nil);
+    });
+}
+
 
 RCT_EXPORT_METHOD(participants:(NSString *)conferenceID
                   resolve:(RCTPromiseResolveBlock)resolve
@@ -449,6 +461,27 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
         case Camera:
             return @"Camera";
     }
+}
+
+- (NSDictionary *)convertFromConference:(VTConference *)conference {
+    NSArray<VTParticipant *> *participants = conference.participants;
+    NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+    for (VTParticipant *participant in participants) {
+        NSDictionary *result = [self convertFromParticipant:participant];
+        [output addObject:result];
+    }
+    
+    VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
+    NSString *statusStr = [self convertFromStatus:status];
+
+    resolve(@{
+        @"conferenceId": conference.id,
+        @"conferenceAlias": conference.alias,
+        @"status": statusStr,
+        @"isNew": [NSNumber numberWithBool:conference.isNew],
+        @"participants": output
+    });
 }
 
 RCT_EXPORT_METHOD(onAccessTokenOk:(NSString *)accessToken

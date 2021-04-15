@@ -12,9 +12,3 @@ export interface JoinUserInfo {
 export interface JoinOptions {
   user?: JoinUserInfo;
 }
-
-export interface JoinResult {
-  conferenceId?: string;
-  conferenceAlias?: string;
-  conferenceUsers?: Array<ConferenceUser>;
-}

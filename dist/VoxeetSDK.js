@@ -78,6 +78,12 @@ class RNVoxeetSDK {
         return RNVoxeetConferencekit.join(conferenceId, options);
     }
     /**
+     * Gets the current conference or undefined if none is live.
+     */
+    current() {
+        return RNVoxeetConferencekit.current();
+    }
+    /**
      * Leaves the conference.
      */
     leave() {

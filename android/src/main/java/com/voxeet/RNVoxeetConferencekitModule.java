@@ -398,6 +398,12 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void current(final Promise promise) {
+        ConferenceInformation conferenceInformation = VoxeetSDK.conference().getCurrentConference();
+        promise.resolve(Opt.of(conferenceInformation).then(ConferenceInformation::getConference).orNull());
+    }
+
+    @ReactMethod
     public void leave(final Promise promise) {
         VoxeetSDK.conference()
                 .leave()

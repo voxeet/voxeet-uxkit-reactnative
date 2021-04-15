@@ -22,7 +22,8 @@ public final class ConferenceUtil {
     public static String CONFERENCE_ID = "conferenceId";
     public static String CONFERENCE_ALIAS = "conferenceAlias";
     public static String CONFERENCE_IS_NEW = "isNew";
-    public static String CONFERENCE_PARTICIPANTS = "conferenceUsers";
+    public static String CONFERENCE_STATUS = "status";
+    public static String CONFERENCE_PARTICIPANTS = "participants";
     public static String CONFERENCE_TYPE = "conferenceType";
     public static String CONFERENCE_OWNER_ID = "ownerId";
     public static String CONFERENCE_DURATION = "conferenceDuration";
@@ -50,6 +51,8 @@ public final class ConferenceUtil {
         WritableMap map = new WritableNativeMap();
         map.putString(CONFERENCE_ID, conference.getId());
         map.putString(CONFERENCE_ALIAS, conference.getAlias());
+        map.putBoolean(CONFERENCE_IS_NEW, conference.isNew());
+        map.putString(CONFERENCE_STATUS, conference.getState().name());
 
         WritableNativeArray array = new WritableNativeArray();
         List<Participant> users = conference.getParticipants();

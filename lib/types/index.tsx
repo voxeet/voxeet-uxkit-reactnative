@@ -1,7 +1,9 @@
 export { default as ConferenceUser } from "./ConferenceUser";
 
-export { CreateOptions, CreateResult } from "./CreateConference";
+export { CreateOptions } from "./CreateConference";
 
-export { JoinOptions, JoinResult } from "./JoinConference";
+export { JoinOptions } from "./JoinConference";
 
 export { default as MediaStream } from "./MediaStream";
+
+export { Conference } from "./Conference";

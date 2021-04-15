@@ -1,8 +1,9 @@
 import ConferenceUser from './types/ConferenceUser';
 import Participant from './types/Participant';
 import MediaStream from './types/MediaStream';
-import { CreateOptions, CreateResult } from './types/CreateConference';
-import { JoinOptions, JoinResult } from './types/JoinConference';
+import { CreateOptions } from './types/CreateConference';
+import { JoinOptions } from './types/JoinConference';
+import { Conference } from './types';
 export interface RefreshCallback {
     (): void;
 }
@@ -41,13 +42,17 @@ declare class RNVoxeetSDK {
      * Creates a conference.
      * @param options Options to use to create the conference
      */
-    create(options: CreateOptions): Promise<CreateResult>;
+    create(options: CreateOptions): Promise<Conference>;
     /**
      * Joins the conference.
      * @param conferenceId Id of the conference to join
      * @param options Options to use to join the conference
      */
-    join(conferenceId: string, options?: JoinOptions): Promise<JoinResult>;
+    join(conferenceId: string, options?: JoinOptions): Promise<Conference>;
+    /**
+     * Gets the current conference or undefined if none is live.
+     */
+    current(): Promise<Conference | undefined>;
     /**
      * Leaves the conference.
      */
