@@ -35,6 +35,7 @@
   "license": "",
   "files": [
     "package.json",
+    "patch.react.aar.sh",
     "lib/",
     "dist/",
     "postinstall.sh",
