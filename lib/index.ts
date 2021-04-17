@@ -4,6 +4,10 @@ import VoxeetSDK from "./VoxeetSDK";
 export * from "./events";
 
 export {
+  ConferenceParticipant,
+  /*
+  * @deprecated
+  */
   ConferenceUser,
   CreateOptions,
   JoinOptions,

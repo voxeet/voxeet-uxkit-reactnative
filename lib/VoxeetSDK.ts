@@ -1,6 +1,6 @@
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import VoxeetEvents from './VoxeetEvents';
-import ConferenceUser from './types/ConferenceUser';
+import ConferenceParticipant from './types/ConferenceParticipant';
 import Participant from './types/Participant';
 import MediaStream from './types/MediaStream';
 import { CreateOptions } from './types/CreateConference';
@@ -63,7 +63,7 @@ class RNVoxeetSDK {
    * Opens a new session.
    * @param userInfo Participant information
    */
-  connect(userInfo: ConferenceUser): Promise<boolean> {
+  connect(userInfo: ConferenceParticipant): Promise<boolean> {
     return RNVoxeetConferencekit.connect(userInfo);
   }
 
@@ -124,7 +124,7 @@ class RNVoxeetSDK {
    * @param conferenceId Id of the conference to invite the participant to
    * @param participants List of participants to invite
    */
-  invite(conferenceId: string, participants: ConferenceUser[]): Promise<boolean> {
+  invite(conferenceId: string, participants: ConferenceParticipant[]): Promise<boolean> {
     return RNVoxeetConferencekit.invite(conferenceId, participants);
   }
 
@@ -223,7 +223,7 @@ class RNVoxeetSDK {
   }
 
   /** @deprecated Use join() instead. */
-  startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise<boolean> {
+  startConference(conferenceId: string, participants: Array<ConferenceParticipant>): Promise<boolean> {
     return RNVoxeetConferencekit.startConference(conferenceId, participants);
   }
 
@@ -233,7 +233,7 @@ class RNVoxeetSDK {
   }
 
   /** @deprecated Use connect() instead. */
-  openSession(userInfo: ConferenceUser): Promise<boolean> {
+  openSession(userInfo: ConferenceParticipant): Promise<boolean> {
     return this.connect(userInfo);
   }
 

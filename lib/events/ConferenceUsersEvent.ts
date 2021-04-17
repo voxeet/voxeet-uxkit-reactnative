@@ -2,28 +2,28 @@ import Participant from "../types/Participant";
 import MediaStream from "../types/MediaStream";
 
 export interface ParticipantAddedEvent {
-  user: Participant
+  participant: Participant
 }
 
 export interface ParticipantUpdatedEvent {
-  user: Participant
+  participant: Participant
 }
 
 export interface StreamAddedEvent {
-  user: Participant,
+  participant: Participant,
   mediaStream: MediaStream
 }
 
 export interface StreamRemovedEvent {
-  user: Participant,
+  participant: Participant,
   mediaStream: MediaStream
 }
 
 export interface StreamUpdatedEvent {
-  user: Participant,
+  participant: Participant,
   mediaStream: MediaStream
 }
 
 export interface ConferenceParticipantQualityUpdatedEvent {
-  user: Participant
+  participant: Participant
 }

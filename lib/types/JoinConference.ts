@@ -1,4 +1,4 @@
-import ConferenceUser from './ConferenceUser';
+import ConferenceParticipant from './ConferenceParticipant';
 
 export enum UserType {
   USER = "user",

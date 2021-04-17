@@ -1,4 +1,4 @@
-export default class ConferenceUser {
+export default class ConferenceParticipant {
   
   public externalId: string | undefined;
   public name: string;

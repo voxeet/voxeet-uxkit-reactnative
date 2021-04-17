@@ -1,4 +1,4 @@
-import ConferenceUser from './types/ConferenceUser';
+import ConferenceParticipant from './types/ConferenceParticipant';
 import Participant from './types/Participant';
 import MediaStream from './types/MediaStream';
 import { CreateOptions } from './types/CreateConference';
@@ -33,7 +33,7 @@ declare class RNVoxeetSDK {
      * Opens a new session.
      * @param userInfo Participant information
      */
-    connect(userInfo: ConferenceUser): Promise<boolean>;
+    connect(userInfo: ConferenceParticipant): Promise<boolean>;
     /**
      * Closes the current session.
      */
@@ -70,7 +70,7 @@ declare class RNVoxeetSDK {
      * @param conferenceId Id of the conference to invite the participant to
      * @param participants List of participants to invite
      */
-    invite(conferenceId: string, participants: ConferenceUser[]): Promise<boolean>;
+    invite(conferenceId: string, participants: ConferenceParticipant[]): Promise<boolean>;
     /**
      * Get the list of participants
      * @param conferenceId Id of the conference to get the participants from
@@ -123,11 +123,11 @@ declare class RNVoxeetSDK {
      */
     checkForAwaitingConference(): Promise<boolean>;
     /** @deprecated Use join() instead. */
-    startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise<boolean>;
+    startConference(conferenceId: string, participants: Array<ConferenceParticipant>): Promise<boolean>;
     /** @deprecated Use leave() instead. */
     stopConference(): Promise<boolean>;
     /** @deprecated Use connect() instead. */
-    openSession(userInfo: ConferenceUser): Promise<boolean>;
+    openSession(userInfo: ConferenceParticipant): Promise<boolean>;
     /** @deprecated Use disconnect() instead. */
     closeSession(): Promise<boolean>;
     static VoxeetSDK: RNVoxeetSDK;

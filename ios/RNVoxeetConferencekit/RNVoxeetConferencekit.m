@@ -81,7 +81,7 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)userInfo
         NSString *avatarURL = [userInfo objectForKey:@"avatarUrl"];
         
         VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
-        
+       
         [VoxeetSDK.shared.session openWithInfo:participantInfo completion:^(NSError *error) {
             if (error != nil) {
                 reject(@"connect_error", [error localizedDescription], nil);
@@ -404,13 +404,13 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
     VTConference *conference = VoxeetSDK.shared.conference.current;
     if (conference != nil) {
         NSString *conferenceStatus = [self convertFromStatus:conference.status];
-        
+
         return @{
             @"participantId": participant.id ? participant.id : @"",
             @"conferenceStatus": conferenceStatus ? conferenceStatus : @"",
-            @"externalId": participant.info.externalID ? participant.info.externalID : @"",
-            @"name": participant.info.name ? participant.info.name, @"",
-            @"avatarUrl": participant.info.avatarURL ? participant.info.avatarURL : @"",
+            @"externalId": participant.info.externalID ? participant.info.externalID : [NSNull null],
+            @"name": participant.info.name ? participant.info.name : [NSNull null],
+            @"avatarUrl": participant.info.avatarURL ? participant.info.avatarURL : [NSNull null],
         };
     }
     return nil;
@@ -557,7 +557,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
             NSDictionary *result = @{
-                @"Participant": [self convertFromParticipant:participant]
+                @"participant": [self convertFromParticipant:participant]
             };
             [self sendEventWithName:@"ParticipantAddedEvent" body:result];
         }
@@ -571,7 +571,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
             NSDictionary *result = @{
-                @"Participant": [self convertFromParticipant:participant]
+                @"participant": [self convertFromParticipant:participant]
             };
             [self sendEventWithName:@"ParticipantUpdatedEvent" body:result];
         }
@@ -609,7 +609,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
             NSDictionary *result = @{
-                @"user": [self convertFromParticipant:participant],
+                @"participant": [self convertFromParticipant:participant],
                 @"mediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamAddedEvent" body:result];
@@ -626,7 +626,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         NSLog(@"updating streams %@", notification.userInfo);
         if (conference != nil) {
             NSDictionary *result = @{
-                @"user": [self convertFromParticipant:participant],
+                @"participant": [self convertFromParticipant:participant],
                 @"mediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamUpdatedEvent" body:result];
@@ -642,7 +642,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
             NSDictionary *result = @{
-                @"user": [self convertFromParticipant:participant],
+                @"participant": [self convertFromParticipant:participant],
                 @"mediaStream": [self convertFromStream:stream]
             };
             [self sendEventWithName:@"StreamRemovedEvent" body:result];
