@@ -4,7 +4,7 @@ export default class ConferenceParticipant {
   public name: string;
   public avatarUrl: string | undefined;
 
-  constructor(externalId: string, name: string, avatarUrl: string | undefined) {
+  constructor(externalId: string | undefined, name: string, avatarUrl: string | undefined) {
     this.externalId = externalId;
     this.name = name;
     this.avatarUrl = avatarUrl;
