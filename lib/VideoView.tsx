@@ -147,9 +147,9 @@ export default class VideoView extends Component<Props, State> {
 
     this._requestMap.delete(requestId);
 
-    if(error && message) {
+    if(error && message && promise) {
         promise.reject(`${error} ${message}`);
-    } else {
+    } else if(promise) {
         promise.resolve(event);
     }
   }
