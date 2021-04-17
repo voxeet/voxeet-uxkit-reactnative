@@ -4,9 +4,13 @@ export declare type ConferenceStatus = "DEFAULT" | "CREATING" | "CREATED" | "JOI
 /** @deprecated */
 "NO_MORE_PARTICIPANT" | "LEAVING" | "LEFT" | "ERROR" | "DESTROYED" | "ENDED";
 export declare type PermissionRefusedType = "CAMERA" | "MICROPHONE";
+/**
+ * conferenceId and conferenceAlias can be empty on iOS if the status is LEFT
+ * This is because the SDK is not currently handling sending conference information in the event
+ */
 export interface ConferenceStatusUpdatedEvent {
-    conferenceId: string;
-    conferenceAlias: string;
+    conferenceId?: string;
+    conferenceAlias?: string;
     status: ConferenceStatus;
 }
 export interface PermissionRefusedEvent {

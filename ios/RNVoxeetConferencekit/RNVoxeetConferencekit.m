@@ -585,14 +585,12 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
         NSString *statusStr = [self convertFromStatus:status];
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
-        if (conference != nil) {
-            NSDictionary *statusDict = @{
-                @"status": statusStr,
-                @"conferenceId": conference.id,
-                @"conferenceAlias": conference.alias
-            };
-            [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
-        }
+        NSDictionary *statusDict = @{
+            @"status": statusStr,
+            @"conferenceId": conference ? conference.id : "",
+            @"conferenceAlias": conference ? conference.alias : ""
+        };
+        [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
     });
 }
 

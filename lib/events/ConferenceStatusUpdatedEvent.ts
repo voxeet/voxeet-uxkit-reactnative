@@ -16,9 +16,13 @@ export type ConferenceStatus =
 
 export type PermissionRefusedType = "CAMERA" | "MICROPHONE";
 
+/**
+ * conferenceId and conferenceAlias can be empty on iOS if the status is LEFT
+ * This is because the SDK is not currently handling sending conference information in the event
+ */
 export interface ConferenceStatusUpdatedEvent {
-  conferenceId: string,
-  conferenceAlias: string,
+  conferenceId?: string,
+  conferenceAlias?: string,
   status: ConferenceStatus
 }
 
