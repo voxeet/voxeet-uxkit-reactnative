@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,9 +110,15 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
             if (null != mEventBus) mEventBus.register(this);
 
             mUsername.setText(mIncomingBundleChecker.getUserName());
-            Picasso.get()
-                    .load(mIncomingBundleChecker.getAvatarUrl())
-                    .into(mAvatar);
+            try {
+                if(!TextUtils.isEmpty(mIncomingBundleChecker.getAvatarUrl())) {
+                    Picasso.get()
+                            .load(mIncomingBundleChecker.getAvatarUrl())
+                            .into(mAvatar);
+                }
+            } catch (Exception e) {
+
+            }
         } else {
             Toast.makeText(this, getString(com.voxeet.uxkit.R.string.invalid_bundle), Toast.LENGTH_SHORT).show();
             finish();
