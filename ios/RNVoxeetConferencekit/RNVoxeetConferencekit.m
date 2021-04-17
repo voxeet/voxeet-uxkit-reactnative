@@ -471,17 +471,16 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
         NSDictionary *result = [self convertFromParticipant:participant];
         [output addObject:result];
     }
-    
-    VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
-    NSString *statusStr = [self convertFromStatus:status];
 
-    resolve(@{
+    NSString *statusStr = [self convertFromStatus:conference.status];
+
+    return @{
         @"conferenceId": conference.id,
         @"conferenceAlias": conference.alias,
         @"status": statusStr,
         @"isNew": [NSNumber numberWithBool:conference.isNew],
         @"participants": output
-    });
+    };
 }
 
 RCT_EXPORT_METHOD(onAccessTokenOk:(NSString *)accessToken
