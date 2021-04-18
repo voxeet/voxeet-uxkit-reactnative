@@ -53,8 +53,10 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         RNVoxeetManifestComponent.root_view_provider = new RNRootViewProvider(application, VoxeetToolkit.instance());
         application.registerActivityLifecycleCallbacks(RNVoxeetManifestComponent.root_view_provider);
         VoxeetToolkit.instance().setProvider(RNVoxeetManifestComponent.root_view_provider);
+        RNVoxeetManifestComponent.root_view_provider.registerLifecycleListener(VoxeetToolkit.instance());
 
         VoxeetToolkit.instance().enableOverlay(true);
+        VoxeetToolkit.instance().enable(VoxeetToolkit.instance().getConferenceToolkit());
 
         //change the overlay used by default
         VoxeetToolkit.instance().getConferenceToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
