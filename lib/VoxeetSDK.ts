@@ -215,11 +215,10 @@ class RNVoxeetSDK {
 
   /**
    * Checks if a conference is awaiting. Android only.
+   * @deprecated
    */
   checkForAwaitingConference(): Promise<boolean> {
-    if (Platform.OS != "android") return new Promise<boolean>(r => r(false));
-
-    return RNVoxeetConferencekit.checkForAwaitingConference();
+    return Promise.resolve(false);
   }
 
   /** @deprecated Use join() instead. */

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.voxeet">
+    package="com.voxeet.reactnative">
 
     <!-- VOXEET PERMISSIONS - WARNING: THERE MAY BE DUPLICATES - no expected issues -->
 
@@ -19,15 +19,21 @@
 
     <application android:supportsRtl="true">
         <provider
-            android:name="com.voxeet.rn.manifests.RNVoxeetManifestComponent"
+            android:name="com.voxeet.reactnative.manifests.RNVoxeetManifestComponent"
             android:authorities="${applicationId}.manifests.RNVoxeetManifestComponent"
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name=".notification.RNIncomingCallActivity" />
-        <activity android:name=".specifics.BounceVoxeetActivity" />
-
-        <meta-data android:name="voxeet_incoming_class" android:value="com.voxeet.notification.RNIncomingCallActivity" />
+        <receiver
+            android:name="com.voxeet.reactnative.notification.InvitationAcceptedBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <activity android:name="com.voxeet.reactnative.notification.RNIncomingCallActivity" />
+        <activity android:name="com.voxeet.reactnative.specifics.BounceVoxeetActivity" />
+<!--         <meta-data android:name="voxeet_incoming_class" android:value="com.voxeet.rn.notification.RNIncomingCallActivity" />
+ -->
+        <meta-data android:name="voxeet_incoming_class" android:value="com.voxeet.specifics.BounceVoxeetActivity" />
+        <meta-data android:name="voxeet_incoming_accepted_class" android:value="com.testappvoxeet.MainActivity" />
     </application>
 
 </manifest>

@@ -120,6 +120,7 @@ declare class RNVoxeetSDK {
     isUserLoggedIn(): Promise<boolean>;
     /**
      * Checks if a conference is awaiting. Android only.
+     * @deprecated
      */
     checkForAwaitingConference(): Promise<boolean>;
     /** @deprecated Use join() instead. */
