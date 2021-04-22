@@ -52,25 +52,29 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ]
     ```
 
-    A pickFirst option must be used for the libc++ shared object:
+3. Patch react-native AAR directly :
 
-    ```gradle
-    android {
-        packagingOptions {
-            pickFirst '**/armeabi-v7a/libc++_shared.so'
-            pickFirst '**/x86/libc++_shared.so'
-            pickFirst '**/arm64-v8a/libc++_shared.so'
-            pickFirst '**/x86_64/libc++_shared.so'
-        }
-    }
+    ```
+    bash ./node_modules/@voxeet/react-native-voxeet-conferenceki/patch.react.aar.sh
     ```
 
-3. Open the `android/app/src/main/java/[...]/MainActivity.java` file: 
+4. Open the `android/app/src/main/java/[...]/MainActivity.java` file: 
     
     If you are using `Expo` you can skip this step.
     
     If your `MainActivity` extends `ReactActivity`, change from `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`. With the following import: `import com.voxeet.specifics.RNVoxeetActivity`
 
+5. Update the `android/build.gradle` and aupdate the allProjects block with the following :
+
+```gradle
+allprojects {
+    repositories {
+        maven { url "https://android-sdk.voxeet.com/release" }
+        maven { url "http://dl.bintray.com/voxeet/maven" }
+        ... // keep the other lines below
+    }
+}
+```
 
 ## Usage
 
