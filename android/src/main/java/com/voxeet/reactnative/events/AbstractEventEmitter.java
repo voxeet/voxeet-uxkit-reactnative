@@ -37,10 +37,12 @@ public class AbstractEventEmitter {
     protected <TYPE> AbstractEventEmitter emit(TYPE object) {
         EventFormatterCallback<TYPE> callback = transformers.get(object.getClass());
         WritableMap map = new WritableNativeMap();
+        WritableMap event_map = new WritableNativeMap();
         callback.transform(map, object);
+        callback.transform(event_map, object);
 
         WritableMap event = new WritableNativeMap();
-        event.putMap("event", map);
+        event.putMap("event", event_map);
         event.putString("name", callback.name());
 
         context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)

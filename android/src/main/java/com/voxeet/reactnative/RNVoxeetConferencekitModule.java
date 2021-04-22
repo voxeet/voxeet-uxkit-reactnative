@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.VoxeetSDK;
@@ -383,7 +384,12 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void current(final Promise promise) {
         ConferenceInformation conferenceInformation = VoxeetSDK.conference().getCurrentConference();
-        promise.resolve(Opt.of(conferenceInformation).then(ConferenceInformation::getConference).orNull());
+        Conference conference = Opt.of(conferenceInformation).then(ConferenceInformation::getConference).orNull();
+        WritableMap map = null;
+        if (null != conference) {
+            map = ConferenceUtil.toMap(conference);
+        }
+        promise.resolve(map);
     }
 
     @ReactMethod
