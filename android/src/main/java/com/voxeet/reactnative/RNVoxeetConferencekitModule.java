@@ -100,6 +100,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         EventBus eventBus = VoxeetSDK.instance().getEventBus();
         eventsManager = new EventsManager();
         eventsManager.init(eventBus, reactContext);
+        eventsManager.register();
     }
 
     @Override

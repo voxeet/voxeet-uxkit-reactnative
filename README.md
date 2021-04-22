@@ -62,7 +62,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     
     If you are using `Expo` you can skip this step.
     
-    If your `MainActivity` extends `ReactActivity`, change from `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`. With the following import: `import com.voxeet.specifics.RNVoxeetActivity`
+    If your `MainActivity` extends `ReactActivity`, change from `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`. With the following import: `import com.voxeet.reactnative.specifics.RNVoxeetActivity`
 
 5. Update the `android/build.gradle` and aupdate the allProjects block with the following :
 

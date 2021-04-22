@@ -22,4 +22,10 @@ public class EventsManager {
         eventEmitters.add(new FilePresentationEventEmitter(reactContext, eventBus));
         eventEmitters.add(new VideoPresentationEventEmitter(reactContext, eventBus));
     }
+
+    public void register() {
+        for (AbstractEventEmitter eventEmitter : eventEmitters) {
+            eventEmitter.register();
+        }
+    }
 }
