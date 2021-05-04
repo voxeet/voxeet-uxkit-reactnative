@@ -166,6 +166,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                 .initialize(application, EventBus.getDefault())
                 .enableOverlay(!deactivateOverlay);
 
+        if (!deactivateOverlay) VoxeetToolkit.instance().enable(ConferenceToolkitController.class);
+
         VoxeetSDK.instance().register(this);
     }
 
@@ -529,7 +531,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             }
         }
 
-        VoxeetToolkit.instance().enable(ConferenceToolkitController.class);
         VoxeetSDK.conference()
                 .join(conferenceAlias)
                 .then(conference -> {
