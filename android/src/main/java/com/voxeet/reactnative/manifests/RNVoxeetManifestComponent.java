@@ -9,12 +9,14 @@ import androidx.annotation.Nullable;
 
 import com.voxeet.VoxeetSDK;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
+import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotification;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
 import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
+import com.voxeet.uxkit.firebase.implementation.FirebaseProvider;
 import com.voxeet.uxkit.implementation.overlays.OverlayState;
 
 import org.greenrobot.eventbus.EventBus;
@@ -63,6 +65,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         VoxeetToolkit.instance().getReplayMessageToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
 
         RNVoxeetConferencekitModule.initNotificationCenter();
+        RNVoxeetFirebaseIncomingNotification.createNotificationChannel(context);
     }
 
     @Override

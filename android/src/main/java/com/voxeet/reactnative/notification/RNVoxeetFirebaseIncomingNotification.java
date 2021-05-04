@@ -13,9 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.voxeet.reactnative.R;
+import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.ParticipantNotification;
 import com.voxeet.sdk.push.center.invitation.InvitationBundle;
+import com.voxeet.sdk.push.utils.NotificationHelper;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.Opt;
 import com.voxeet.uxkit.incoming.IncomingFullScreen;
@@ -49,7 +51,7 @@ public class RNVoxeetFirebaseIncomingNotification {
 
     public void onInvitation(@NonNull Context context, @NonNull InvitationBundle invitationBundle) {
         notificationId = random.nextInt(Integer.MAX_VALUE / 2);
-        if(null != invitationBundle.conferenceId) {
+        if (null != invitationBundle.conferenceId) {
             notificationId = invitationBundle.conferenceId.hashCode();
         }
 
@@ -59,7 +61,7 @@ public class RNVoxeetFirebaseIncomingNotification {
         Intent accept = createAcceptIntent(context, invitationBundle);
         Intent dismiss = createDismissIntent(context, invitationBundle);
 
-        if(null != accept) accept.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
+        if (null != accept) accept.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
         dismiss.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
 
         if (null == accept) {
@@ -74,7 +76,7 @@ public class RNVoxeetFirebaseIncomingNotification {
 
         Notification lastNotification = new NotificationCompat.Builder(context, channelId)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentTitle("!!"+context.getString(R.string.voxeet_incoming_notification_from_user, inviterName))
+                .setContentTitle(context.getString(R.string.voxeet_incoming_notification_from_user, inviterName))
                 .setContentText(context.getString(R.string.voxeet_incoming_notification_accept))
                 .setSmallIcon(R.drawable.ic_incoming_call_notification)
                 .addAction(R.drawable.ic_incoming_call_dismiss, context.getString(R.string.voxeet_incoming_notification_button_dismiss), pendingIntentDismissed)
@@ -86,6 +88,7 @@ public class RNVoxeetFirebaseIncomingNotification {
 
         notificationManager.notify(notificationId, lastNotification);
 
+        VoxeetLog.log(TAG, "showing notification overhead");
     }
 
     @Nullable
@@ -118,5 +121,13 @@ public class RNVoxeetFirebaseIncomingNotification {
 
     public static String getChannelId(@NonNull Context context) {
         return AndroidManifest.readMetadata(context, SDK_CHANNEL_ID, DEFAULT_ID);
+    }
+
+    public static boolean createNotificationChannel(@NonNull Context context) {
+        return NotificationHelper.createNotificationChannel(context,
+                DEFAULT_ID,
+                context.getString(R.string.voxeet_channel_title),
+                context.getString(R.string.voxeet_channel_description),
+                0);
     }
 }

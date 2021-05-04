@@ -24,18 +24,12 @@ public class NotificationCenterRNNotificationOnly implements IIncomingInvitation
     @SuppressLint("WrongConstant")
     @Override
     public void onInvitation(@NonNull Context context, @NonNull InvitationBundle invitationBundle) {
-        RNVoxeetActivity instance = RNVoxeetActivityObject.getActivity();
+        VoxeetLog.log(TAG, "onInvitation received, will set incomingInvitation+!accepted");
+        PendingInvitationResolution.incomingInvitation = invitationBundle;
+        PendingInvitationResolution.accepted = false;
 
-        Intent activity = IntentUtils.createIntent(context, invitationBundle);
-        if (null == activity) return;
-
-        if (instance == null) {
-            VoxeetLog.log(TAG, "onInvitation: startActivity " + activity);
-            context.startActivity(activity);
-        } else {
-            VoxeetLog.log(TAG, "onInvitation: onInvitationBundle " + activity);
-            instance.onInvitationBundle(activity);
-        }
+        RNVoxeetFirebaseIncomingNotification manage = new RNVoxeetFirebaseIncomingNotification();
+        manage.onInvitation(context, invitationBundle);
     }
 
     @Override

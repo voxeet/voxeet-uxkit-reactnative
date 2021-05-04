@@ -40,7 +40,6 @@ public class PendingInvitationResolution {
 
         InvitationBundle invitationBundle = PendingInvitationResolution.incomingInvitation;
         accepted = true;
-        //PendingInvitationResolution.incomingInvitation = null;
         onCancelNotification(context, invitationBundle.conferenceId);
 
         Intent intent = IntentUtils.createIntent(context, invitationBundle);
