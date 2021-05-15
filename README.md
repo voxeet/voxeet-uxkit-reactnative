@@ -52,7 +52,7 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ]
     ```
 
-3. Patch react-native AAR directly :
+3. Patch react-native AAR directly : (an alternative is using the gradle configuration's pickFirst for the libc++_shared.so)
 
     ```
     bash ./node_modules/@voxeet/react-native-voxeet-conferenceki/patch.react.aar.sh
@@ -64,17 +64,19 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     
     If your `MainActivity` extends `ReactActivity`, change from `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`. With the following import: `import com.voxeet.reactnative.specifics.RNVoxeetActivity`
 
-5. Update the `android/build.gradle` and aupdate the allProjects block with the following :
+5. Update the `android/build.gradle` and update the allProjects block with the following :
 
 ```gradle
 allprojects {
     repositories {
         maven { url "https://android-sdk.voxeet.com/release" }
-        maven { url "http://dl.bintray.com/voxeet/maven" }
+        maven { url "https://dl.bintray.com/voxeet/maven" }
         ... // keep the other lines below
     }
 }
 ```
+
+6. Note : if crashes occurs in debug mode, remove `debugImplementation` for any *flipper* library from the android/app/build.gradle + remove the java file in your debug/ folder. (the initializeFlipper method from the MainApplication can be removed as well)
 
 ## Usage
 

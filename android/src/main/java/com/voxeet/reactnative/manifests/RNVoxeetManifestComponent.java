@@ -7,6 +7,7 @@ import android.content.pm.ProviderInfo;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.soloader.SoLoader;
 import com.voxeet.VoxeetSDK;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
 import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotification;
@@ -36,6 +37,12 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
             VoxeetLog.log(TAG, "init: ISSUE CONTEXT IS NOT AN Application");
             return;
         }
+
+        // init React native right away using the ApplicationContext
+        SoLoader.init(context, /* native exopackage */ false);
+
+        SoLoader.loadLibrary("dvclient");
+        SoLoader.loadLibrary("MediaEngineJni");
 
         //Log.d(TAG, "init: com.testappvoxeet reload");
         Application application = (Application) context;
