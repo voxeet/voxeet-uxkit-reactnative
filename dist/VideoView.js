@@ -1,7 +1,7 @@
 //promise call done using https://pspdfkit.com/blog/2018/advanced-techniques-for-react-native-ui-components/
 //TODO lock call ?
 import React, { Component } from 'react';
-import { requireNativeComponent, findNodeHandle, UIManager } from 'react-native';
+import { requireNativeComponent, findNodeHandle, UIManager, Platform, View } from 'react-native';
 import VoxeetSDK from './VoxeetSDK';
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 /**
@@ -48,22 +48,41 @@ export default class VideoView extends Component {
     }
     componentDidMount() {
         VoxeetSDK.events.addListener("VoxeetConferencekitVideoView", this._onEvent);
-        this._videoViewHandler = findNodeHandle(this._videoView);
     }
     componentWillUnmount() {
         VoxeetSDK.events.removeListener("VoxeetConferencekitVideoView", this._onEvent);
     }
     attach(participant, mediaStream) {
+        if (Platform.OS == "android") {
+            this.setState({ mediaStream });
+            return Promise.resolve();
+        }
         return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId).then(() => { });
     }
     unattach() {
+        if (Platform.OS == "android") {
+            this.setState({ mediaStream: undefined });
+            return Promise.resolve();
+        }
         return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach).then(() => { });
     }
     isAttached() {
+        if (Platform.OS == "android") {
+            if (!this._videoView || !this._videoViewHandler)
+                return Promise.resolve(false);
+            if (!this.state.mediaStream)
+                return Promise.resolve(false);
+        }
         return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached)
             .then(r => !!r.isAttached);
     }
     isScreenShare() {
+        if (Platform.OS == "android") {
+            if (!this._videoView || !this._videoViewHandler)
+                return Promise.resolve(false);
+            if (!this.state.mediaStream)
+                return Promise.resolve(false);
+        }
         return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare)
             .then(r => !!r.isScreenShare);
     }
@@ -76,7 +95,25 @@ export default class VideoView extends Component {
         this._UiManager.dispatchViewManagerCommand(this._videoViewHandler, command, [requestId, param1, param2]);
         return promise;
     }
+    setVideoView(v) {
+        if (!!v) {
+            this._videoView = v;
+            this._videoViewHandler = findNodeHandle(this._videoView);
+        }
+        else {
+            this._videoView = null;
+            this._videoViewHandler = null;
+        }
+    }
     render() {
+        if (Platform.OS == "android") {
+            if (!this.state.mediaStream) {
+                return <View {...this.props}/>;
+            }
+            else {
+                return (<RCTVoxeetVideoView {...this.props} attach={this.state.mediaStream} ref={(v) => this.setVideoView(v)} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
+            }
+        }
         return (<RCTVoxeetVideoView {...this.props} ref={(v) => this._videoView = v} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
     }
 }

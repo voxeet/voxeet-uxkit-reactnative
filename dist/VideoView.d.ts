@@ -6,6 +6,7 @@ export interface Stream {
     label: string;
 }
 export interface State {
+    mediaStream?: MediaStream;
 }
 export interface Props {
     attach: MediaStream | undefined;
@@ -13,7 +14,7 @@ export interface Props {
     isCircle: boolean;
     hasFlip: boolean;
     isAutoUnAttach: boolean;
-    scaleType: string;
+    scaleType: "fit" | "fill";
 }
 export interface Resolve {
     (result: any): any | undefined;
@@ -74,6 +75,7 @@ export default class VideoView extends Component<Props, State> {
     _sendCallReturn(command: any, param1?: any, param2?: any): Promise<VideoViewAsyncCallResult>;
     _onCallReturn: (event: any) => void;
     _onEvent: (event: VideoViewAsyncCallResult) => void;
+    private setVideoView;
     render(): JSX.Element;
 }
 export {};

@@ -21,6 +21,7 @@ public class EventsManager {
         eventEmitters.add(new ConferenceUserEventEmitter(reactContext, eventBus));
         eventEmitters.add(new FilePresentationEventEmitter(reactContext, eventBus));
         eventEmitters.add(new VideoPresentationEventEmitter(reactContext, eventBus));
+        eventEmitters.add(new VideoViewEventEmitter(reactContext, eventBus));
     }
 
     public void register() {

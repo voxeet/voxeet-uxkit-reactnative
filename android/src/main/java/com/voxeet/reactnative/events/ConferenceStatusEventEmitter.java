@@ -136,11 +136,6 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(StopVideoAnswerEvent event) {
-        emit(event);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(SdkLogoutSuccessEvent event) {
         emit(event);
     }

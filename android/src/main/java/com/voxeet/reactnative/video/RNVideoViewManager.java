@@ -1,5 +1,9 @@
 package com.voxeet.reactnative.video;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -8,19 +12,19 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.uimanager.events.EventDispatcher;
 import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
+import com.voxeet.reactnative.R;
 import com.voxeet.sdk.models.Participant;
 import com.voxeet.sdk.services.ConferenceService;
-import com.voxeet.sdk.views.VideoView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 import java.util.Map;
 
-public class RNVideoViewManager extends SimpleViewManager<VideoView> {
+public class RNVideoViewManager extends SimpleViewManager<RNVideoViewWrapper> {
     public static final int IS_ATTACHED = 1;
     public static final int IS_SCREENSHARE = 2;
     public static final int ATTACH = 3;
@@ -32,13 +36,14 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     public static final String HAS_VIDEO_TRACKS = "hasVideoTracks";
     public static final String HAS_AUDIO_TRACKS = "hasAudioTracks";
 
-    private static final String SCALE_FIT = "fit";
-    private static final String SCALE_FILL = "fill";
-    private static final String SCALE_BALANCED = "balanced";
+    public static final String SCALE_FIT = "fit";
+    public static final String SCALE_FILL = "fill";
+    public static final String SCALE_BALANCED = "balanced";
 
     private static final String REACT_CLASS = "RCTVoxeetVideoView";
     private static final String TAG = RNVideoViewManager.class.getSimpleName();
-    private EventDispatcher eventDispatcher;
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private String savedScaleType = null;
 
     @NonNull
     @Override
@@ -48,33 +53,31 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
 
     @NonNull
     @Override
-    protected VideoView createViewInstance(@NonNull ThemedReactContext reactContext) {
-
-        if (null == eventDispatcher)
-            eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        return new VideoView(reactContext);
+    protected RNVideoViewWrapper createViewInstance(@NonNull ThemedReactContext reactContext) {
+        return new RNVideoViewWrapper(reactContext);
     }
 
     @ReactProp(name = "cornerRadius", defaultFloat = 0f)
-    public void setCornerRadius(@NonNull VideoView view,
+    public void setCornerRadius(@NonNull RNVideoViewWrapper view,
                                 float cornerRadius) {
         view.setCornerRadius(cornerRadius);
     }
 
     @ReactProp(name = "isCircle", defaultBoolean = false)
-    public void isCircle(@NonNull VideoView view,
+    public void isCircle(@NonNull RNVideoViewWrapper view,
                          boolean isCircle) {
         view.setIsCircle(isCircle);
     }
 
     @ReactProp(name = "hasFlip", defaultBoolean = false)
-    public void hasFlip(@NonNull VideoView view,
+    public void hasFlip(@NonNull RNVideoViewWrapper view,
                         boolean hasFlip) {
-        view.setFlip(hasFlip);
+        Log.d(TAG, "hasFlip: not usable");
+        //view.setFlip(hasFlip);
     }
 
     @ReactProp(name = "attach")
-    public void attach(@NonNull VideoView view,
+    public void attach(@NonNull RNVideoViewWrapper view,
                        @Nullable ReadableMap map) {
         if (null != map && map.hasKey(PEER_ID) && map.hasKey(LABEL)) {
             attach(view, map.getString(PEER_ID), map.getString(LABEL));
@@ -86,7 +89,6 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     @Nullable
     private MediaStream tryToFindMediaStream(String peerId, String label) {
         ConferenceService conferenceService = VoxeetSDK.conference();
-        if (null == conferenceService) return null;
 
         Participant user = conferenceService.findParticipantById(peerId);
         if (null == user) return null;
@@ -102,22 +104,9 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     }
 
     @ReactProp(name = "scaleType")
-    public void scaleType(@NonNull VideoView view,
+    public void scaleType(@NonNull RNVideoViewWrapper view,
                           @Nullable String scaleType) {
-        view.setVideoFill();
-        if (null != scaleType) {
-            switch (scaleType) {
-                case SCALE_BALANCED:
-                    view.setVideoBalanced();
-                    break;
-                case SCALE_FIT:
-                    view.setVideoFit();
-                    break;
-                case SCALE_FILL:
-                    view.setVideoFill();
-                default:
-            }
-        }
+        view.scaleType(scaleType);
     }
 
     @Nullable
@@ -132,16 +121,22 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
     }
 
     @Override
-    public void receiveCommand(VideoView view, int commandId, @Nullable ReadableArray args) {
+    public void receiveCommand(@NonNull RNVideoViewWrapper view, int commandId, @Nullable ReadableArray args) {
+        handler.post(() -> receiveCommandOnMainThread(view, commandId, args));
+    }
+
+    public void receiveCommandOnMainThread(RNVideoViewWrapper view, int commandId, @Nullable ReadableArray args) {
         // This will be called whenever a command is sent from react-native.
+        int requestId = null != args && !args.isNull(0) ? args.getInt(0) : -1;
+
         switch (commandId) {
             case IS_ATTACHED:
                 boolean attached = view.isAttached();
-                eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), attached));
+                EventBus.getDefault().post(new RNVideoViewInternalEvent(requestId, attached));
                 return;
             case IS_SCREENSHARE:
                 boolean screenshare = view.isScreenShare();
-                eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), screenshare));
+                EventBus.getDefault().post(new RNVideoViewInternalEvent(requestId, screenshare));
                 return;
             case ATTACH:
                 try {
@@ -150,18 +145,18 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
                         String labelId = args.getString(2);
 
                         attach(view, peerId, labelId);
-                        eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), true));
+                        EventBus.getDefault().post(new RNVideoViewInternalEvent(requestId, true));
+                        return;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), false));
+                EventBus.getDefault().post(new RNVideoViewInternalEvent(requestId, false));
                 return;
             case UNATTACH:
                 unattach(view);
-                eventDispatcher.dispatchEvent(new RCTVideoViewBooleanEvent(args.getInt(0), true));
-                return;
+                EventBus.getDefault().post(new RNVideoViewInternalEvent(requestId, true));
             default:
         }
     }
@@ -172,22 +167,27 @@ public class RNVideoViewManager extends SimpleViewManager<VideoView> {
         return MapBuilder.of(RCTVideoViewBooleanEvent.EVENT_NAME, MapBuilder.of("registrationName", "onCallReturn"));
     }
 
-    private void attach(@NonNull VideoView view, @Nullable String peerId, @Nullable String label) {
+    private void attach(@NonNull RNVideoViewWrapper view, @Nullable String peerId, @Nullable String label) {
         try {
             if (null == peerId) peerId = "";
             if (null == label) label = "";
 
             MediaStream mediaStream = tryToFindMediaStream(peerId, label);
 
-            if (null != mediaStream) view.attach(peerId, mediaStream);
+            if (null != mediaStream) {
+                view.setBackgroundResource(R.color.red);
+                view.attach(peerId, mediaStream);
+            }
         } catch (Exception e) {
+            Log.d(TAG, "attach: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void unattach(@Nullable VideoView view) {
+    private void unattach(@Nullable RNVideoViewWrapper view) {
         try {
-            view.unAttach();
+            Log.d(TAG, "unattach: " + view);
+            if (null != view) view.unAttach();
         } catch (Exception e) {
             e.printStackTrace();
         }

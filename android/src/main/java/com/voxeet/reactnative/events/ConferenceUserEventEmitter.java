@@ -75,6 +75,11 @@ public class ConferenceUserEventEmitter extends AbstractEventEmitter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(StreamUpdatedEvent event) {
+        emit(event);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(StreamRemovedEvent event) {
         emit(event);
     }

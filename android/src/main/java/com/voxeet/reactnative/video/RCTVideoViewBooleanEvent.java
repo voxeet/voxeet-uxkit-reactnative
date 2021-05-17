@@ -12,13 +12,15 @@ public class RCTVideoViewBooleanEvent extends Event<RCTVideoViewBooleanEvent> {
 
     private boolean result;
 
-    public RCTVideoViewBooleanEvent(int requestId, boolean result) {
+    public RCTVideoViewBooleanEvent(int viewTag, int requestId, boolean result) {
         this.result = result;
         this.requestId = requestId;
 
         payload = Arguments.createMap();
         payload.putBoolean("result", result);
         payload.putInt("requestId", requestId);
+
+        this.init(viewTag);
     }
 
     public boolean isTrue() {
