@@ -175,7 +175,6 @@ public class RNVideoViewManager extends SimpleViewManager<RNVideoViewWrapper> {
             MediaStream mediaStream = tryToFindMediaStream(peerId, label);
 
             if (null != mediaStream) {
-                view.setBackgroundResource(R.color.red);
                 view.attach(peerId, mediaStream);
             }
         } catch (Exception e) {
