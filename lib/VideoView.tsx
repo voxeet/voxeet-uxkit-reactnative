@@ -85,6 +85,8 @@ export default class VideoView extends Component<Props, State> {
   private static _nextRequestId = 1;
   private _requestMap: Map<number, Holder> = new Map();
 
+  public state: State = {};
+
   constructor(props: Props) {
     super(props);
     this._videoViewHandler = null;

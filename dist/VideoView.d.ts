@@ -65,6 +65,7 @@ export default class VideoView extends Component<Props, State> {
     private _videoViewHandler;
     private static _nextRequestId;
     private _requestMap;
+    state: State;
     constructor(props: Props);
     componentDidMount(): void;
     componentWillUnmount(): void;

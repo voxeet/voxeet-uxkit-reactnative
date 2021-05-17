@@ -26,6 +26,7 @@ export default class VideoView extends Component {
         super(props);
         this._UiManager = UIManager;
         this._requestMap = new Map();
+        this.state = {};
         this._onCallReturn = (event) => {
             !!event.nativeEvent && this._onEvent(event.nativeEvent);
         };
