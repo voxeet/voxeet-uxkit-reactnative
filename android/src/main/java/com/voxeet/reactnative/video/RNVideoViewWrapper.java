@@ -40,6 +40,12 @@ public class RNVideoViewWrapper extends RoundedFrameLayout {
         }
     }
 
+    public void setIsMirror(boolean isMirror) {
+        if (null != videoView) {
+            videoView.setMirror(isMirror);
+        }
+    }
+
     public void scaleType(String scaleType) {
         if (null == scaleType) scaleType = "";
         this.scaleType = scaleType;

@@ -28,6 +28,15 @@ RCT_EXPORT_MODULE(RCTVoxeetVideoView);
   return [[VTVideoView alloc] init];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(isMirror, BOOL, VTVideoView)
+{
+    if (json) {
+        [view setMirrorEffect: json];
+    } else {
+        [view setMirrorEffect: FALSE];
+    }
+}
+
 RCT_EXPORT_METHOD(attach: (nonnull NSNumber *)reactTag
                   requestId: (nonnull NSNumber*) requestId
                   peerId: (NSString*) peerId

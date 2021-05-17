@@ -57,6 +57,12 @@ public class RNVideoViewManager extends SimpleViewManager<RNVideoViewWrapper> {
         return new RNVideoViewWrapper(reactContext);
     }
 
+    @ReactProp(name = "isMirror", defaultFloat = 0f)
+    public void setIsMirror(@NonNull RNVideoViewWrapper view,
+                                boolean isMirror) {
+        view.setIsMirror(isMirror);
+    }
+
     @ReactProp(name = "cornerRadius", defaultFloat = 0f)
     public void setCornerRadius(@NonNull RNVideoViewWrapper view,
                                 float cornerRadius) {

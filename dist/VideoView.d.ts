@@ -9,11 +9,7 @@ export interface State {
     mediaStream?: MediaStream;
 }
 export interface Props {
-    attach: MediaStream | undefined;
-    cornerRadius: number;
-    isCircle: boolean;
-    hasFlip: boolean;
-    isAutoUnAttach: boolean;
+    isMirror?: boolean;
     scaleType: "fit" | "fill";
 }
 export interface Resolve {
@@ -39,10 +35,7 @@ interface VideoViewAsyncCallResult {
 /**
  * Composes `View`.
  *
- * - cornerRadius: number
- * - isCircle: boolean
- * - hasFlip: boolean
- * - isAutoUnAttach: boolean
+ * - isMirror: boolean
  * - scaleType: 'fit' | 'fill'
  *
  *
@@ -56,6 +49,7 @@ interface VideoViewAsyncCallResult {
 export default class VideoView extends Component<Props, State> {
     static defaultProps: {
         isCircle: boolean;
+        isMirror: boolean;
         hasFlip: boolean;
         isAutoUnAttach: boolean;
         scaleType: string;
@@ -67,6 +61,7 @@ export default class VideoView extends Component<Props, State> {
     private _requestMap;
     state: State;
     constructor(props: Props);
+    filteredProps(): {};
     componentDidMount(): void;
     componentWillUnmount(): void;
     attach(participant: Participant, mediaStream: MediaStream): Promise<void>;

@@ -4,13 +4,11 @@ import React, { Component } from 'react';
 import { requireNativeComponent, findNodeHandle, UIManager, Platform, View } from 'react-native';
 import VoxeetSDK from './VoxeetSDK';
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
+const ValidProps = ["style", "isMirror", "scaleType"];
 /**
  * Composes `View`.
  *
- * - cornerRadius: number
- * - isCircle: boolean
- * - hasFlip: boolean
- * - isAutoUnAttach: boolean
+ * - isMirror: boolean
  * - scaleType: 'fit' | 'fill'
  *
  *
@@ -46,6 +44,11 @@ export default class VideoView extends Component {
         };
         this._videoViewHandler = null;
         this._videoView = null;
+    }
+    filteredProps() {
+        const result = {};
+        Object.keys(this.props).filter(k => ValidProps).forEach(k => result[k] = this.props[k]);
+        return result;
     }
     componentDidMount() {
         VoxeetSDK.events.addListener("VoxeetConferencekitVideoView", this._onEvent);
@@ -107,19 +110,21 @@ export default class VideoView extends Component {
         }
     }
     render() {
+        const props = this.filteredProps();
         if (Platform.OS == "android") {
             if (!this.state.mediaStream) {
-                return <View {...this.props}/>;
+                return <View {...props}/>;
             }
             else {
-                return (<RCTVoxeetVideoView {...this.props} attach={this.state.mediaStream} ref={(v) => this.setVideoView(v)} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
+                return (<RCTVoxeetVideoView {...props} attach={this.state.mediaStream} ref={(v) => this.setVideoView(v)} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
             }
         }
-        return (<RCTVoxeetVideoView {...this.props} ref={(v) => this._videoView = v} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
+        return (<RCTVoxeetVideoView {...props} ref={(v) => this._videoView = v} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
     }
 }
 VideoView.defaultProps = {
     isCircle: false,
+    isMirror: false,
     hasFlip: false,
     isAutoUnAttach: true,
     scaleType: 'fill'

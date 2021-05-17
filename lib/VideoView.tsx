@@ -21,13 +21,11 @@ export interface State {
 }
 
 export interface Props {
-  attach: MediaStream|undefined;
-  cornerRadius: number,
-  isCircle: boolean,
-  hasFlip: boolean,
-  isAutoUnAttach: boolean,
+  isMirror?: boolean,
   scaleType: "fit"|"fill"; //[ 'fit', 'fill' ]
 }
+
+const ValidProps = [ "style", "isMirror", "scaleType" ];
 
 export interface Resolve {
   (result: any): any|undefined;
@@ -56,10 +54,7 @@ interface VideoViewAsyncCallResult {
 /**
  * Composes `View`.
  *
- * - cornerRadius: number
- * - isCircle: boolean
- * - hasFlip: boolean
- * - isAutoUnAttach: boolean
+ * - isMirror: boolean
  * - scaleType: 'fit' | 'fill'
  * 
  * 
@@ -73,6 +68,7 @@ interface VideoViewAsyncCallResult {
 export default class VideoView extends Component<Props, State> {
   static defaultProps = {
     isCircle: false,
+    isMirror: false,
     hasFlip: false,
     isAutoUnAttach: true,
     scaleType: 'fill'
@@ -91,6 +87,12 @@ export default class VideoView extends Component<Props, State> {
     super(props);
     this._videoViewHandler = null;
     this._videoView = null;
+  }
+
+  filteredProps() {
+    const result = {};
+    Object.keys(this.props).filter(k => ValidProps).forEach(k => result[k] = this.props[k]);
+    return result;
   }
 
   componentDidMount() {
@@ -185,12 +187,13 @@ export default class VideoView extends Component<Props, State> {
   }
 
   render() {
+    const props = this.filteredProps();
     if(Platform.OS == "android") {
       if(!this.state.mediaStream) {
-          return <View {...this.props} />
+          return <View {...props} />
       } else {
           return (
-            <RCTVoxeetVideoView {...this.props}
+            <RCTVoxeetVideoView {...props}
               attach={this.state.mediaStream}
               ref={(v: React.Component|null) => this.setVideoView(v)}
               {...{ onCallReturn: (event: any) => this._onCallReturn(event) }}/>
@@ -200,7 +203,7 @@ export default class VideoView extends Component<Props, State> {
 
     return (
       <RCTVoxeetVideoView
-        {...this.props}
+        {...props}
         ref={(v: React.Component|null) => this._videoView = v}
         { ...{onCallReturn: (event: any) => this._onCallReturn(event)} }
       />
