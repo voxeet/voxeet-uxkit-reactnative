@@ -80,7 +80,10 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)userInfo
         NSString *name = [userInfo objectForKey:@"name"];
         NSString *avatarURL = [userInfo objectForKey:@"avatarUrl"];
         
-        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                              initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                              name:![name isEqual:[NSNull null]] ? name : nil
+                                              avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
        
         [VoxeetSDK.shared.session openWithInfo:participantInfo completion:^(NSError *error) {
             if (error != nil) {
@@ -214,7 +217,10 @@ RCT_EXPORT_METHOD(invite:(NSString *)conferenceID
             NSString *name = [participant objectForKey:@"name"];
             NSString *avatarURL = [participant objectForKey:@"avatarUrl"];
             
-            VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+            VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                                  initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                                  name:![name isEqual:[NSNull null]] ? name : nil
+                                                  avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
             [participantInfos addObject:participantInfo];
         }
         
@@ -667,7 +673,10 @@ RCT_EXPORT_METHOD(startConference:(NSString *)conferenceID
         NSString *name = [participant objectForKey:@"name"];
         NSString *avatarURL = [participant objectForKey:@"avatarUrl"];
         
-        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                              initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                              name:![name isEqual:[NSNull null]] ? name : nil
+                                              avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
         [participantInfos addObject:participantInfo];
     }
     
@@ -719,7 +728,10 @@ RCT_EXPORT_METHOD(openSession:(NSDictionary *)userInfo
         NSString *name = [userInfo objectForKey:@"name"];
         NSString *avatarURL = [userInfo objectForKey:@"avatarUrl"];
         
-        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                              initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                              name:![name isEqual:[NSNull null]] ? name : nil
+                                              avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
         
         [VoxeetSDK.shared.session openWithInfo:participantInfo completion:^(NSError *error) {
             if (error != nil) {
