@@ -1,7 +1,12 @@
-export { default as ConferenceUser } from "./ConferenceUser";
+//@deprecated
+export { default as ConferenceUser } from "./ConferenceParticipant";
 
-export { CreateOptions, CreateResult } from "./CreateConference";
+export { default as ConferenceParticipant } from "./ConferenceParticipant";
 
-export { JoinOptions, JoinResult } from "./JoinConference";
+export { CreateOptions } from "./CreateConference";
+
+export { JoinOptions } from "./JoinConference";
 
 export { default as MediaStream } from "./MediaStream";
+
+export { Conference } from "./Conference";

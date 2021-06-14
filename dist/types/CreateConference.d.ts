@@ -24,8 +24,3 @@ export interface CreateOptions {
     alias?: string;
     params?: CreateParameters;
 }
-export interface CreateResult {
-    conferenceId?: string;
-    conferenceAlias?: string;
-    isNew?: boolean;
-}

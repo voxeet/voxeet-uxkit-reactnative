@@ -1,8 +1,11 @@
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import VoxeetEvents from './VoxeetEvents';
-import ConferenceUser from './types/ConferenceUser';
-import { CreateOptions, CreateResult } from './types/CreateConference';
-import { JoinOptions, JoinResult } from './types/JoinConference';
+import ConferenceParticipant from './types/ConferenceParticipant';
+import Participant from './types/Participant';
+import MediaStream from './types/MediaStream';
+import { CreateOptions } from './types/CreateConference';
+import { JoinOptions } from './types/JoinConference';
+import { Conference } from './types';
 
 const { RNVoxeetConferencekit } = NativeModules;
 
@@ -14,7 +17,7 @@ export interface TokenRefreshCallback {
   (): Promise<string>
 };
 
-export default class _VoxeetSDK {
+class RNVoxeetSDK {
 
   #events = new VoxeetEvents();
   get events() { return this.#events; }
@@ -26,17 +29,19 @@ export default class _VoxeetSDK {
    * Initializes the SDK using the customer key and secret.
    * @param consumerKey Consumer Key
    * @param consumerSecret Consumer Secret
+   * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
    */
-  initialize(consumerKey: string, consumerSecret: string): Promise<boolean> {
-    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+  initialize(consumerKey: string, consumerSecret: string, deactivateOverlay?: boolean): Promise<boolean> {
+    return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret, !!deactivateOverlay);
   }
 
   /**
    * Initializes the SDK with an access token that is provided by the customer backend communicating with Voxeet servers.
    * @param accessToken Access token
    * @param refreshToken Callback to get a new access token after it expires
+   * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
    */
-  initializeToken(accessToken: string | undefined, refreshToken: TokenRefreshCallback): Promise<boolean> {
+  initializeToken(accessToken: string | undefined, refreshToken: TokenRefreshCallback, deactivateOverlay?: boolean): Promise<boolean> {
     if (!this.refreshAccessTokenCallback) {
       this.refreshAccessTokenCallback = () => {
         refreshToken()
@@ -51,14 +56,14 @@ export default class _VoxeetSDK {
       });
     }
 
-    return RNVoxeetConferencekit.initializeToken(accessToken);
+    return RNVoxeetConferencekit.initializeToken(accessToken, !!deactivateOverlay);
   }
 
   /**
    * Opens a new session.
    * @param userInfo Participant information
    */
-  connect(userInfo: ConferenceUser): Promise<boolean> {
+  connect(userInfo: ConferenceParticipant): Promise<boolean> {
     return RNVoxeetConferencekit.connect(userInfo);
   }
 
@@ -73,7 +78,7 @@ export default class _VoxeetSDK {
    * Creates a conference.
    * @param options Options to use to create the conference
    */
-  create(options: CreateOptions): Promise<CreateResult> {
+  create(options: CreateOptions): Promise<Conference> {
     return RNVoxeetConferencekit.create(options);
   }
 
@@ -82,8 +87,15 @@ export default class _VoxeetSDK {
    * @param conferenceId Id of the conference to join
    * @param options Options to use to join the conference
    */
-  join(conferenceId: string, options: JoinOptions = {}): Promise<JoinResult> {
+  join(conferenceId: string, options: JoinOptions = {}): Promise<Conference> {
     return RNVoxeetConferencekit.join(conferenceId, options);
+  }
+
+  /**
+   * Gets the current conference or undefined if none is live.
+   */
+  current(): Promise<Conference|undefined> {
+    return RNVoxeetConferencekit.current();
   }
 
   /**
@@ -94,12 +106,47 @@ export default class _VoxeetSDK {
   }
 
   /**
+   * Starts the local video
+   */
+  startVideo(): Promise<boolean> {
+    return RNVoxeetConferencekit.startVideo();
+  }
+
+  /**
+   * Stops the local video
+   */
+  stopVideo(): Promise<boolean> {
+    return RNVoxeetConferencekit.stopVideo();
+  }
+
+  /**
    * Invite a participant to the conference.
    * @param conferenceId Id of the conference to invite the participant to
    * @param participants List of participants to invite
    */
-  invite(conferenceId: string, participants: ConferenceUser[]): Promise<boolean> {
+  invite(conferenceId: string, participants: ConferenceParticipant[]): Promise<boolean> {
     return RNVoxeetConferencekit.invite(conferenceId, participants);
+  }
+
+  /**
+   * Get the list of participants
+   * @param conferenceId Id of the conference to get the participants from
+   * @returns List of participants in the conference
+   */
+  participants(conferenceId: string): Promise<Participant[]> {
+    return RNVoxeetConferencekit.participants(conferenceId)
+    .then((result: any[]) => result.map(r => new Participant(
+      r.participantId || "", r.status, r.externalId, r.name, r.avatarUrl
+    )));
+  }
+
+  /**
+   * Get the list of streams for a given participant
+   * @param participantId Id of the participant to get the streams from
+   * @returns List of streams for this participant
+   */
+  streams(participantId: string): Promise<MediaStream[]> {
+    return RNVoxeetConferencekit.streams(participantId);
   }
 
   /**
@@ -168,15 +215,14 @@ export default class _VoxeetSDK {
 
   /**
    * Checks if a conference is awaiting. Android only.
+   * @deprecated
    */
   checkForAwaitingConference(): Promise<boolean> {
-    if (Platform.OS != "android") return new Promise<boolean>(r => r(false));
-
-    return RNVoxeetConferencekit.checkForAwaitingConference();
+    return Promise.resolve(false);
   }
 
   /** @deprecated Use join() instead. */
-  startConference(conferenceId: string, participants: Array<ConferenceUser>): Promise<boolean> {
+  startConference(conferenceId: string, participants: Array<ConferenceParticipant>): Promise<boolean> {
     return RNVoxeetConferencekit.startConference(conferenceId, participants);
   }
 
@@ -186,7 +232,7 @@ export default class _VoxeetSDK {
   }
 
   /** @deprecated Use connect() instead. */
-  openSession(userInfo: ConferenceUser): Promise<boolean> {
+  openSession(userInfo: ConferenceParticipant): Promise<boolean> {
     return this.connect(userInfo);
   }
 
@@ -194,6 +240,8 @@ export default class _VoxeetSDK {
   closeSession(): Promise<boolean> {
     return this.disconnect();
   }
+
+  public static VoxeetSDK = new RNVoxeetSDK();
 }
 
-export const VoxeetSDK = new _VoxeetSDK();
+export default new RNVoxeetSDK();

@@ -1,7 +1,2 @@
-export default class MediaStream {
-    constructor(peerId, label) {
-        this.peerId = peerId;
-        this.label = label;
-    }
-}
+export {};
 //# sourceMappingURL=MediaStream.js.map

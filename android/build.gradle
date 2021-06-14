@@ -4,16 +4,13 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.6'
+        classpath "com.android.tools.build:gradle:3.3.0"
     }
 }
 
 repositories {
     maven { url "https://android-sdk.voxeet.com/release" }
+    maven { url "http://dl.bintray.com/voxeet/maven" }
     google()
     mavenCentral()
     jcenter()
@@ -50,15 +47,14 @@ android {
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-native:+'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "com.facebook.react:react-native:+"
+    implementation "androidx.appcompat:appcompat:1.1.0"
     implementation "androidx.annotation:annotation:1.1.0"
 
+
     //add by default the optional firebase dependency
-    compile ('com.voxeet.sdk:uxkit-firebase:3.1.1')
+    implementation "com.voxeet.sdk:uxkit-firebase:3.1.3"
 
     //use the latest toolkit
-    compile ('com.voxeet.sdk:uxkit:3.1.1') {
-        transitive = true
-    }
+    implementation ('com.voxeet.sdk:uxkit:3.1.3') { transitive = true }
 }

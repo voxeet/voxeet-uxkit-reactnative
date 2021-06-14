@@ -1,13 +1,17 @@
 import VoxeetEvents from "./VoxeetEvents";
 import VideoView from "./VideoView";
-import { default as _VoxeetSDK } from "./VoxeetSDK";
+import VoxeetSDK from "./VoxeetSDK";
 export * from "./events";
-const VoxeetSDK = new _VoxeetSDK();
 
 export {
+  ConferenceParticipant,
+  /*
+  * @deprecated
+  */
   ConferenceUser,
-  CreateOptions, CreateResult,
-  JoinOptions, JoinResult,
+  CreateOptions,
+  JoinOptions,
+  Conference,
   MediaStream
 } from "./types";
 

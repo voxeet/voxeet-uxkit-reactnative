@@ -1,0 +1,1 @@
+{"version":3,"file":"Participant.js","sourceRoot":"","sources":["../../lib/types/Participant.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,WAAW;IAE9B,YACS,aAAqB,EACrB,gBAAyB,EACzB,UAAmB,EACnB,IAAa,EACb,SAAkB;QAJlB,kBAAa,GAAb,aAAa,CAAQ;QACrB,qBAAgB,GAAhB,gBAAgB,CAAS;QACzB,eAAU,GAAV,UAAU,CAAS;QACnB,SAAI,GAAJ,IAAI,CAAS;QACb,cAAS,GAAT,SAAS,CAAS;IAC3B,CAAC;CAEF"}

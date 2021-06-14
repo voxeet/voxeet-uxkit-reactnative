@@ -1,18 +1,16 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import MediaStream from "./types/MediaStream";
+import Participant from './types/Participant';
 export interface Stream {
     peerId: string;
     label: string;
 }
 export interface State {
+    mediaStream?: MediaStream;
 }
 export interface Props {
-    attach: MediaStream | undefined;
-    cornerRadius: number;
-    isCircle: boolean;
-    hasFlip: boolean;
-    isAutoUnAttach: boolean;
-    scaleType: string;
+    isMirror?: boolean;
+    scaleType: "fit" | "fill";
 }
 export interface Resolve {
     (result: any): any | undefined;
@@ -24,33 +22,56 @@ export interface Holder {
     resolve: Resolve;
     reject: Reject;
 }
+interface VideoViewAsyncCallResult {
+    requestId: number;
+    error?: string;
+    message?: string;
+    peerId?: string;
+    streamId?: string;
+    attach?: number;
+    isAttached?: number;
+    isScreenShare?: number;
+}
 /**
  * Composes `View`.
  *
- * - attach: MediaStream
- * - cornerRadius: number
- * - isCircle: boolean
- * - hasFlip: boolean
- * - isAutoUnAttach: boolean
+ * - isMirror: boolean
  * - scaleType: 'fit' | 'fill'
+ *
+ *
+ * Public methods :
+ *
+ * attach(participant: Participant, mediaStream: MediaStream): Promise<void>
+ * unattach(): Promise<void>
+ * isAttached(): Promise<boolean>
+ * isScreenShare(): Promise<boolean>
  */
 export default class VideoView extends Component<Props, State> {
     static defaultProps: {
         isCircle: boolean;
+        isMirror: boolean;
         hasFlip: boolean;
         isAutoUnAttach: boolean;
         scaleType: string;
     };
-    _UiManager: any;
-    _videoView: React.Component | null;
-    _videoViewHandler: null | number;
-    _nextRequestId: number;
-    _requestMap: Map<number, Holder>;
+    private _UiManager;
+    private _videoView;
+    private _videoViewHandler;
+    private static _nextRequestId;
+    private _requestMap;
+    state: State;
     constructor(props: Props);
+    filteredProps(): {};
     componentDidMount(): void;
-    isAttached(): Promise<unknown>;
-    isScreenShare(): Promise<unknown>;
-    _sendCallReturn(command: any): Promise<unknown>;
+    componentWillUnmount(): void;
+    attach(participant: Participant, mediaStream: MediaStream): Promise<void>;
+    unattach(): Promise<void>;
+    isAttached(): Promise<boolean>;
+    isScreenShare(): Promise<boolean>;
+    _sendCallReturn(command: any, param1?: any, param2?: any): Promise<VideoViewAsyncCallResult>;
     _onCallReturn: (event: any) => void;
+    _onEvent: (event: VideoViewAsyncCallResult) => void;
+    private setVideoView;
     render(): JSX.Element;
 }
+export {};

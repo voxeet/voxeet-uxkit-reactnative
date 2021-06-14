@@ -1,0 +1,1 @@
+{"version":3,"file":"ConferenceParticipant.js","sourceRoot":"","sources":["../../lib/types/ConferenceParticipant.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,qBAAqB;IAMxC,YAAY,UAA8B,EAAE,IAAY,EAAE,SAA6B;QACrF,IAAI,CAAC,UAAU,GAAG,UAAU,CAAC;QAC7B,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;IAC7B,CAAC;CAEF"}

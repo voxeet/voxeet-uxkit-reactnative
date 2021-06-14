@@ -2,8 +2,8 @@
 //  RNVoxeetConferencekit.m
 //  RNVoxeetConferencekit
 //
-//  Created by Corentin Larroque on 11/16/18.
-//  Copyright © 2018 Voxeet. All rights reserved.
+//  Created by Kevin Le PErf on 22/03/21.
+//  Copyright © 2021 Voxeet. All rights reserved.
 //
 
 #import "RNVoxeetConferencekit.h"
@@ -20,12 +20,14 @@
 @implementation RNVoxeetConferencekit
 {
     BOOL _hasListeners;
+    BOOL _deactivatedOverlay;
 }
 
 RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
                   consumerSecret:(NSString *)consumerSecret
+                  deactivateOverlay:(BOOL) deactivateOverlay
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -34,12 +36,18 @@ RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
         VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
         
         [VoxeetSDK.shared initializeWithConsumerKey:consumerKey consumerSecret:consumerSecret];
-        [VoxeetUXKit.shared initialize];
+
+        self->_deactivatedOverlay = deactivateOverlay;
+        if (!deactivateOverlay) {
+            [VoxeetUXKit.shared initialize];
+        }
+
         resolve(nil);
     });
 }
 
 RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
+                  deactivateOverlay:(BOOL) deactivateOverlay
                   resolve:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
@@ -53,7 +61,11 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
                 [self sendEventWithName:@"refreshToken" body:nil];
             }
         }];
-        [VoxeetUXKit.shared initialize];
+
+        self->_deactivatedOverlay = deactivateOverlay;
+        if (!deactivateOverlay) {
+            [VoxeetUXKit.shared initialize];
+        }
         
         resolve(nil);
     });
@@ -68,8 +80,11 @@ RCT_EXPORT_METHOD(connect:(NSDictionary *)userInfo
         NSString *name = [userInfo objectForKey:@"name"];
         NSString *avatarURL = [userInfo objectForKey:@"avatarUrl"];
         
-        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
-        
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                              initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                              name:![name isEqual:[NSNull null]] ? name : nil
+                                              avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
+       
         [VoxeetSDK.shared.session openWithInfo:participantInfo completion:^(NSError *error) {
             if (error != nil) {
                 reject(@"connect_error", [error localizedDescription], nil);
@@ -120,10 +135,7 @@ RCT_EXPORT_METHOD(create:(NSDictionary *)options
     // Create conference.
     dispatch_async(dispatch_get_main_queue(), ^{
         [VoxeetSDK.shared.conference createWithOptions:conferenceOptions success:^(VTConference *conference) {
-            NSDictionary *result = @{@"conferenceId": conference.id,
-                                     @"conferenceAlias": conference.alias,
-                                     @"isNew": [NSNumber numberWithBool:conference.isNew]};
-            resolve(result);
+            resolve([self convertFromConference:conference]);
         } fail:^(NSError *error) {
             reject(@"create_error", [error localizedDescription], nil);
         }];
@@ -159,8 +171,8 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
         [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
             if (!isListener) {
                 [VoxeetSDK.shared.conference joinWithConference:conference options:options success:^(VTConference *conference2) {
-                    NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
-                    resolve(result);
+
+                    resolve([self convertFromConference:conference2]);
                 } fail:^(NSError *error) {
                     reject(@"join_error", [error localizedDescription], nil);
                 }];
@@ -168,8 +180,8 @@ RCT_EXPORT_METHOD(join:(NSString *)conferenceID
                 VoxeetSDK.shared.conference.defaultVideo = NO;
                 [VoxeetSDK.shared.conference listenWithConference:conference options:nil success:^(VTConference *conference2) {
                     VoxeetSDK.shared.conference.defaultVideo = defaultVideo;
-                    NSDictionary *result = @{@"conferenceId": conference2.id, @"conferenceAlias": conference2.alias};
-                    resolve(result);
+
+                    resolve([self convertFromConference:conference2]);
                 } fail:^(NSError *error) {
                     reject(@"join_error", [error localizedDescription], nil);
                 }];
@@ -205,7 +217,10 @@ RCT_EXPORT_METHOD(invite:(NSString *)conferenceID
             NSString *name = [participant objectForKey:@"name"];
             NSString *avatarURL = [participant objectForKey:@"avatarUrl"];
             
-            VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+            VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                                  initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                                  name:![name isEqual:[NSNull null]] ? name : nil
+                                                  avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
             [participantInfos addObject:participantInfo];
         }
         
@@ -218,6 +233,112 @@ RCT_EXPORT_METHOD(invite:(NSString *)conferenceID
                 }
             }];
         }];
+    });
+}
+
+RCT_EXPORT_METHOD(startVideo:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [VoxeetSDK.shared.conference startVideoWithParticipant:nil completion:^(NSError *error) {
+            if (error != nil) {
+                reject(@"startVideo_error", [error localizedDescription], nil);
+            } else {
+                resolve([NSNumber numberWithBool:TRUE]);
+            }
+        }];
+    });
+}
+
+RCT_EXPORT_METHOD(stopVideo:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [VoxeetSDK.shared.conference stopVideoWithParticipant:nil completion:^(NSError *error) {
+            if (error != nil) {
+                reject(@"stopVideo_error", [error localizedDescription], nil);
+            } else {
+                resolve([NSNumber numberWithBool:TRUE]);
+            }
+        }];
+    });
+}
+
+RCT_EXPORT_METHOD(current:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if(conference) {
+            resolve([self convertFromConference:conference]);
+            return;
+        }
+        
+        resolve(nil);
+    });
+}
+
+
+RCT_EXPORT_METHOD(participants:(NSString *)conferenceID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if(conference) {
+            NSArray<VTParticipant *> *participants = conference.participants;
+            NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+            for (VTParticipant *participant in participants) {
+                NSDictionary *result = [self convertFromParticipant:participant];
+                [output addObject:result];
+            }
+            
+            resolve(output);
+            return;
+        }
+
+        [VoxeetSDK.shared.conference fetchWithConferenceID:conferenceID completion:^(VTConference *conference) {
+
+            NSArray<VTParticipant *> *participants = conference.participants;
+            NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+            for (VTParticipant *participant in participants) {
+                NSDictionary *result = [self convertFromParticipant:participant];
+                [output addObject:result];
+            }
+            
+            resolve(output);
+        }];
+    });
+}
+
+RCT_EXPORT_METHOD(streams:(NSString *)participantID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  ejecter:(RCTPromiseRejectBlock)reject)
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        
+        if (!conference) {
+            resolve(nil);
+            return;
+        }
+
+        NSArray<VTParticipant *> *participants = conference.participants;
+        NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+        for (VTParticipant *participant in participants) {
+            
+            if ([participant.id isEqualToString: participantID]) {
+                for (MediaStream *stream in participant.streams) {
+                    NSDictionary *result = [self convertFromStream:stream];
+                    [output addObject:result];
+                }
+            }
+        }
+        resolve(output);
     });
 }
 
@@ -239,6 +360,7 @@ RCT_EXPORT_METHOD(sendBroadcastMessage:(NSString *)message
 RCT_EXPORT_METHOD(appearMaximized:(BOOL)enable)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self->_deactivatedOverlay) return;
         [VoxeetUXKit.shared setAppearMaximized:enable];
     });
 }
@@ -259,6 +381,10 @@ RCT_EXPORT_METHOD(isAudio3DEnabled:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(isTelecomMode:(RCTPromiseResolveBlock)resolve
                   ejecter:(RCTPromiseRejectBlock)reject)
 {
+    if (self->_deactivatedOverlay) {
+        resolve([NSNumber numberWithBool:FALSE]);
+        return;
+    }
     resolve([NSNumber numberWithBool:VoxeetUXKit.shared.telecom]);
 }
 
@@ -275,23 +401,92 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent"];
+    return @[@"refreshToken", @"ConferenceStatusUpdatedEvent", @"StreamAddedEvent", @"StreamUpdatedEvent", @"StreamRemovedEvent", @"ParticipantAddedEvent", @"ParticipantUpdatedEvent", @"VoxeetConferencekitVideoView"];
+}
+/*
+ *  MARK: Convert helpers
+ */
+- (NSDictionary *)convertFromParticipant:(VTParticipant *)participant {
+    VTConference *conference = VoxeetSDK.shared.conference.current;
+    if (conference != nil) {
+        NSString *conferenceStatus = [self convertFromStatus:conference.status];
+
+        return @{
+            @"participantId": participant.id ? participant.id : @"",
+            @"conferenceStatus": conferenceStatus ? conferenceStatus : @"",
+            @"externalId": participant.info.externalID ? participant.info.externalID : [NSNull null],
+            @"name": participant.info.name ? participant.info.name : [NSNull null],
+            @"avatarUrl": participant.info.avatarURL ? participant.info.avatarURL : [NSNull null],
+        };
+    }
+    return nil;
 }
 
-// Will be called when this module's first listener is added.
-- (void)startObserving
-{
-    _hasListeners = YES;
-    // Observers.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conferenceStatusUpdated:) name:@"VTConferenceStatusUpdated" object:nil];
+- (NSDictionary *)convertFromStream:(MediaStream *)stream {
+    BOOL hasAudioTracks = stream.audioTracks.count > 0;
+    BOOL hasVideoTracks = stream.videoTracks.count > 0;
+    NSString *streamType = [self convertFromStreamType:stream.type];
+    
+    return @{
+        @"streamId": stream.streamId,
+        @"type": streamType,
+        @"hasAudioTracks": @(hasAudioTracks),
+        @"hasVideoTracks": @(hasVideoTracks)
+    };
 }
 
-// Will be called when this module's last listener is removed, or on dealloc.
-- (void)stopObserving
-{
-    _hasListeners = NO;
-    // Observers.
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+- (NSString *)convertFromStatus:(VTConferenceStatus)status {
+    switch (status) {
+        case VTConferenceStatusCreating:
+            return @"CREATING";
+        case VTConferenceStatusCreated:
+            return @"CREATED";
+        case VTConferenceStatusJoining:
+            return @"JOINING";
+        case VTConferenceStatusJoined:
+            return @"JOINED";
+        case VTConferenceStatusLeaving:
+            return @"LEAVING";
+        case VTConferenceStatusLeft:
+            return @"LEFT";
+        case VTConferenceStatusEnded:
+            return @"ENDED";
+        case VTConferenceStatusDestroyed:
+            return @"DESTROYED";
+        case VTConferenceStatusError:
+            return @"ERROR";
+    }
+}
+
+- (NSString *)convertFromStreamType:(MediaStreamType)type {
+    switch(type) {
+        case ScreenShare:
+            return @"ScreenShare";
+        case Custom:
+            return @"Custom";
+        case Camera:
+            return @"Camera";
+    }
+}
+
+- (NSDictionary *)convertFromConference:(VTConference *)conference {
+    NSArray<VTParticipant *> *participants = conference.participants;
+    NSMutableArray<NSDictionary *> *output = [[NSMutableArray alloc] init];
+
+    for (VTParticipant *participant in participants) {
+        NSDictionary *result = [self convertFromParticipant:participant];
+        [output addObject:result];
+    }
+
+    NSString *statusStr = [self convertFromStatus:conference.status];
+
+    return @{
+        @"conferenceId": conference.id,
+        @"conferenceAlias": conference.alias,
+        @"status": statusStr,
+        @"isNew": [NSNumber numberWithBool:conference.isNew],
+        @"participants": output
+    };
 }
 
 RCT_EXPORT_METHOD(onAccessTokenOk:(NSString *)accessToken
@@ -339,51 +534,124 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
 /*
  *  MARK: Observers
  */
+// Will be called when this module's first listener is added.
+- (void)startObserving
+{
+    _hasListeners = YES;
+    // Observers.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conferenceStatusUpdated:) name:@"VTConferenceStatusUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamAdded:) name:@"VTStreamAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamUpdated:) name:@"VTStreamUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(streamRemoved:) name:@"VTStreamRemoved" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(participantAdded:) name:@"VTParticipantAdded" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(participantUpdated:) name:@"VTParticipantUpdated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(VoxeetConferencekitVideoView:) name:@"VoxeetConferencekitVideoView" object:nil];
+}
+
+// Will be called when this module's last listener is removed, or on dealloc.
+- (void)stopObserving
+{
+    _hasListeners = NO;
+    // Observers.
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)participantAdded:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"participant": [self convertFromParticipant:participant]
+            };
+            [self sendEventWithName:@"ParticipantAddedEvent" body:result];
+        }
+    });
+}
+
+- (void)participantUpdated:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"participant": [self convertFromParticipant:participant]
+            };
+            [self sendEventWithName:@"ParticipantUpdatedEvent" body:result];
+        }
+    });
+}
 
 - (void)conferenceStatusUpdated:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSNumber *rawStatus = notification.userInfo[@"status"];
         VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
-        NSString *statusStr = @"DEFAULT";
+        NSString *statusStr = [self convertFromStatus:status];
         
-        switch (status) {
-            case VTConferenceStatusCreating:
-                statusStr = @"CREATING";
-                break;
-            case VTConferenceStatusCreated:
-                statusStr = @"CREATED";
-                break;
-            case VTConferenceStatusJoining:
-                statusStr = @"JOINING";
-                break;
-            case VTConferenceStatusJoined:
-                statusStr = @"JOINED";
-                break;
-            case VTConferenceStatusLeaving:
-                statusStr = @"LEAVING";
-                break;
-            case VTConferenceStatusLeft:
-                statusStr = @"LEFT";
-                break;
-            case VTConferenceStatusEnded:
-                statusStr = @"ENDED";
-                break;
-            case VTConferenceStatusDestroyed:
-                statusStr = @"DESTROYED";
-                break;
-            case VTConferenceStatusError:
-                statusStr = @"ERROR";
-                break;
-            default:
-                break;
-        }
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        NSDictionary *statusDict = @{
+            @"status": statusStr,
+            @"conferenceId": conference ? conference.id : [NSNull null],
+            @"conferenceAlias": conference ? conference.alias : [NSNull null]
+        };
+        [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
+    });
+}
+
+
+- (void)VoxeetConferencekitVideoView:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendEventWithName:@"VoxeetConferencekitVideoView" body:notification.userInfo];
+    });
+}
+
+- (void)streamAdded:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         if (conference != nil) {
-            NSDictionary *statusDict = @{@"status": statusStr,
-                                         @"conferenceId": conference.id,
-                                         @"conferenceAlias": conference.alias};
-            [self sendEventWithName:@"ConferenceStatusUpdatedEvent" body:statusDict];
+            NSDictionary *result = @{
+                @"participant": [self convertFromParticipant:participant],
+                @"mediaStream": [self convertFromStream:stream]
+            };
+            [self sendEventWithName:@"StreamAddedEvent" body:result];
+        }
+    });
+}
+
+- (void)streamUpdated:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        NSLog(@"updating streams %@", notification.userInfo);
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"participant": [self convertFromParticipant:participant],
+                @"mediaStream": [self convertFromStream:stream]
+            };
+            [self sendEventWithName:@"StreamUpdatedEvent" body:result];
+        }
+    });
+}
+
+- (void)streamRemoved:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VTParticipant *participant = notification.userInfo[@"participant"];
+        MediaStream *stream = notification.userInfo[@"stream"];
+        
+        VTConference *conference = VoxeetSDK.shared.conference.current;
+        if (conference != nil) {
+            NSDictionary *result = @{
+                @"participant": [self convertFromParticipant:participant],
+                @"mediaStream": [self convertFromStream:stream]
+            };
+            [self sendEventWithName:@"StreamRemovedEvent" body:result];
         }
     });
 }
@@ -405,7 +673,10 @@ RCT_EXPORT_METHOD(startConference:(NSString *)conferenceID
         NSString *name = [participant objectForKey:@"name"];
         NSString *avatarURL = [participant objectForKey:@"avatarUrl"];
         
-        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                              initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                              name:![name isEqual:[NSNull null]] ? name : nil
+                                              avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
         [participantInfos addObject:participantInfo];
     }
     
@@ -457,7 +728,10 @@ RCT_EXPORT_METHOD(openSession:(NSDictionary *)userInfo
         NSString *name = [userInfo objectForKey:@"name"];
         NSString *avatarURL = [userInfo objectForKey:@"avatarUrl"];
         
-        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc] initWithExternalID:externalID name:name avatarURL:avatarURL];
+        VTParticipantInfo *participantInfo = [[VTParticipantInfo alloc]
+                                              initWithExternalID:![externalID isEqual:[NSNull null]] ? externalID : nil
+                                              name:![name isEqual:[NSNull null]] ? name : nil
+                                              avatarURL: ![avatarURL isEqual:[NSNull null]] ? avatarURL : nil];
         
         [VoxeetSDK.shared.session openWithInfo:participantInfo completion:^(NSError *error) {
             if (error != nil) {

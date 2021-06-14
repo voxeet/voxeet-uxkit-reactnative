@@ -3,9 +3,11 @@
 
 
 import React, {Component} from 'react';
-import { requireNativeComponent, findNodeHandle, UIManager } from 'react-native';
+import { requireNativeComponent, findNodeHandle, UIManager, Platform, NativeModules, View } from 'react-native';
 
 import MediaStream from "./types/MediaStream";
+import Participant from './types/Participant';
+import VoxeetSDK from './VoxeetSDK';
 
 const RCTVoxeetVideoView = requireNativeComponent('RCTVoxeetVideoView');
 
@@ -15,17 +17,15 @@ export interface Stream {
 }
 
 export interface State {
-
+  mediaStream?: MediaStream
 }
 
 export interface Props {
-  attach: MediaStream|undefined;
-  cornerRadius: number,
-  isCircle: boolean,
-  hasFlip: boolean,
-  isAutoUnAttach: boolean,
-  scaleType: string; //[ 'fit', 'fill' ]
+  isMirror?: boolean,
+  scaleType: "fit"|"fill"; //[ 'fit', 'fill' ]
 }
+
+const ValidProps = [ "style", "isMirror", "scaleType" ];
 
 export interface Resolve {
   (result: any): any|undefined;
@@ -40,30 +40,48 @@ export interface Holder {
   reject: Reject;
 }
 
+interface VideoViewAsyncCallResult {
+  requestId: number,
+  error?: string,
+  message?: string,
+  peerId?: string,
+  streamId?: string,
+  attach?: number,
+  isAttached?: number,
+  isScreenShare?: number
+}
+
 /**
  * Composes `View`.
  *
- * - attach: MediaStream
- * - cornerRadius: number
- * - isCircle: boolean
- * - hasFlip: boolean
- * - isAutoUnAttach: boolean
+ * - isMirror: boolean
  * - scaleType: 'fit' | 'fill'
+ * 
+ * 
+ * Public methods :
+ * 
+ * attach(participant: Participant, mediaStream: MediaStream): Promise<void>
+ * unattach(): Promise<void>
+ * isAttached(): Promise<boolean>
+ * isScreenShare(): Promise<boolean>
  */
 export default class VideoView extends Component<Props, State> {
   static defaultProps = {
     isCircle: false,
+    isMirror: false,
     hasFlip: false,
     isAutoUnAttach: true,
     scaleType: 'fill'
   }
 
-  _UiManager:any = UIManager;
+  private _UiManager:any = UIManager;
 
-  _videoView: React.Component|null;
-  _videoViewHandler: null | number;
-  _nextRequestId = 1;
-  _requestMap: Map<number, Holder> = new Map();
+  private _videoView: React.Component|null;
+  private _videoViewHandler: null | number;
+  private static _nextRequestId = 1;
+  private _requestMap: Map<number, Holder> = new Map();
+
+  public state: State = {};
 
   constructor(props: Props) {
     super(props);
@@ -71,54 +89,123 @@ export default class VideoView extends Component<Props, State> {
     this._videoView = null;
   }
 
+  filteredProps() {
+    const result = {};
+    Object.keys(this.props).filter(k => ValidProps).forEach(k => result[k] = this.props[k]);
+    return result;
+  }
+
   componentDidMount() {
-    this._videoViewHandler = findNodeHandle(this._videoView);
+    VoxeetSDK.events.addListener("VoxeetConferencekitVideoView", this._onEvent);
   }
 
-  //android
-  isAttached() {
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached);
+  componentWillUnmount() {
+    VoxeetSDK.events.removeListener("VoxeetConferencekitVideoView", this._onEvent);
   }
 
-  //android
-  isScreenShare() {
-    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare);
+  attach(participant: Participant, mediaStream: MediaStream): Promise<void> {
+    if(Platform.OS == "android") {
+        this.setState({mediaStream});
+        return Promise.resolve();
+    }
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.attach, participant.participantId, mediaStream.streamId).then(() => {});
   }
 
-  _sendCallReturn(command: any) {
-    const requestId: number = this._nextRequestId++;
+  unattach(): Promise<void> {
+    if(Platform.OS == "android") {
+        this.setState({mediaStream: undefined});
+        return Promise.resolve();
+    }
+
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.unattach).then(() => {});
+  }
+
+  isAttached(): Promise<boolean> {
+    if(Platform.OS == "android") {
+        if(!this._videoView || !this._videoViewHandler) return Promise.resolve(false);
+        if(!this.state.mediaStream) return Promise.resolve(false);
+    }
+
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isAttached)
+    .then(r => !!r.isAttached);
+  }
+
+  isScreenShare(): Promise<boolean> {
+    if(Platform.OS == "android") {
+        if(!this._videoView || !this._videoViewHandler) return Promise.resolve(false);
+        if(!this.state.mediaStream) return Promise.resolve(false);
+    }
+
+    return this._sendCallReturn(this._UiManager.RCTVoxeetVideoView.Commands.isScreenShare)
+    .then(r => !!r.isScreenShare);
+  }
+
+  _sendCallReturn(command: any, param1?: any, param2?: any): Promise<VideoViewAsyncCallResult> {
+    const requestId: number = VideoView._nextRequestId++;
     const requestMap: Map<number, Holder> = this._requestMap;
 
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<VideoViewAsyncCallResult>((resolve, reject) => {
       requestMap[requestId] = { resolve, reject };
     });
 
     this._UiManager.dispatchViewManagerCommand(
       this._videoViewHandler,
       command,
-      [ requestId ]
+      [ requestId, param1, param2]
     );
 
     return promise;
   }
 
   _onCallReturn = (event: any) => {
-    const { requestId, result, error } = event.nativeEvent;
-    const promise: Holder = this._requestMap[requestId];
-    if (result) {
-      promise.resolve(result);
-    } else {
-      promise.reject(error);
-    }
+    !!event.nativeEvent && this._onEvent(event.nativeEvent);
+  }
+  
+  _onEvent = (event: VideoViewAsyncCallResult) => {
+    console.warn("event is", event);
+    if(!event) return;
+    const { requestId, error, message, peerId, streamId, attach, isAttached} = event;
+    const promise = this._requestMap[requestId];
+
     this._requestMap.delete(requestId);
+
+    if(error && message && promise) {
+        promise.reject(`${error} ${message}`);
+    } else if(promise) {
+        promise.resolve(event);
+    }
+  }
+
+  private setVideoView(v: VideoView|null|undefined) {
+    if(!!v) {
+      this._videoView = v;
+      this._videoViewHandler = findNodeHandle(this._videoView);
+    } else {
+      this._videoView = null;
+      this._videoViewHandler = null;
+    }
   }
 
   render() {
+    const props = this.filteredProps();
+    if(Platform.OS == "android") {
+      if(!this.state.mediaStream) {
+          return <View {...props} />
+      } else {
+          return (
+            <RCTVoxeetVideoView {...props}
+              attach={this.state.mediaStream}
+              ref={(v: React.Component|null) => this.setVideoView(v)}
+              {...{ onCallReturn: (event: any) => this._onCallReturn(event) }}/>
+          );
+      }
+    }
+
     return (
       <RCTVoxeetVideoView
-        {...this.props}
+        {...props}
         ref={(v: React.Component|null) => this._videoView = v}
-        { ...{onCallReturn: (event :any) => this._onCallReturn(event)} }
+        { ...{onCallReturn: (event: any) => this._onCallReturn(event)} }
       />
     );
   }

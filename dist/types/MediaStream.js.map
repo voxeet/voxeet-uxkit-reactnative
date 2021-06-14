@@ -1,1 +1,1 @@
-{"version":3,"file":"MediaStream.js","sourceRoot":"","sources":["../../lib/types/MediaStream.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,WAAW;IAI5B,YAAY,MAAc,EAAE,KAAa;QACvC,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;IACrB,CAAC;CACF"}
+{"version":3,"file":"MediaStream.js","sourceRoot":"","sources":["../../lib/types/MediaStream.ts"],"names":[],"mappings":""}

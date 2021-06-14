@@ -1,9 +1,9 @@
-export default class MediaStream {
-    public peerId: string;
-    public label: string;
-  
-    constructor(peerId: string, label: string) {
-      this.peerId = peerId;
-      this.label = label;
-    }
-  }
+export type MediaStreamType = "Camera" | "ScreenShare" | "Custom";
+
+export default interface MediaStream {
+  peerId: string;
+  streamId: string;
+  hasVideoTracks: boolean;
+  hasAudioTracks: boolean;
+  type: MediaStreamType;
+}

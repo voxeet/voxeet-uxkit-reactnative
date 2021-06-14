@@ -7,10 +7,11 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var _events;
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import VoxeetEvents from './VoxeetEvents';
+import Participant from './types/Participant';
 const { RNVoxeetConferencekit } = NativeModules;
 ;
 ;
-export default class _VoxeetSDK {
+class RNVoxeetSDK {
     constructor() {
         _events.set(this, new VoxeetEvents());
         this.refreshAccessTokenCallback = null;
@@ -21,16 +22,18 @@ export default class _VoxeetSDK {
      * Initializes the SDK using the customer key and secret.
      * @param consumerKey Consumer Key
      * @param consumerSecret Consumer Secret
+     * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
      */
-    initialize(consumerKey, consumerSecret) {
-        return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret);
+    initialize(consumerKey, consumerSecret, deactivateOverlay) {
+        return RNVoxeetConferencekit.initialize(consumerKey, consumerSecret, !!deactivateOverlay);
     }
     /**
      * Initializes the SDK with an access token that is provided by the customer backend communicating with Voxeet servers.
      * @param accessToken Access token
      * @param refreshToken Callback to get a new access token after it expires
+     * @param deactivateOverlay Optional value to deactivate the whole overlay if the react native will take care of displaying specific UI
      */
-    initializeToken(accessToken, refreshToken) {
+    initializeToken(accessToken, refreshToken, deactivateOverlay) {
         if (!this.refreshAccessTokenCallback) {
             this.refreshAccessTokenCallback = () => {
                 refreshToken()
@@ -44,7 +47,7 @@ export default class _VoxeetSDK {
                 this.refreshAccessTokenCallback && this.refreshAccessTokenCallback();
             });
         }
-        return RNVoxeetConferencekit.initializeToken(accessToken);
+        return RNVoxeetConferencekit.initializeToken(accessToken, !!deactivateOverlay);
     }
     /**
      * Opens a new session.
@@ -75,10 +78,28 @@ export default class _VoxeetSDK {
         return RNVoxeetConferencekit.join(conferenceId, options);
     }
     /**
+     * Gets the current conference or undefined if none is live.
+     */
+    current() {
+        return RNVoxeetConferencekit.current();
+    }
+    /**
      * Leaves the conference.
      */
     leave() {
         return RNVoxeetConferencekit.leave();
+    }
+    /**
+     * Starts the local video
+     */
+    startVideo() {
+        return RNVoxeetConferencekit.startVideo();
+    }
+    /**
+     * Stops the local video
+     */
+    stopVideo() {
+        return RNVoxeetConferencekit.stopVideo();
     }
     /**
      * Invite a participant to the conference.
@@ -87,6 +108,23 @@ export default class _VoxeetSDK {
      */
     invite(conferenceId, participants) {
         return RNVoxeetConferencekit.invite(conferenceId, participants);
+    }
+    /**
+     * Get the list of participants
+     * @param conferenceId Id of the conference to get the participants from
+     * @returns List of participants in the conference
+     */
+    participants(conferenceId) {
+        return RNVoxeetConferencekit.participants(conferenceId)
+            .then((result) => result.map(r => new Participant(r.participantId || "", r.status, r.externalId, r.name, r.avatarUrl)));
+    }
+    /**
+     * Get the list of streams for a given participant
+     * @param participantId Id of the participant to get the streams from
+     * @returns List of streams for this participant
+     */
+    streams(participantId) {
+        return RNVoxeetConferencekit.streams(participantId);
     }
     /**
      * Sends a broadcast message to the participants of the conference.
@@ -146,11 +184,10 @@ export default class _VoxeetSDK {
     }
     /**
      * Checks if a conference is awaiting. Android only.
+     * @deprecated
      */
     checkForAwaitingConference() {
-        if (Platform.OS != "android")
-            return new Promise(r => r(false));
-        return RNVoxeetConferencekit.checkForAwaitingConference();
+        return Promise.resolve(false);
     }
     /** @deprecated Use join() instead. */
     startConference(conferenceId, participants) {
@@ -170,5 +207,6 @@ export default class _VoxeetSDK {
     }
 }
 _events = new WeakMap();
-export const VoxeetSDK = new _VoxeetSDK();
+RNVoxeetSDK.VoxeetSDK = new RNVoxeetSDK();
+export default new RNVoxeetSDK();
 //# sourceMappingURL=VoxeetSDK.js.map
