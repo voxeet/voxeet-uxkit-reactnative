@@ -176,7 +176,7 @@ export default class VideoView extends Component<Props, State> {
     }
   }
 
-  private setVideoView(v: VideoView|null|undefined) {
+  private setVideoView(v: React.Component|null|undefined) {
     if(!!v) {
       this._videoView = v;
       this._videoViewHandler = findNodeHandle(this._videoView);
@@ -204,7 +204,7 @@ export default class VideoView extends Component<Props, State> {
     return (
       <RCTVoxeetVideoView
         {...props}
-        ref={(v: React.Component|null) => this._videoView = v}
+        ref={(v: React.Component|null) => this.setVideoView(v)}
         { ...{onCallReturn: (event: any) => this._onCallReturn(event)} }
       />
     );
