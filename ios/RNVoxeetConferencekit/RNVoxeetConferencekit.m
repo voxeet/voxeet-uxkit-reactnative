@@ -409,11 +409,11 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
 - (NSDictionary *)convertFromParticipant:(VTParticipant *)participant {
     VTConference *conference = VoxeetSDK.shared.conference.current;
     if (conference != nil) {
-        NSString *conferenceStatus = [self convertFromStatus:conference.status];
+        NSString *participantStatus = [self convertParticipantStatusFromStatus:participant.status];
 
         return @{
             @"participantId": participant.id ? participant.id : @"",
-            @"conferenceStatus": conferenceStatus ? conferenceStatus : @"",
+            @"conferenceStatus": participantStatus ? participantStatus : @"",
             @"externalId": participant.info.externalID ? participant.info.externalID : [NSNull null],
             @"name": participant.info.name ? participant.info.name : [NSNull null],
             @"avatarUrl": participant.info.avatarURL ? participant.info.avatarURL : [NSNull null],
@@ -435,7 +435,7 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
     };
 }
 
-- (NSString *)convertFromStatus:(VTConferenceStatus)status {
+- (NSString *)convertConferenceStatusFromStatus:(VTConferenceStatus)status {
     switch (status) {
         case VTConferenceStatusCreating:
             return @"CREATING";
@@ -455,6 +455,29 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
             return @"DESTROYED";
         case VTConferenceStatusError:
             return @"ERROR";
+    }
+}
+
+- (NSString *)convertParticipantStatusFromStatus:(VTParticipantStatus)status {
+    switch (status) {
+        case VTParticipantStatusReserved:
+            return @"RESERVED";
+        case VTParticipantStatusInactive:
+            return @"INACTIVE";
+        case VTParticipantStatusDecline:
+            return @"DECLINE";
+        case VTParticipantStatusConnecting:
+            return @"CONNECTING";
+        case VTParticipantStatusConnected:
+            return @"ON_AIR";
+        case VTParticipantStatusLeft:
+            return @"LEFT";
+        case VTParticipantStatusWarning:
+            return @"WARNING";
+        case VTParticipantStatusError:
+            return @"ERROR";
+        case VTParticipantStatusKicked:
+            return @"KICKED";
     }
 }
 
@@ -478,7 +501,7 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
         [output addObject:result];
     }
 
-    NSString *statusStr = [self convertFromStatus:conference.status];
+    NSString *statusStr = [self convertConferenceStatusFromStatus:conference.status];
 
     return @{
         @"conferenceId": conference.id,
@@ -588,7 +611,7 @@ RCT_EXPORT_METHOD(checkForAwaitingConference:(RCTPromiseResolveBlock)resolve
     dispatch_async(dispatch_get_main_queue(), ^{
         NSNumber *rawStatus = notification.userInfo[@"status"];
         VTConferenceStatus status = (VTConferenceStatus)rawStatus.intValue;
-        NSString *statusStr = [self convertFromStatus:status];
+        NSString *statusStr = [self convertConferenceStatusFromStatus:status];
         
         VTConference *conference = VoxeetSDK.shared.conference.current;
         NSDictionary *statusDict = @{
