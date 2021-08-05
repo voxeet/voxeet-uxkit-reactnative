@@ -54,8 +54,8 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 3. Patch react-native AAR directly : (an alternative is using the gradle configuration's pickFirst for the libc++_shared.so)
 
-    ```
-    bash ./node_modules/@voxeet/react-native-voxeet-conferenceki/patch.react.aar.sh
+    ```bash
+    bash ./node_modules/@voxeet/react-native-voxeet-conferencekit/patch.react.aar.sh
     ```
 
 4. Open the `android/app/src/main/java/[...]/MainActivity.java` file: 
@@ -88,13 +88,13 @@ Note: The VoxeetEvents is now deprecated and will disappear from the library its
 
 ### Initialization
 
-```
+```javascript
 VoxeetSDK.initialize(appKey, appSecret);
 ```
 
 or 
 
-```
+```javascript
 VoxeetSDK.initializeToken(accessToken, () => {
     return new Promise((resolve, reject) => {
         ... //get the new accessToken
@@ -108,7 +108,7 @@ VoxeetSDK.initializeToken(accessToken, () => {
 
 Once the SDK is initialized, try to connect your current user as soon as possible.
 
-```
+```javascript
 await VoxeetSDK.connect(new UserInfo("externalId", "name", "optAvatarUrl"));
 ```
 
@@ -118,14 +118,14 @@ Once the session is started, if an incoming call is accepted by the user, it is 
 
 Use the corresponding method to perform the action:
 
-```
+```javascript
 const conference = await VoxeetSDK.create({ alias: "yourConferenceAlias" });
 await VoxeetSDK.join(conference.conferenceId);
 ```
 
 To leave, use the following command:
 
-```
+```javascript
 await VoxeetSDK.leave(conferenceId);
 ```
 
@@ -138,7 +138,7 @@ You can subscribe to events via the `addListener` (and unsubscribe via the corre
 
 ### Example
 
-```
+```javascript
 import { VoxeetSDK } from "@voxeet/react-native-voxeet-conferencekit";
 import { ConferenceStatusUpdatedEvent } from "@voxeet/react-native-voxeet-conferencekit";
 
