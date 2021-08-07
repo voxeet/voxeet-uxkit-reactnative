@@ -81,9 +81,8 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         RNVoxeetConferencekitModule.initNotificationCenter();
         RNVoxeetFirebaseIncomingNotificationService.createNotificationChannel(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String DEFAULT_ID = "VideoConference";
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel mChannel = notificationManager.getNotificationChannel(DEFAULT_ID);
+            NotificationChannel mChannel = notificationManager.getNotificationChannel(RNVoxeetFirebaseIncomingNotificationService.DEFAULT_ID);
             Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +context.getPackageName()+"/"+ R.raw.google_pixel_zen);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)

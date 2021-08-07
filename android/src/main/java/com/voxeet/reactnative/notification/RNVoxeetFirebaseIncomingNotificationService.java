@@ -1,6 +1,7 @@
 package com.voxeet.reactnative.notification;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -34,7 +35,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
     //extracted from the sdk
     //TODO set in the push module not the push_manifest one
     private static final String SDK_CHANNEL_ID = "voxeet_sdk_channel_id";
-    private static final String DEFAULT_ID = "VideoConference";
+    public static final String DEFAULT_ID = "VideoConference";
 
     public final static int INCOMING_NOTIFICATION_REQUEST_CODE = 98;
     private static final String TAG = IncomingNotification.class.getSimpleName();
@@ -66,6 +67,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
             notificationId = serviceInvitationBundle.conferenceId.hashCode();
         }
 
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = getChannelId(this);
 
         Intent accept = createAcceptIntent(this, serviceInvitationBundle);
@@ -86,7 +88,6 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
         PendingIntent pendingCallingIntent = PendingIntent.getActivity(this, INCOMING_NOTIFICATION_REQUEST_CODE, callingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +this.getPackageName()+"/"+R.raw.google_pixel_zen);
-
         String inviterName = Opt.of(serviceInvitationBundle.inviter).then(ParticipantNotification::getInfo).then(ParticipantInfo::getName).or("");
         Notification lastNotification = new NotificationCompat.Builder(this, channelId)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
