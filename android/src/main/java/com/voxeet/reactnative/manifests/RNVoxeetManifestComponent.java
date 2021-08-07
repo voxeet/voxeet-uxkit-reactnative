@@ -1,16 +1,23 @@
 package com.voxeet.reactnative.manifests;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ProviderInfo;
+import android.media.AudioAttributes;
+import android.net.Uri;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.soloader.SoLoader;
 import com.voxeet.VoxeetSDK;
+import com.voxeet.reactnative.R;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
-import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotification;
+import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotificationService;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
 import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
@@ -72,7 +79,18 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         VoxeetToolkit.instance().getReplayMessageToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
 
         RNVoxeetConferencekitModule.initNotificationCenter();
-        RNVoxeetFirebaseIncomingNotification.createNotificationChannel(context);
+        RNVoxeetFirebaseIncomingNotificationService.createNotificationChannel(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String DEFAULT_ID = "VideoConference";
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel mChannel = notificationManager.getNotificationChannel(DEFAULT_ID);
+            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +context.getPackageName()+"/"+ R.raw.google_pixel_zen);
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
+            mChannel.setSound(soundUri, audioAttributes);
+        }
     }
 
     @Override
