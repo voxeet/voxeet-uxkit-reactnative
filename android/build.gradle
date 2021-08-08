@@ -1,3 +1,6 @@
+//used to fetch package.json file
+import groovy.json.JsonSlurper
+
 buildscript {
     repositories {
         google()
@@ -26,6 +29,9 @@ def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 29
 
 if(_minSdk < 21) _minSdk = 21
 
+def packageJson = new JsonSlurper().parse file("../package.json")
+def version = packageJson.version
+
 android {
     compileSdkVersion _compile
     buildToolsVersion _buildTools
@@ -35,6 +41,7 @@ android {
         targetSdkVersion _targetSdk
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "VOXEET_REACT_NATIVE_VERSION", "\"${version}\""
     }
     lintOptions {
         abortOnError false
