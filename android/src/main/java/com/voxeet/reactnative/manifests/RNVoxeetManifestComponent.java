@@ -83,7 +83,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel mChannel = notificationManager.getNotificationChannel(RNVoxeetFirebaseIncomingNotificationService.DEFAULT_ID);
-            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +context.getPackageName()+"/"+ R.raw.google_pixel_zen);
+            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +context.getPackageName()+"/"+ R.raw.incoming_call);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)

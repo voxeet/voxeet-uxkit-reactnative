@@ -87,7 +87,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
         PendingIntent pendingIntentDismissed = PendingIntent.getBroadcast(this, INCOMING_NOTIFICATION_REQUEST_CODE, dismiss, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent pendingCallingIntent = PendingIntent.getActivity(this, INCOMING_NOTIFICATION_REQUEST_CODE, callingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +this.getPackageName()+"/"+R.raw.google_pixel_zen);
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +this.getPackageName()+"/"+R.raw.incoming_call);
         String inviterName = Opt.of(serviceInvitationBundle.inviter).then(ParticipantNotification::getInfo).then(ParticipantInfo::getName).or("");
         Notification lastNotification = new NotificationCompat.Builder(this, channelId)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
