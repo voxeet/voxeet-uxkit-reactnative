@@ -1,6 +1,7 @@
 package com.voxeet.reactnative.notification;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -150,6 +151,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
 
     protected void onDecline() {
         ConferenceService conferenceService = VoxeetSDK.conference();
+        stopService(new Intent(this.getBaseContext(), RNVoxeetFirebaseIncomingNotificationService.class));
         if (null != getConferenceId()) {
             conferenceService.decline(getConferenceId())
                     .then(result -> {
@@ -162,6 +164,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
     }
 
     protected void onAccept() {
+        stopService(new Intent(this.getBaseContext(), RNVoxeetFirebaseIncomingNotificationService.class));
         if (!Validate.hasMicrophonePermissions(this)) {
             Validate.requestMandatoryPermissions(this, new String[]{
                     Manifest.permission.RECORD_AUDIO,

@@ -28,12 +28,14 @@ public class NotificationCenterRNNotificationOnly implements IIncomingInvitation
         PendingInvitationResolution.incomingInvitation = invitationBundle;
         PendingInvitationResolution.accepted = false;
 
-        RNVoxeetFirebaseIncomingNotification manage = new RNVoxeetFirebaseIncomingNotification();
-        manage.onInvitation(context, invitationBundle);
+        Intent serviceIntent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
+        serviceIntent.putExtras(invitationBundle.asBundle());
+        context.startService(serviceIntent);
     }
 
     @Override
     public void onInvitationCanceled(@NonNull Context context, @NonNull String conferenceId) {
-
+        Intent serviceIntent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
+        context.stopService(serviceIntent);
     }
 }

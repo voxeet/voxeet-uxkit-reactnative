@@ -40,7 +40,7 @@ public abstract class RNVoxeetActivity extends ReactActivity {
     }
 
     public void onInvitationBundle(Intent intent) {
-        mActivityObject.onDirectIntent(intent, false);
+        mActivityObject.onDirectIntent(this.getBaseContext(), intent, false);
     }
 
     @Override
@@ -84,7 +84,7 @@ public abstract class RNVoxeetActivity extends ReactActivity {
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        mActivityObject.onNewIntent(intent, false);
+        mActivityObject.onNewIntent(this.getBaseContext(), intent, false);
     }
 
     @Override
