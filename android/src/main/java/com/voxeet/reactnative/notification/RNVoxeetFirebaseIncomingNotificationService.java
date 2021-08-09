@@ -34,8 +34,8 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
 
     //extracted from the sdk
     //TODO set in the push module not the push_manifest one
-    private static final String SDK_CHANNEL_ID = "voxeet_sdk_channel_id";
-    public static final String DEFAULT_ID = "VideoConference";
+    private static final String SDK_CHANNEL_ID = "voxeet_sdk_incoming_channel_id";
+    public static final String DEFAULT_ID = "IncomingVideoConference";
 
     public final static int INCOMING_NOTIFICATION_REQUEST_CODE = 98;
     private static final String TAG = IncomingNotification.class.getSimpleName();
