@@ -175,7 +175,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
 
     protected void onAccept() {
         String conferenceId = getConferenceId();
-        RNVoxeetFirebaseIncomingNotificationService.stop(this, conferenceId);
+        RNVoxeetFirebaseIncomingNotificationService.stop(this, conferenceId, null);
 
         if (!Validate.hasMicrophonePermissions(this)) {
             Validate.requestMandatoryPermissions(this, new String[]{
