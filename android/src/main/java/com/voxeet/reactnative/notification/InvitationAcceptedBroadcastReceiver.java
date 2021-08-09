@@ -13,7 +13,8 @@ public class InvitationAcceptedBroadcastReceiver extends BroadcastReceiver {
         //override the incomingInvitation set because it could be in context of multiple invitations
         PendingInvitationResolution.incomingInvitation = new InvitationBundle(intent.getExtras());
         PendingInvitationResolution.onIncomingInvitationAccepted(context);
-        context.stopService(new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class));
+
+        RNVoxeetFirebaseIncomingNotificationService.stop(context);
     }
 
 }

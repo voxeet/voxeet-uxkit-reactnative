@@ -31,7 +31,6 @@ public class InvitationDismissBroadcastReceiver extends BroadcastReceiver {
                 NotificationCenter.instance.onInvitationCanceledReceived(context, finalInvitationBundle.conferenceId);
             }).error(error -> NotificationCenter.instance.onInvitationCanceledReceived(context, finalInvitationBundle.conferenceId));
         }
-        context.stopService(new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class));
     }
 
     private Promise<Boolean> createPromise(@NonNull String conferenceId) {

@@ -17,8 +17,11 @@ import com.voxeet.VoxeetSDK;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
+import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.services.ConferenceService;
+import com.voxeet.sdk.services.NotificationService;
 import com.voxeet.sdk.utils.AndroidManifest;
+import com.voxeet.sdk.utils.Opt;
 import com.voxeet.sdk.utils.Validate;
 import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
 import com.voxeet.uxkit.views.internal.rounded.RoundedImageView;
@@ -151,9 +154,16 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
 
     protected void onDecline() {
         ConferenceService conferenceService = VoxeetSDK.conference();
-        stopService(new Intent(this.getBaseContext(), RNVoxeetFirebaseIncomingNotificationService.class));
-        if (null != getConferenceId()) {
-            conferenceService.decline(getConferenceId())
+        NotificationService notificationService = VoxeetSDK.notification();
+
+        String conferenceId = getConferenceId();
+        Conference conference = Opt.of(conferenceId)
+                .then(conferenceService::getConference).orNull();
+
+        RNVoxeetFirebaseIncomingNotificationService.stop(this, conferenceId, null);
+
+        if (null != conference) {
+            notificationService.decline(conference)
                     .then(result -> {
                         finish();
                     })
@@ -164,7 +174,9 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
     }
 
     protected void onAccept() {
-        stopService(new Intent(this.getBaseContext(), RNVoxeetFirebaseIncomingNotificationService.class));
+        String conferenceId = getConferenceId();
+        RNVoxeetFirebaseIncomingNotificationService.stop(this, conferenceId);
+
         if (!Validate.hasMicrophonePermissions(this)) {
             Validate.requestMandatoryPermissions(this, new String[]{
                     Manifest.permission.RECORD_AUDIO,

@@ -45,8 +45,26 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
     // to edit, preferrably use either Factory component in the manifest or Application override when dealing with FCM
     public final static IncomingNotificationConfiguration Configuration = new IncomingNotificationConfiguration();
 
+
     private SecureRandom random;
     private int notificationId = -1;
+
+    public static void stop(@NonNull Context context) {
+        RNVoxeetFirebaseIncomingNotificationService.stop(context, null, null);
+    }
+
+    public static void stop(@NonNull Context context, @Nullable String conferenceId, @Nullable Bundle bundle) {
+        //TODO manage the case where conferenceId are different from the one creating this notification
+        Intent intent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
+        intent.putExtras(bundle);
+        context.stopService(intent);
+    }
+
+    public static void start(Context context, InvitationBundle invitation) {
+        Intent intent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
+        intent.putExtras(invitation.asBundle());
+        context.startService(intent);
+    }
 
     @Override
     public void onCreate() {
@@ -63,7 +81,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
         Bundle bundle = intent.getExtras();
         InvitationBundle serviceInvitationBundle = new InvitationBundle(bundle);
         notificationId = random.nextInt(Integer.MAX_VALUE / 2);
-        if (null != (serviceInvitationBundle ).conferenceId) {
+        if (null != serviceInvitationBundle.conferenceId) {
             notificationId = serviceInvitationBundle.conferenceId.hashCode();
         }
 
@@ -87,7 +105,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
         PendingIntent pendingIntentDismissed = PendingIntent.getBroadcast(this, INCOMING_NOTIFICATION_REQUEST_CODE, dismiss, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent pendingCallingIntent = PendingIntent.getActivity(this, INCOMING_NOTIFICATION_REQUEST_CODE, callingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE+ "://" +this.getPackageName()+"/"+R.raw.incoming_call);
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.incoming_call);
         String inviterName = Opt.of(serviceInvitationBundle.inviter).then(ParticipantNotification::getInfo).then(ParticipantInfo::getName).or("");
         Notification lastNotification = new NotificationCompat.Builder(this, channelId)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

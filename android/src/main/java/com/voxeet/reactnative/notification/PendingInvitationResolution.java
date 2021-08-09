@@ -32,9 +32,8 @@ public class PendingInvitationResolution {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (-1 != notificationId) notificationManager.cancel(notificationId);
         notificationId = 0;
-        Intent serviceIntent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
-        serviceIntent.putExtras(incomingInvitation.asBundle());
-        context.stopService(serviceIntent);
+
+        RNVoxeetFirebaseIncomingNotificationService.stop(context, conferenceId, incomingInvitation.asBundle());
     }
 
     public static void onIncomingInvitationAccepted(Context context) {
@@ -77,10 +76,7 @@ public class PendingInvitationResolution {
         VoxeetLog.log(TAG, "onForwardToIncomingCall: " + incomingInvitation + " " + accepted);
         if (null == incomingInvitation || accepted) return;
 
-        RNVoxeetFirebaseIncomingNotificationService service = new RNVoxeetFirebaseIncomingNotificationService();
-        Intent serviceIntent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
-        serviceIntent.putExtras(incomingInvitation.asBundle());
-        context.startService(serviceIntent);
+        RNVoxeetFirebaseIncomingNotificationService.start(context, incomingInvitation);
     }
 
 }
