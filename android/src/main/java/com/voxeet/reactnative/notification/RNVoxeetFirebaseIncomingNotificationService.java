@@ -27,6 +27,7 @@ import com.voxeet.sdk.utils.Opt;
 import com.voxeet.uxkit.incoming.IncomingFullScreen;
 import com.voxeet.uxkit.incoming.IncomingNotification;
 import com.voxeet.uxkit.incoming.IncomingNotificationConfiguration;
+import com.voxeet.uxkit.incoming.manifest.DismissNotificationBroadcastReceiver;
 
 import java.security.SecureRandom;
 
@@ -144,7 +145,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
     @NonNull
     private Intent createDismissIntent(@NonNull Context context, @NonNull InvitationBundle invitationBundle) {
         Bundle extra = invitationBundle.asBundle();
-        Intent intent = new Intent(context, InvitationDismissBroadcastReceiver.class);
+        Intent intent = new Intent(context, DismissNotificationBroadcastReceiver.class);
 
         for (String key : IncomingFullScreen.DEFAULT_NOTIFICATION_KEYS) {
             if (extra.containsKey(key)) {

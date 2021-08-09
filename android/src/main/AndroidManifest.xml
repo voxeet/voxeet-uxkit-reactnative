@@ -30,10 +30,6 @@
             android:name="com.voxeet.reactnative.notification.InvitationAcceptedBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
-        <receiver
-            android:name="com.voxeet.reactnative.notification.InvitationDismissBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false" />
         <activity android:name="com.voxeet.reactnative.notification.RNIncomingCallActivity" android:showOnLockScreen="true" />
         <activity android:name="com.voxeet.reactnative.specifics.BounceVoxeetActivity" />
         <service android:name="com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotificationService" />
