@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.facebook.soloader.SoLoader;
 import com.voxeet.VoxeetSDK;
+import com.voxeet.android.media.utils.MediaEngineEnvironmentHelper;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
 import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotification;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
@@ -43,6 +44,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
 
         SoLoader.loadLibrary("dvclient");
         SoLoader.loadLibrary("MediaEngineJni");
+        MediaEngineEnvironmentHelper.initSoLoader(false);
 
         //Log.d(TAG, "init: com.testappvoxeet reload");
         Application application = (Application) context;

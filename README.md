@@ -52,10 +52,20 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     ]
     ```
 
-3. Patch react-native AAR directly : (an alternative is using the gradle configuration's pickFirst for the libc++_shared.so)
+3. use gradle configuration's pickFirst for the libc++_shared.so in the `android/app/build.gradle` file
 
     ```
-    bash ./node_modules/@voxeet/react-native-voxeet-conferenceki/patch.react.aar.sh
+    android {
+      compileSdkVersion rootProject.ext.compileSdkVersion //just for reference
+
+      ...
+
+      packagingOptions {
+        pickFirst "**/libc++_shared.so"
+      }
+
+      ...
+    }
     ```
 
 4. Open the `android/app/src/main/java/[...]/MainActivity.java` file: 
