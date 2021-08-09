@@ -16,8 +16,8 @@ import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.ScreenShareService;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.utils.Validate;
-import com.voxeet.toolkit.incoming.factory.IncomingCallFactory;
 import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
+import com.voxeet.uxkit.incoming.factory.IncomingCallFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
