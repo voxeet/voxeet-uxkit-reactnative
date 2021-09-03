@@ -39,6 +39,23 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 
 5. Open your .xcworkspace project, navigate to Product > Scheme > Edit scheme > Build > and uncheck "Parallelize Build".
 
+#### Use beta version
+
+To use iOS beta version, you need to add in your podfile the following pod (where x.x.x-beta.x is the version):
+```bash
+  pod 'VoxeetUXKit', :podspec => 'https://raw.githubusercontent.com/voxeet/voxeet-uxkit-ios/release/x.x.x-beta.x/VoxeetUXKit.podspec'
+  pod 'VoxeetSDK', :podspec => 'https://raw.githubusercontent.com/voxeet/voxeet-sdk-ios/release/vx.x.x-beta.x/VoxeetSDK.podspec'
+```
+Here is an example for UXKit 1.5.2-beta.1 with SDK 3.3.0-beta.1:
+```bash
+  pod 'VoxeetUXKit', :podspec => 'https://raw.githubusercontent.com/voxeet/voxeet-uxkit-ios/release/1.5.2-beta.1/VoxeetUXKit.podspec'
+  pod 'VoxeetSDK', :podspec => 'https://raw.githubusercontent.com/voxeet/voxeet-sdk-ios/release/v3.3.0-beta.1/VoxeetSDK.podspec'
+```
+And run
+```bash
+  pod update
+```
+
 ### Android
 
 1. In `android/app/build.gradle`, add the maven repository and set the `minSdkVersion` to at least **21**.
