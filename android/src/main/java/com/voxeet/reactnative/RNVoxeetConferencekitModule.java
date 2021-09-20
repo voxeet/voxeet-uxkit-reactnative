@@ -95,7 +95,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         this.reactContext = reactContext;
 
         VoxeetPreferences.init(reactContext, new VoxeetEnvironmentHolder(reactContext));
-        TelemetryService.register(SdkEnvironment.REACT_NATIVE, "____REACT_NATIVE_VERSION____");
+        TelemetryService.register(SdkEnvironment.REACT_NATIVE, BuildConfig.VOXEET_REACT_NATIVE_VERSION);
 
         //properly init the events
         EventBus eventBus = VoxeetSDK.instance().getEventBus();

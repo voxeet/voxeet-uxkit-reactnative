@@ -1,6 +1,7 @@
 package com.voxeet.reactnative.specifics;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
@@ -16,8 +17,8 @@ import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.ScreenShareService;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
 import com.voxeet.sdk.utils.Validate;
-import com.voxeet.toolkit.incoming.factory.IncomingCallFactory;
 import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
+import com.voxeet.uxkit.incoming.factory.IncomingCallFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,7 +51,7 @@ public class RNVoxeetActivityObject {
         BounceVoxeetActivity.registerBouncedActivity(activity.getClass());
 
         paused = false;
-        onNewIntent(mActivity.getIntent(), true);
+        onNewIntent(mActivity.getBaseContext(), mActivity.getIntent(), true);
     }
 
     public void onResume(@NonNull RNVoxeetActivity activity) {
@@ -117,11 +118,11 @@ public class RNVoxeetActivityObject {
         }
     }
 
-    public void onNewIntent(Intent intent, boolean creation) {
-        onDirectIntent(intent, creation);
+    public void onNewIntent(Context context, Intent intent, boolean creation) {
+        onDirectIntent(context, intent, creation);
     }
 
-    public void onDirectIntent(Intent intent, boolean creation) {
+    public void onDirectIntent(Context context, Intent intent, boolean creation) {
         IncomingBundleChecker checker = new IncomingBundleChecker(intent, null);
 
         VoxeetLog.log(TAG, "onNewIntent: checker.isBundleValid() " + checker.isBundleValid() + " creation//" + creation + " paused//" + paused + " pending//" + PendingInvitationResolution.incomingInvitation);
@@ -129,7 +130,7 @@ public class RNVoxeetActivityObject {
             if (PendingInvitationResolution.incomingInvitation == null) {
                 InvitationBundle bundle = new InvitationBundle(intent.getExtras());
                 PendingInvitationResolution.onIncomingInvitation(mActivity, bundle);
-                PendingInvitationResolution.onForwardToIncomingCall(mActivity);
+                PendingInvitationResolution.onForwardToIncomingCall(context, mActivity);
                 if (creation) mActivity.moveTaskToBack(true);
 
                 Intent new_intent = new Intent();
