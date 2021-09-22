@@ -110,7 +110,7 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
         Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.incoming_call);
         String inviterName = Opt.of(serviceInvitationBundle.inviter).then(ParticipantNotification::getInfo).then(ParticipantInfo::getName).or("");
         Notification lastNotification = new NotificationCompat.Builder(this, channelId)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setFullScreenIntent(pendingCallingIntent, true)
                 .setSound(soundUri)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
