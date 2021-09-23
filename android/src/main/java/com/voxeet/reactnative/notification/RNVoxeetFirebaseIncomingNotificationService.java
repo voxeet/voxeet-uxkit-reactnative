@@ -107,12 +107,10 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
         PendingIntent pendingIntentDismissed = PendingIntent.getBroadcast(this, INCOMING_NOTIFICATION_REQUEST_CODE, dismiss, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent pendingCallingIntent = PendingIntent.getActivity(this, INCOMING_NOTIFICATION_REQUEST_CODE, callingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.incoming_call);
         String inviterName = Opt.of(serviceInvitationBundle.inviter).then(ParticipantNotification::getInfo).then(ParticipantInfo::getName).or("");
         Notification lastNotification = new NotificationCompat.Builder(this, channelId)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setFullScreenIntent(pendingCallingIntent, true)
-                .setSound(soundUri)
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setContentTitle(this.getString(R.string.voxeet_incoming_notification_from_user, inviterName))
                 .setContentText(this.getString(R.string.voxeet_incoming_notification_accept))
@@ -176,10 +174,32 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
     }
 
     public static boolean createNotificationChannel(@NonNull Context context) {
-        return NotificationHelper.createNotificationChannel(context,
-                DEFAULT_ID,
-                context.getString(R.string.voxeet_channel_title),
-                context.getString(R.string.voxeet_channel_description),
-                0);
+        if (Build.VERSION.SDK_INT >= 26) {
+            String channelId = getChannelId(context);
+
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    context.getString(R.string.voxeet_channel_title),
+                    NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(context.getString(R.string.voxeet_channel_description));
+            channel.enableLights(true);
+            channel.setLightColor(0);
+            channel.enableVibration(true);
+            channel.setVibrationPattern(new long[]{100L, 200L});
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+
+            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/raw/incoming_call");
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_REQUEST)
+                    .build();
+            channel.setSound(soundUri, audioAttributes);
+
+            NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (null != mNotificationManager) {
+                mNotificationManager.createNotificationChannel(channel);
+            }
+        }
+
+        return true;
     }
 }
