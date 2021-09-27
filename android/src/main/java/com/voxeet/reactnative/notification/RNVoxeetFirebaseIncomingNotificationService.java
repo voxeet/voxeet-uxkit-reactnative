@@ -1,12 +1,15 @@
 package com.voxeet.reactnative.notification;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.app.Service;
@@ -21,7 +24,6 @@ import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.models.ParticipantNotification;
 import com.voxeet.sdk.push.center.invitation.InvitationBundle;
-import com.voxeet.sdk.push.utils.NotificationHelper;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.Opt;
 import com.voxeet.uxkit.incoming.IncomingFullScreen;
