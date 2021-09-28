@@ -4,10 +4,10 @@ import groovy.json.JsonSlurper
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:3.3.0"
+        classpath "com.android.tools.build:gradle:4.2.1"
     }
 }
 
@@ -17,10 +17,8 @@ repositories {
         url("$rootDir/../node_modules/react-native/android")
     }
     maven { url "https://android-sdk.voxeet.com/release" }
-    maven { url "http://dl.bintray.com/voxeet/maven" }
     google()
     mavenCentral()
-    jcenter()
 }
 
 apply plugin: 'com.android.library'
@@ -64,9 +62,8 @@ dependencies {
 
 
     //add by default the optional firebase dependency
-    implementation "com.voxeet.sdk:uxkit-firebase:3.2.1"
+    implementation "com.voxeet.sdk:uxkit-firebase:3.2.3"
 
-    //use the latest toolkit
-    implementation ('com.voxeet.sdk:uxkit:3.2.1') { transitive = true }
-    implementation ('com.voxeet.sdk:sdk:3.2.2') { transitive = true }
+    //use the latest uxkit
+    implementation ('com.voxeet.sdk:uxkit:3.2.3') { transitive = true }
 }

@@ -57,11 +57,13 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
     public static void stop(@NonNull Context context, @Nullable String conferenceId, @Nullable Bundle bundle) {
         //TODO manage the case where conferenceId are different from the one creating this notification
         Intent intent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
-        intent.putExtras(bundle);
+        if (null != bundle) {
+            intent.putExtras(bundle);
+        }
         context.stopService(intent);
     }
 
-    public static void start(Context context, InvitationBundle invitation) {
+    public static void start(@NonNull Context context, @NonNull InvitationBundle invitation) {
         Intent intent = new Intent(context, RNVoxeetFirebaseIncomingNotificationService.class);
         intent.putExtras(invitation.asBundle());
         context.startService(intent);
@@ -86,7 +88,6 @@ public class RNVoxeetFirebaseIncomingNotificationService extends Service {
             notificationId = serviceInvitationBundle.conferenceId.hashCode();
         }
 
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         String channelId = getChannelId(this);
 
         Intent accept = createAcceptIntent(this, serviceInvitationBundle);

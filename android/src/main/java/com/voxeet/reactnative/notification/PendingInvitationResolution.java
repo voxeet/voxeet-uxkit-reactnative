@@ -31,7 +31,6 @@ public class PendingInvitationResolution {
         int notificationId = conferenceId.hashCode();
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (-1 != notificationId) notificationManager.cancel(notificationId);
-        notificationId = 0;
 
         RNVoxeetFirebaseIncomingNotificationService.stop(context, conferenceId, incomingInvitation.asBundle());
     }

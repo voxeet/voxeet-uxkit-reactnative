@@ -629,7 +629,10 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
                 VoxeetSDK.conference().join(new ConferenceJoinOptions.Builder(conference).build()).then(conference1 -> {
                     log("call: conference joined following invitation and session connected");
-                }).error(error -> error.printStackTrace());
+
+                    // also checks for default video if used prior the initialization call
+                    checkStartVideo();
+                }).error(Throwable::printStackTrace);
 
                 return true;
             } else {
