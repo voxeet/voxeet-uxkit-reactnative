@@ -1,14 +1,8 @@
 package com.voxeet.reactnative.manifests;
 
 import android.app.Application;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.ProviderInfo;
-import android.media.AudioAttributes;
-import android.net.Uri;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,7 +10,6 @@ import androidx.annotation.Nullable;
 import com.facebook.soloader.SoLoader;
 import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.utils.MediaEngineEnvironmentHelper;
-import com.voxeet.reactnative.R;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
 import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotificationService;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
@@ -25,7 +18,6 @@ import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
-import com.voxeet.uxkit.firebase.implementation.FirebaseProvider;
 import com.voxeet.uxkit.implementation.overlays.OverlayState;
 
 import org.greenrobot.eventbus.EventBus;
@@ -82,16 +74,6 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
 
         RNVoxeetConferencekitModule.initNotificationCenter();
         RNVoxeetFirebaseIncomingNotificationService.createNotificationChannel(context);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel mChannel = notificationManager.getNotificationChannel(RNVoxeetFirebaseIncomingNotificationService.DEFAULT_ID);
-            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.incoming_call);
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .build();
-            mChannel.setSound(soundUri, audioAttributes);
-        }
     }
 
     @Override
