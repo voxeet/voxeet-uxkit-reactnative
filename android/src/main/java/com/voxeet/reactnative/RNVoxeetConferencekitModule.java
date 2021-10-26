@@ -622,7 +622,11 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             if (VoxeetSDK.session().isSocketOpen()) {
                 InvitationBundle bundle = PendingInvitationResolution.incomingInvitation;
 
-                PendingInvitationResolution.flushPendingInvitation(getActivity());
+                try {
+                    PendingInvitationResolution.flushPendingInvitation(getActivity());
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
 
                 Conference conference = VoxeetSDK.conference().getConference(bundle.conferenceId);
                 if (null == conference) return false;

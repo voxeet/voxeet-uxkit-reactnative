@@ -27,21 +27,17 @@ public class PendingInvitationResolution {
         context.startActivity(intent);
     }
 
-    public static void onCancelNotification(@NonNull Context context, @NonNull String conferenceId) {
-        int notificationId = conferenceId.hashCode();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (-1 != notificationId) notificationManager.cancel(notificationId);
-
-        RNVoxeetFirebaseIncomingNotificationService.stop(context, conferenceId, incomingInvitation.asBundle());
+    public static void onCancelNotification(@NonNull Context context, @NonNull InvitationBundle incomingInvitation) {
+        RNVoxeetFirebaseIncomingNotificationService.stop(context, incomingInvitation.conferenceId, incomingInvitation.asBundle());
     }
 
     public static void onIncomingInvitationAccepted(Context context) {
         VoxeetLog.log(TAG, "onIncomingInvitationAccepted: " + incomingInvitation + " " + accepted);
         if (null == incomingInvitation || accepted) return;
 
-        InvitationBundle invitationBundle = PendingInvitationResolution.incomingInvitation;
         accepted = true;
-        onCancelNotification(context, invitationBundle.conferenceId);
+        InvitationBundle invitationBundle = PendingInvitationResolution.incomingInvitation;
+        onCancelNotification(context, invitationBundle);
 
         Intent intent = IntentUtils.createIntent(context, invitationBundle);
         VoxeetLog.log(TAG, "onIncomingInvitationAccepted: intent " + intent);
@@ -68,7 +64,7 @@ public class PendingInvitationResolution {
 
         accepted = true;
         PendingInvitationResolution.incomingInvitation = null;
-        onCancelNotification(context, invitationBundle.conferenceId);
+        onCancelNotification(context, invitationBundle);
     }
 
     public static void onForwardToIncomingCall(Context context, Activity activity) {
