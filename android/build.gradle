@@ -24,10 +24,10 @@ repositories {
 apply plugin: 'com.android.library'
 
 def ext = rootProject.ext
-def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 29
-def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "29.0.3"
+def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 30
+def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "30.0.3"
 def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 21
-def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 29
+def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 30
 
 if(_minSdk < 21) _minSdk = 21
 
