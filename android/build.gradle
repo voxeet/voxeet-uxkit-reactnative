@@ -24,10 +24,10 @@ repositories {
 apply plugin: 'com.android.library'
 
 def ext = rootProject.ext
-def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 30
-def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "30.0.3"
+def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 31
+def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "31.0.0"
 def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 21
-def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 30
+def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 31
 
 if(_minSdk < 21) _minSdk = 21
 
@@ -62,8 +62,8 @@ dependencies {
 
 
     //add by default the optional firebase dependency
-    implementation "com.voxeet.sdk:uxkit-firebase:3.2.3"
+    api "com.voxeet.sdk:uxkit-firebase:3.3.0"
 
     //use the latest uxkit
-    implementation ('com.voxeet.sdk:uxkit:3.2.3') { transitive = true }
+    api ('com.voxeet.sdk:uxkit:3.3.0') { transitive = true }
 }
