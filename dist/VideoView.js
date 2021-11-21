@@ -116,10 +116,10 @@ export default class VideoView extends Component {
                 return <View {...props}/>;
             }
             else {
-                return (<RCTVoxeetVideoView {...props} attach={this.state.mediaStream} ref={(v) => this.setVideoView(v)} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
+                return (<RCTVoxeetVideoView {...props} attach={this.state.mediaStream} ref={(v) => this.setVideoView(v)} onCallReturn={(event) => this._onCallReturn(event)}/>);
             }
         }
-        return (<RCTVoxeetVideoView {...props} ref={(v) => this.setVideoView(v)} {...{ onCallReturn: (event) => this._onCallReturn(event) }}/>);
+        return (<RCTVoxeetVideoView {...props} ref={(v) => this.setVideoView(v)} onCallReturn={(event) => this._onCallReturn(event)}/>);
     }
 }
 VideoView.defaultProps = {
