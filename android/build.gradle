@@ -62,8 +62,12 @@ dependencies {
 
 
     //add by default the optional firebase dependency
-    api "com.voxeet.sdk:uxkit-firebase:3.3.0"
+    api ("com.voxeet.sdk:uxkit-firebase:3.3.0") {
+        exclude group: 'androidx.appcompat', module: 'appcompat'
+    }
 
     //use the latest uxkit
-    api ('com.voxeet.sdk:uxkit:3.3.0') { transitive = true }
+    api ('com.voxeet.sdk:uxkit:3.3.0') { 
+        exclude group: 'androidx.appcompat', module: 'appcompat'
+    }
 }
