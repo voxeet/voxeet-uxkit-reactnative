@@ -88,6 +88,17 @@ allprojects {
 
 6. Note : if crashes occurs in debug mode, remove `debugImplementation` for any *flipper* library from the android/app/build.gradle + remove the java file in your debug/ folder. (the initializeFlipper method from the MainApplication can be removed as well)
 
+7. Bump the application environment to target Android API Level 31. Note: outdated libraries could be incompatible due to lack of android:exported flag (build errors)
+
+```
+    ext {
+        buildToolsVersion = "31.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 31
+        targetSdkVersion = 31
+    }
+```
+
 ## Usage
 
 ```javascript
