@@ -80,7 +80,6 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
 allprojects {
     repositories {
         maven { url "https://android-sdk.voxeet.com/release" }
-        maven { url "https://dl.bintray.com/voxeet/maven" }
         ... // keep the other lines below
     }
 }
