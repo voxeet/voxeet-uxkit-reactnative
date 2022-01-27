@@ -1,19 +1,18 @@
 package com.voxeet.reactnative.notification;
 
 import android.Manifest;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.squareup.picasso.Picasso;
 import com.voxeet.VoxeetSDK;
+import com.voxeet.reactnative.utils.RNPermissionHelper;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
@@ -22,15 +21,22 @@ import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.NotificationService;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.Opt;
-import com.voxeet.sdk.utils.Validate;
-import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
+import com.voxeet.uxkit.common.activity.PermissionContractHolder;
+import com.voxeet.uxkit.common.activity.bundle.DefaultIncomingBundleChecker;
+import com.voxeet.uxkit.common.activity.bundle.IExtraBundleFillerListener;
+import com.voxeet.uxkit.common.activity.bundle.IncomingBundleChecker;
+import com.voxeet.uxkit.common.permissions.PermissionController;
+import com.voxeet.uxkit.common.permissions.PermissionResult;
 import com.voxeet.uxkit.views.internal.rounded.RoundedImageView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class RNIncomingCallActivity extends AppCompatActivity implements IncomingBundleChecker.IExtraBundleFillerListener {
+import java.util.Arrays;
+import java.util.List;
+
+public class RNIncomingCallActivity extends AppCompatActivity implements IExtraBundleFillerListener {
 
     private final static String TAG = RNIncomingCallActivity.class.getSimpleName();
     private static final String DEFAULT_VOXEET_INCOMING_CALL_DURATION_KEY = "voxeet_incoming_call_duration";
@@ -43,14 +49,17 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
     protected RoundedImageView mAvatar;
     protected EventBus mEventBus;
 
-    private RNIncomingBundleChecker mIncomingBundleChecker;
+    private IncomingBundleChecker incomingBundleChecker;
     private Handler mHandler;
+    private PermissionContractHolder permissionContractHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mIncomingBundleChecker = new RNIncomingBundleChecker(this, getIntent(), this);
+        incomingBundleChecker = new DefaultIncomingBundleChecker(getIntent(), this);
+        permissionContractHolder = new PermissionContractHolder(this);
+
 
         //add few Flags to start the activity before its setContentView
         //note that if your device is using a keyguard (code or password)
@@ -62,11 +71,11 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
 
         setContentView(com.voxeet.uxkit.R.layout.voxeet_activity_incoming_call);
 
-        mUsername = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_username);
-        mAvatar = (RoundedImageView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_avatar_image);
-        mStateTextView = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_text);
-        mAcceptTextView = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_accept);
-        mDeclineTextView = (TextView) findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_decline);
+        mUsername = findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_username);
+        mAvatar = findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_avatar_image);
+        mStateTextView = findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_text);
+        mAcceptTextView = findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_accept);
+        mDeclineTextView = findViewById(com.voxeet.uxkit.R.id.voxeet_incoming_decline);
 
         mDeclineTextView.setOnClickListener(view -> onDecline());
 
@@ -87,24 +96,25 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
     @Override
     protected void onResume() {
         super.onResume();
+        PermissionController.register(permissionContractHolder.getRequestPermissions());
 
-        if (mIncomingBundleChecker.isBundleValid()) {
+        if (incomingBundleChecker.isBundleValid()) {
             VoxeetSDK instance = VoxeetSDK.instance();
             mEventBus = instance.getEventBus();
             if (null != mEventBus) mEventBus.register(this);
 
-            mUsername.setText(mIncomingBundleChecker.getUserName());
+            mUsername.setText(incomingBundleChecker.getUserName());
             try {
-                if (!TextUtils.isEmpty(mIncomingBundleChecker.getAvatarUrl())) {
+                if (!TextUtils.isEmpty(incomingBundleChecker.getAvatarUrl())) {
                     Picasso.get()
-                            .load(mIncomingBundleChecker.getAvatarUrl())
+                            .load(incomingBundleChecker.getAvatarUrl())
                             .into(mAvatar);
                 }
             } catch (Exception e) {
 
             }
         } else {
-            Toast.makeText(this, getString(com.voxeet.uxkit.R.string.invalid_bundle), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, getString(com.voxeet.uxkit.R.string.invalid_bundle), Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -121,7 +131,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ConferenceDestroyedPush event) {
-        if (mIncomingBundleChecker.isSameConference(event.conferenceId)) {
+        if (incomingBundleChecker.isSameConference(event.conferenceId)) {
             finish();
         }
     }
@@ -131,7 +141,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ConferenceEnded event) {
-        if (mIncomingBundleChecker.isSameConference(event.conferenceId)) {
+        if (incomingBundleChecker.isSameConference(event.conferenceId)) {
             finish();
         }
     }
@@ -140,7 +150,8 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
     public void onEvent(ConferenceStatusUpdatedEvent event) {
         switch (event.state) {
             case JOINING:
-                if (mIncomingBundleChecker.isSameConference(event.conference)) {
+                String conferenceId = Opt.of(event).then(e -> e.conference).then(Conference::getId).orNull();
+                if (incomingBundleChecker.isSameConference(conferenceId)) {
                     finish();
                 }
             default:
@@ -149,7 +160,7 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
 
     @Nullable
     protected String getConferenceId() {
-        return mIncomingBundleChecker != null && mIncomingBundleChecker.isBundleValid() ? mIncomingBundleChecker.getConferenceId() : null;
+        return incomingBundleChecker != null && incomingBundleChecker.isBundleValid() ? incomingBundleChecker.getConferenceId() : null;
     }
 
     protected void onDecline() {
@@ -177,25 +188,22 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
         String conferenceId = getConferenceId();
         RNVoxeetFirebaseIncomingNotificationService.stop(this, conferenceId, null);
 
-        if (!Validate.hasMicrophonePermissions(this)) {
-            Validate.requestMandatoryPermissions(this, new String[]{
-                    Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.CAMERA
-            }, 42);
-            return;
-        }
+        if (incomingBundleChecker.isBundleValid()) {
 
-        if (mIncomingBundleChecker.isBundleValid()) {
-            PendingInvitationResolution.onIncomingInvitationAccepted(this);
-            //REACT_NATIVE_ROOT_BUNDLE = mIncomingBundleChecker;
+            RNPermissionHelper.requestDefaultPermission().then(ok -> {
+                if(!ok) throw new IllegalStateException("no mic permission");
 
-            //Intent intent = mIncomingBundleChecker.createRNActivityAccepted(this);
-            ////start the accepted call activity
-            //startActivity(intent);
+                PendingInvitationResolution.onIncomingInvitationAccepted(RNIncomingCallActivity.this);
+                //REACT_NATIVE_ROOT_BUNDLE = mIncomingBundleChecker;
 
-            //and finishing this one - before the prejoined event
-            finish();
-            overridePendingTransition(0, 0);
+                //Intent intent = mIncomingBundleChecker.createRNActivityAccepted(this);
+                ////start the accepted call activity
+                //startActivity(intent);
+
+                //and finishing this one - before the prejoined event
+                finish();
+                overridePendingTransition(0, 0);
+            }).error(Throwable::printStackTrace);
         }
     }
 
@@ -220,8 +228,8 @@ public class RNIncomingCallActivity extends AppCompatActivity implements Incomin
      * @return an instance or null corresponding to the current bundle checker
      */
     @Nullable
-    protected RNIncomingBundleChecker getBundleChecker() {
-        return mIncomingBundleChecker;
+    protected IncomingBundleChecker getBundleChecker() {
+        return incomingBundleChecker;
     }
 
     @Override

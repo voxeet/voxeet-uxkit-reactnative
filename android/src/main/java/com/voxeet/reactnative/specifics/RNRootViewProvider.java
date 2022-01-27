@@ -7,11 +7,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 
 import com.voxeet.VoxeetSDK;
-import com.voxeet.reactnative.notification.RNIncomingBundleChecker;
 import com.voxeet.reactnative.notification.RNIncomingCallActivity;
-import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
+import com.voxeet.uxkit.common.UXKitLogger;
+import com.voxeet.uxkit.common.activity.bundle.DefaultIncomingBundleChecker;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
 import com.voxeet.uxkit.providers.rootview.DefaultRootViewProvider;
 
@@ -23,7 +23,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
     private final static String TAG = RNRootViewProvider.class.getSimpleName();
 
     private final Application mApplication;
-    private RNIncomingBundleChecker mRNIncomingBundleChecker;
+    private DefaultIncomingBundleChecker mRNIncomingBundleChecker;
 
     /**
      * @param application a valid application which be called to obtain events
@@ -43,7 +43,7 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
 
         log("onActivityCreated :: creating checker");
         if (!RNIncomingCallActivity.class.equals(activity.getClass())) {
-            mRNIncomingBundleChecker = new RNIncomingBundleChecker(mApplication, activity.getIntent(), null);
+            mRNIncomingBundleChecker = new DefaultIncomingBundleChecker(activity.getIntent(), null);
             log("onActivityCreated :: creating checker done");
         } else {
             log("onActivityCreated :: creating checker canceled");
@@ -123,6 +123,6 @@ public class RNRootViewProvider extends DefaultRootViewProvider {
     }
 
     private final void log(@NonNull String text) {
-        VoxeetLog.log(TAG, "log: " + text);
+        UXKitLogger.d(TAG, "log: " + text);
     }
 }

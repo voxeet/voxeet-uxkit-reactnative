@@ -1,7 +1,6 @@
 package com.voxeet.reactnative.notification;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 
@@ -10,8 +9,8 @@ import androidx.annotation.NonNull;
 import com.voxeet.reactnative.specifics.RNVoxeetActivity;
 import com.voxeet.reactnative.specifics.RNVoxeetActivityObject;
 import com.voxeet.reactnative.utils.IntentUtils;
-import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.push.center.invitation.InvitationBundle;
+import com.voxeet.uxkit.common.UXKitLogger;
 
 public class PendingInvitationResolution {
     private final static String TAG = PendingInvitationResolution.class.getSimpleName();
@@ -19,7 +18,7 @@ public class PendingInvitationResolution {
     public static boolean accepted = false;
 
     public static void onIncomingInvitation(Context context, InvitationBundle incomingInvitation) {
-        VoxeetLog.log(TAG, "onIncomingInvitation: " + incomingInvitation);
+        UXKitLogger.d(TAG, "onIncomingInvitation: " + incomingInvitation);
         PendingInvitationResolution.incomingInvitation = incomingInvitation;
         accepted = false;
 
@@ -32,7 +31,7 @@ public class PendingInvitationResolution {
     }
 
     public static void onIncomingInvitationAccepted(Context context) {
-        VoxeetLog.log(TAG, "onIncomingInvitationAccepted: " + incomingInvitation + " " + accepted);
+        UXKitLogger.d(TAG, "onIncomingInvitationAccepted: " + incomingInvitation + " " + accepted);
         if (null == incomingInvitation || accepted) return;
 
         accepted = true;
@@ -40,15 +39,15 @@ public class PendingInvitationResolution {
         onCancelNotification(context, invitationBundle);
 
         Intent intent = IntentUtils.createIntent(context, invitationBundle);
-        VoxeetLog.log(TAG, "onIncomingInvitationAccepted: intent " + intent);
+        UXKitLogger.d(TAG, "onIncomingInvitationAccepted: intent " + intent);
 
         RNVoxeetActivity activity = RNVoxeetActivityObject.getActivity();
 
         if (null == activity) {
-            VoxeetLog.log(TAG, "onIncomingInvitationAccepted: startActivity");
+            UXKitLogger.d(TAG, "onIncomingInvitationAccepted: startActivity");
             context.startActivity(intent);
         } else {
-            VoxeetLog.log(TAG, "onIncomingInvitationAccepted: direct call to activity");
+            UXKitLogger.d(TAG, "onIncomingInvitationAccepted: direct call to activity");
             activity.onInvitationBundle(intent);
 
             // and bring to front
@@ -68,7 +67,7 @@ public class PendingInvitationResolution {
     }
 
     public static void onForwardToIncomingCall(Context context, Activity activity) {
-        VoxeetLog.log(TAG, "onForwardToIncomingCall: " + incomingInvitation + " " + accepted);
+        UXKitLogger.d(TAG, "onForwardToIncomingCall: " + incomingInvitation + " " + accepted);
         if (null == incomingInvitation || accepted) return;
 
         RNVoxeetFirebaseIncomingNotificationService.start(context, incomingInvitation);

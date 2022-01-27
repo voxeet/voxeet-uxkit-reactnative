@@ -1,9 +1,7 @@
 package com.voxeet.reactnative;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +17,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.MediaStream;
+import com.voxeet.promise.solve.ThenPromise;
 import com.voxeet.reactnative.events.EventsManager;
 import com.voxeet.reactnative.models.ConferenceUserUtil;
 import com.voxeet.reactnative.models.ConferenceUtil;
@@ -27,12 +26,8 @@ import com.voxeet.reactnative.notification.NotificationCenterRNNotificationOnly;
 import com.voxeet.reactnative.notification.PendingInvitationResolution;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
 import com.voxeet.reactnative.specifics.RNVoxeetActivity;
-import com.voxeet.reactnative.specifics.waiting.WaitingAbstractHolder;
-import com.voxeet.reactnative.specifics.waiting.WaitingJoinHolder;
-import com.voxeet.reactnative.specifics.waiting.WaitingStartConferenceHolder;
-import com.voxeet.reactnative.utils.VoxeetLog;
+import com.voxeet.reactnative.utils.RNPermissionHelper;
 import com.voxeet.sdk.authent.token.TokenCallback;
-import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.SocketStateChangeEvent;
 import com.voxeet.sdk.json.ParticipantInfo;
 import com.voxeet.sdk.json.internal.MetadataHolder;
@@ -53,8 +48,8 @@ import com.voxeet.sdk.services.builders.ConferenceJoinOptions;
 import com.voxeet.sdk.services.conference.information.ConferenceInformation;
 import com.voxeet.sdk.services.telemetry.SdkEnvironment;
 import com.voxeet.sdk.utils.Opt;
-import com.voxeet.sdk.utils.Validate;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
+import com.voxeet.uxkit.common.UXKitLogger;
 import com.voxeet.uxkit.controllers.ConferenceToolkitController;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
 import com.voxeet.uxkit.implementation.overlays.OverlayState;
@@ -85,7 +80,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     private ParticipantInfo _current_user;
     private ReentrantLock lockAwaitingToken = new ReentrantLock();
     private List<TokenCallback> mAwaitingTokenCallback;
-    private static WaitingAbstractHolder sWaitingHolder;
     //private Callback refreshAccessTokenCallbackInstance;
 
     public RNVoxeetConferencekitModule(RNRootViewProvider rootViewProvider, ReactApplicationContext reactContext) {
@@ -308,13 +302,13 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                         paramsHolder.putValue("mode", getString(params, "mode"));
 
                     if (valid(params, "liveRecording"))
-                        paramsHolder.putValue("liveRecording", getString(params, "liveRecording"));
+                        paramsHolder.putValue("liveRecording", getBoolean(params, "liveRecording"));
 
                     if (valid(params, "dolbyVoice"))
-                        paramsHolder.setDolbyVoice(params.getBoolean("dolbyVoice"));
+                        paramsHolder.setDolbyVoice(getBoolean(params, "dolbyVoice"));
 
                     if (valid(params, "simulcast"))
-                        paramsHolder.setSimulcast(params.getBoolean("simulcast"));
+                        paramsHolder.setSimulcast(getBoolean(params, "simulcast"));
                 }
             }
         }
@@ -335,25 +329,10 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     public void join(String conferenceId, @Nullable ReadableMap map, final Promise promise) {
         //for now listener mode also needs microphone...
         boolean listener = false;
-
-        //TODO check for direct api call in react native to add listener in it
-        if (!Validate.hasMicrophonePermissions(reactContext)) {
-            log("join: " + getActivity() + " does not have mic permission");
-            if (null != getActivity()) {
-                sWaitingHolder = new WaitingJoinHolder(this, conferenceId, map, promise);
-                requestMicrophone();
-                return;
-            } else {
-                log("join: UNABLE TO REQUEST PERMISSION -- DID YOU REGISTER THE ACTIVITY ?");
-            }
-        }
-
         if (null != map && valid(map, "user")) {
             ReadableMap user = getMap(map, "user");
             listener = null != user && "listener".equals(getString(user, "type"));
         }
-
-        VoxeetToolkit.instance().enable(VoxeetToolkit.instance().getConferenceToolkit());
 
         Conference expected_conference = VoxeetSDK.conference().getConference(conferenceId);
 
@@ -362,25 +341,19 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        //TODO when the SDK will be using join parameters, use it
-        log("join: joining as listener ? " + listener);
-        if (!listener) {
-            VoxeetSDK.conference()
-                    .join(expected_conference)
-                    .then(conference -> {
-                        promise.resolve(ConferenceUtil.toMap(conference));
+        boolean isListener = listener;
+        RNPermissionHelper.requestDefaultPermission().then((ThenPromise<Boolean, Conference>) ok -> {
 
-                        checkStartVideo();
-                    })
-                    .error(promise::reject);
-        } else {
-            VoxeetSDK.conference()
-                    .listen(expected_conference)
-                    .then(conference -> {
-                        promise.resolve(ConferenceUtil.toMap(conference));
-                    })
-                    .error(promise::reject);
-        }
+            if (!ok) throw new IllegalStateException("no mic permission");
+            VoxeetToolkit.instance().enable(VoxeetToolkit.instance().getConferenceToolkit());
+
+            if (!isListener) return VoxeetSDK.conference().join(expected_conference);
+            return VoxeetSDK.conference().listen(expected_conference);
+        }).then(conference -> {
+            promise.resolve(ConferenceUtil.toMap(conference));
+
+            if (!isListener) checkStartVideo();
+        }).error(promise::reject);
     }
 
     @ReactMethod
@@ -479,7 +452,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void isAudio3DEnabled(Promise promise) {
-        promise.resolve(VoxeetSDK.mediaDevice().isAudio3DEnabled());
+        promise.resolve(false);
     }
 
     @ReactMethod
@@ -519,20 +492,8 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
                                 ReadableArray participants,
                                 final Promise promise) {
 
-        //TODO check for direct api call in react native to add listener in it
-        if (!Validate.hasMicrophonePermissions(reactContext)) {
-            log("join: NOT PERMISSION 2 " + getActivity());
-            if (null != getActivity()) {
-                sWaitingHolder = new WaitingStartConferenceHolder(this, conferenceAlias, participants, promise);
-                requestMicrophone();
-                return;
-            } else {
-                log("join: UNABLE TO REQUEST PERMISSION -- DID YOU REGISTER THE ACTIVITY ?");
-            }
-        }
-
-        VoxeetSDK.conference()
-                .join(conferenceAlias)
+        RNPermissionHelper.requestDefaultPermission()
+                .then(VoxeetSDK.conference().join(conferenceAlias))
                 .then(conference -> {
                     log("onCall: conference joined");
                     checkStartVideo();
@@ -549,25 +510,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         switch (event.state) {
             case CLOSING:
             case CLOSED:
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(PermissionRefusedEvent event) {
-        if (null != event.getPermission()) {
-            switch (event.getPermission()) {
-                case CAMERA:
-                    //Validate.requestMandatoryPermissions(VoxeetToolkit.instance().getCurrentActivity(),
-                    //        new String[]{Manifest.permission.CAMERA},
-                    //        PermissionRefusedEvent.RESULT_CAMERA);
-                    Activity activity = getCurrentActivity();
-                    if (Build.VERSION.SDK_INT >= 23 && null != activity) {
-                        activity.requestPermissions(new String[]{Manifest.permission.CAMERA},
-                                PermissionRefusedEvent.RESULT_CAMERA
-                        );
-                    }
-                    break;
-            }
         }
     }
 
@@ -624,7 +566,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
 
                 try {
                     PendingInvitationResolution.flushPendingInvitation(getActivity());
-                } catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -679,22 +621,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         sActivity = activity;
     }
 
-    public static boolean isWaiting() {
-        return null != sWaitingHolder && null != sWaitingHolder.getPromise();
-    }
-
-    @Nullable
-    public static WaitingAbstractHolder getWaitingJoinHolder() {
-        return sWaitingHolder;
-    }
-
-    private void requestMicrophone() {
-        log("requestMicrophone: " + getActivity());
-        Validate.requestMandatoryPermissions(getActivity(),
-                new String[]{Manifest.permission.RECORD_AUDIO},
-                PermissionRefusedEvent.RESULT_MICROPHONE);
-    }
-
     private int getInteger(@NonNull ReadableMap map, @NonNull String key) {
         try {
             return map.hasKey(key) ? map.getInt(key) : 0;
@@ -743,6 +669,6 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
     }
 
     private static void log(@NonNull String text) {
-        VoxeetLog.log(RNVoxeetConferencekitModule.class.getSimpleName(), text);
+        UXKitLogger.d(RNVoxeetConferencekitModule.class.getSimpleName(), text);
     }
 }

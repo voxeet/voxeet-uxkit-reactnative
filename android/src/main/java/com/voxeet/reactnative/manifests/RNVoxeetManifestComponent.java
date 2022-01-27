@@ -13,10 +13,10 @@ import com.voxeet.android.media.utils.MediaEngineEnvironmentHelper;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
 import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotificationService;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
-import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.manifests.AbstractManifestComponentProvider;
 import com.voxeet.sdk.preferences.VoxeetPreferences;
 import com.voxeet.sdk.utils.VoxeetEnvironmentHolder;
+import com.voxeet.uxkit.common.UXKitLogger;
 import com.voxeet.uxkit.controllers.VoxeetToolkit;
 import com.voxeet.uxkit.implementation.overlays.OverlayState;
 
@@ -34,7 +34,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
     @Override
     protected void init(@NonNull Context context, @Nullable ProviderInfo providerInfo) {
         if (!(context instanceof Application)) {
-            VoxeetLog.log(TAG, "init: ISSUE CONTEXT IS NOT AN Application");
+            UXKitLogger.d(TAG, "init: ISSUE CONTEXT IS NOT AN Application");
             return;
         }
 
@@ -54,7 +54,6 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
 
         VoxeetToolkit.initialize(application, EventBus.getDefault());
 
-
         //force a default voxeet preferences manager
         //in sdk mode, no issues
         VoxeetPreferences.init(application, new VoxeetEnvironmentHolder(application));
@@ -71,9 +70,10 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         //change the overlay used by default
         VoxeetToolkit.instance().getConferenceToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
         VoxeetToolkit.instance().getReplayMessageToolkit().setDefaultOverlayState(OverlayState.EXPANDED);
+	    VoxeetToolkit.instance().getConferenceToolkit().setScreenShareEnabled(true);
 
         RNVoxeetConferencekitModule.initNotificationCenter();
-        RNVoxeetFirebaseIncomingNotificationService.createNotificationChannel(context);
+        //RNVoxeetFirebaseIncomingNotificationService.createNotificationChannel(context);
     }
 
     @Override

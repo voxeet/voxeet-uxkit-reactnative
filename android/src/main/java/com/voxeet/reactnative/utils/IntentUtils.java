@@ -14,8 +14,7 @@ import com.voxeet.reactnative.specifics.RNVoxeetActivityObject;
 import com.voxeet.sdk.push.center.invitation.InvitationBundle;
 import com.voxeet.sdk.utils.AndroidManifest;
 import com.voxeet.sdk.utils.Opt;
-import com.voxeet.uxkit.incoming.IncomingFullScreen;
-import com.voxeet.uxkit.incoming.factory.IncomingCallFactory;
+import com.voxeet.uxkit.common.activity.ActivityInfoHolder;
 
 public class IntentUtils {
 
@@ -30,7 +29,7 @@ public class IntentUtils {
         RNVoxeetActivity activity = RNVoxeetActivityObject.getActivity();
         Class klass = Opt.of(activity).then(Activity::getClass).orNull();
 
-        if (null == klass) klass = IncomingCallFactory.getAcceptedIncomingActivityKlass();
+        if (null == klass) klass = ActivityInfoHolder.getAcceptedIncomingActivityKlass();
 
         if (null == klass) {
             String klass_fully_qualified = getIncomingAcceptedClass(context);
@@ -49,12 +48,13 @@ public class IntentUtils {
         Intent intent = new Intent(context, klass);
 
         //inject the extras from the current "loaded" activity
-        Bundle extras = IncomingCallFactory.getAcceptedIncomingActivityExtras();
+        Bundle extras = ActivityInfoHolder.getAcceptedIncomingActivityExtras();
         if (null != extras) {
             intent.putExtras(extras);
         }
 
-        for (String key : IncomingFullScreen.DEFAULT_NOTIFICATION_KEYS) {
+        // use keys from invitation only?
+        for (String key : extra.keySet()) {
             if (extra.containsKey(key)) {
                 intent.putExtra(key, extra.getString(key));
             }

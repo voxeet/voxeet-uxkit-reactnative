@@ -8,21 +8,28 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.voxeet.VoxeetSDK;
+import com.voxeet.promise.Promise;
+import com.voxeet.promise.solve.ThenPromise;
 import com.voxeet.reactnative.notification.PendingInvitationResolution;
-import com.voxeet.reactnative.utils.VoxeetLog;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.push.center.invitation.InvitationBundle;
 import com.voxeet.sdk.services.ConferenceService;
 import com.voxeet.sdk.services.ScreenShareService;
 import com.voxeet.sdk.services.screenshare.RequestScreenSharePermissionEvent;
-import com.voxeet.sdk.utils.Validate;
-import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
-import com.voxeet.uxkit.incoming.factory.IncomingCallFactory;
+import com.voxeet.uxkit.common.UXKitLogger;
+import com.voxeet.uxkit.common.activity.ActivityInfoHolder;
+import com.voxeet.uxkit.common.activity.bundle.DefaultIncomingBundleChecker;
+import com.voxeet.uxkit.common.activity.bundle.IncomingBundleChecker;
+import com.voxeet.uxkit.common.permissions.PermissionController;
+import com.voxeet.uxkit.common.permissions.PermissionResult;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Class managing the communication between the Activity and the underlying Bundle manager
@@ -63,8 +70,8 @@ public class RNVoxeetActivityObject {
         }
 
         if (canBeRegisteredToReceiveCalls()) {
-            IncomingCallFactory.setTempAcceptedIncomingActivity(BounceVoxeetActivity.class);
-            IncomingCallFactory.setTempExtras(activity.getIntent().getExtras());
+            ActivityInfoHolder.setTempAcceptedIncomingActivity(BounceVoxeetActivity.class);
+            ActivityInfoHolder.setTempExtras(activity.getIntent().getExtras());
         }
 
         VoxeetSDK.screenShare().consumeRightsToScreenShare();
@@ -110,9 +117,22 @@ public class RNVoxeetActivityObject {
         if (null != event.getPermission()) {
             switch (event.getPermission()) {
                 case CAMERA:
-                    Validate.requestMandatoryPermissions(mActivity,
-                            new String[]{Manifest.permission.CAMERA},
-                            PermissionRefusedEvent.RESULT_CAMERA);
+                    PermissionController.requestPermissions(Arrays.asList(Manifest.permission.CAMERA))
+                            .then((ThenPromise<List<PermissionResult>, Boolean>) permissionResults -> {
+                                if (null == permissionResults)
+                                    return Promise.reject(new IllegalStateException("invalid result"));
+                                PermissionResult result = null;
+                                if (permissionResults.size() > 0) result = permissionResults.get(0);
+
+                                if (null == result || result.isGranted)
+                                    return VoxeetSDK.conference().startVideo();
+
+                                return Promise.reject(new IllegalStateException("permission refused"));
+                            })
+                            .then(result -> {
+                                //no-op
+                            })
+                            .error(Throwable::printStackTrace);
                     break;
             }
         }
@@ -123,9 +143,9 @@ public class RNVoxeetActivityObject {
     }
 
     public void onDirectIntent(Context context, Intent intent, boolean creation) {
-        IncomingBundleChecker checker = new IncomingBundleChecker(intent, null);
+        IncomingBundleChecker checker = new DefaultIncomingBundleChecker(intent, null);
 
-        VoxeetLog.log(TAG, "onNewIntent: checker.isBundleValid() " + checker.isBundleValid() + " creation//" + creation + " paused//" + paused + " pending//" + PendingInvitationResolution.incomingInvitation);
+        UXKitLogger.d(TAG, "onNewIntent: checker.isBundleValid() " + checker.isBundleValid() + " creation//" + creation + " paused//" + paused + " pending//" + PendingInvitationResolution.incomingInvitation);
         if (checker.isBundleValid()) {
             if (PendingInvitationResolution.incomingInvitation == null) {
                 InvitationBundle bundle = new InvitationBundle(intent.getExtras());

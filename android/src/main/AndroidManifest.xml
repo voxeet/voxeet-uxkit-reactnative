@@ -30,10 +30,11 @@
             android:name="com.voxeet.reactnative.notification.InvitationAcceptedBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
-        <activity android:name="com.voxeet.reactnative.notification.RNIncomingCallActivity" android:showOnLockScreen="true" />
-        <activity android:name="com.voxeet.reactnative.specifics.BounceVoxeetActivity" />
+        <activity android:name="com.voxeet.reactnative.notification.RNIncomingCallActivity" android:showOnLockScreen="true" android:exported="true"/>
+        <activity android:name="com.voxeet.reactnative.specifics.BounceVoxeetActivity" android:exported="true"/>
         <service android:name="com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotificationService"
-            android:foregroundServiceType="camera|microphone" />
+            android:foregroundServiceType="camera|microphone"
+            android:exported="true" />
 <!--         <meta-data android:name="voxeet_incoming_class" android:value="com.voxeet.rn.notification.RNIncomingCallActivity" />
  -->
         <meta-data android:name="voxeet_incoming_class" android:value="com.voxeet.reactnative.specifics.BounceVoxeetActivity" />

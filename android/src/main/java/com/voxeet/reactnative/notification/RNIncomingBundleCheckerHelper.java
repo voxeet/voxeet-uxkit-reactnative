@@ -8,28 +8,13 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.voxeet.sdk.models.Conference;
 import com.voxeet.sdk.push.center.management.Constants;
-import com.voxeet.uxkit.activities.notification.IncomingBundleChecker;
+import com.voxeet.uxkit.common.activity.bundle.IncomingBundleChecker;
 
-public class RNIncomingBundleChecker extends IncomingBundleChecker {
+public class RNIncomingBundleCheckerHelper {
 
     private final static String BUNDLE_EXTRA_BUNDLE = "BUNDLE_EXTRA_BUNDLE";
-
-    private Context mContext;
-
-    public RNIncomingBundleChecker(Context context, @NonNull Intent intent, @Nullable IExtraBundleFillerListener filler_listener) {
-        super(intent, filler_listener);
-
-        mContext = context;
-    }
-
-    final public boolean isSameConference(@Nullable Conference conference) {
-        if (null == conference) return false;
-        return isSameConference(conference.getId());
-    }
 
     /**
      * Create an intent to start the activity you want after an "accept" call
@@ -39,8 +24,10 @@ public class RNIncomingBundleChecker extends IncomingBundleChecker {
      */
     @SuppressLint("WrongConstant")
     @NonNull
-    final public Intent createRNActivityAccepted(@NonNull Activity caller) {
-        Class to_call = createClassToCall();
+    final public static Intent createRNActivityAccepted(@NonNull Context context,
+                                                        @NonNull Activity caller,
+                                                        @NonNull IncomingBundleChecker bundleChecker) {
+        Class to_call = createClassToCall(context);
 
         //if call is disabled
         if (null == to_call) return null;
@@ -53,13 +40,13 @@ public class RNIncomingBundleChecker extends IncomingBundleChecker {
             intent.putExtras(extras);
         }
 
-        intent.putExtra(BUNDLE_EXTRA_BUNDLE, createExtraBundle());
+        intent.putExtra(BUNDLE_EXTRA_BUNDLE, bundleChecker.createExtraBundle());
 
-        intent.putExtra(Constants.CONF_ID, getConferenceId())
-                .putExtra(Constants.INVITER_NAME, getUserName())
-                .putExtra(Constants.INVITER_ID, getExternalUserId())
-                .putExtra(Constants.INVITER_EXTERNAL_ID, getExternalUserId())
-                .putExtra(Constants.INVITER_URL, getAvatarUrl());
+        intent.putExtra(Constants.CONF_ID, bundleChecker.getConferenceId())
+                .putExtra(Constants.INVITER_NAME, bundleChecker.getUserName())
+                .putExtra(Constants.INVITER_ID, bundleChecker.getExternalUserId())
+                .putExtra(Constants.INVITER_EXTERNAL_ID, bundleChecker.getExternalUserId())
+                .putExtra(Constants.INVITER_URL, bundleChecker.getAvatarUrl());
 
         intent.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
@@ -71,9 +58,9 @@ public class RNIncomingBundleChecker extends IncomingBundleChecker {
         return intent;
     }
 
-    private Class createClassToCall() {
+    private static Class createClassToCall(@NonNull Context context) {
         try {
-            Class klass = Class.forName(mContext.getPackageName() + ".MainActivity");
+            Class klass = Class.forName(context.getPackageName() + ".MainActivity");
             return klass;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
