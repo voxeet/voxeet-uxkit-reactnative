@@ -9,14 +9,12 @@ Pod::Spec.new do |spec|
   spec.license = "Dolby Software License Agreement"
   spec.author = "Voxeet"
   spec.homepage = "https://dolby.io"
-  spec.platform = :ios, "11.0"
-  spec.swift_version = "5.5.1"
+  spec.platform = :ios, "12.0"
   spec.source = { :git => "https://github.com/voxeet/voxeet-uxkit-reactnative.git", :tag => "v#{spec.version}" }
   spec.source_files  = "ios/**/*.{h,m}"
   spec.framework = "UIKit"
   spec.dependency "React"
-  spec.dependency "VoxeetUXKit", "1.6.0"
-  spec.dependency "VoxeetSDK", "3.3.0"
+  spec.dependency "VoxeetUXKit", "~>1.0"
 
   # MacBook arm simulator isn't supported.
   spec.pod_target_xcconfig = {
