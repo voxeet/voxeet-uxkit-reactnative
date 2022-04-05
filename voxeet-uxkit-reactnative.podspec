@@ -16,10 +16,7 @@ Pod::Spec.new do |spec|
   spec.dependency "React"
   spec.dependency "VoxeetUXKit", "~>1.0"
 
-  # MacBook arm simulator isn't supported.
   spec.pod_target_xcconfig = {
-    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
     'ENABLE_BITCODE' => 'NO' # Disable bitcode to support dvclient.framework dependency.
   }
-  spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 end
