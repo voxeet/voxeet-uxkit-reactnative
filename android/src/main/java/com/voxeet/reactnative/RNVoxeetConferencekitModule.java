@@ -88,7 +88,7 @@ public class RNVoxeetConferencekitModule extends ReactContextBaseJavaModule {
         mAwaitingTokenCallback = new ArrayList<>();
         this.reactContext = reactContext;
 
-        VoxeetPreferences.init(reactContext, new VoxeetEnvironmentHolder(reactContext));
+        VoxeetPreferences.init(reactContext);
         TelemetryService.register(SdkEnvironment.REACT_NATIVE, BuildConfig.VOXEET_REACT_NATIVE_VERSION);
 
         //properly init the events

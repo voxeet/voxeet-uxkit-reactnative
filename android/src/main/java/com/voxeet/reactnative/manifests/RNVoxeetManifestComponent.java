@@ -56,7 +56,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
 
         //force a default voxeet preferences manager
         //in sdk mode, no issues
-        VoxeetPreferences.init(application, new VoxeetEnvironmentHolder(application));
+        VoxeetPreferences.init(application);
 
         // set UXKit initialization elements
 

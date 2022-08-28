@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.2.1"
+        classpath "com.android.tools.build:gradle:7.2.2"
     }
 }
 
@@ -63,15 +63,15 @@ dependencies {
 
 
     //add by default the optional firebase dependency
-    api ("com.voxeet.sdk:uxkit-firebase:3.4.0-beta.4") {
+    api ("com.voxeet.sdk:uxkit-firebase:3.6.0") {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
 
     //use the latest uxkit
-    api ('com.voxeet.sdk:uxkit:3.4.0-beta.4') {
+    api ('com.voxeet.sdk:uxkit:3.6.0') {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
-    api ('com.voxeet.sdk:uxkit-system-service:3.4.0-beta.4') {
+    api ('com.voxeet.sdk:uxkit-system-service:3.6.0') {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
 }
