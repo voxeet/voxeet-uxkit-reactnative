@@ -17,6 +17,7 @@ import com.facebook.react.modules.core.PermissionListener;
 import com.voxeet.audio.utils.__Call;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
+import com.voxeet.sdk.services.screenshare.ScreenCapturerService;
 import com.voxeet.uxkit.common.activity.IPermissionContractHolder;
 import com.voxeet.uxkit.common.activity.VoxeetCommonAppCompatActivityWrapper;
 import com.voxeet.uxkit.common.activity.bundle.DefaultIncomingBundleChecker;
@@ -73,6 +74,7 @@ public abstract class RNVoxeetActivity extends ReactActivity {
         super.onResume();
 
         mActivityObject.onResume();
+        ScreenCapturerService.register(this);
         RNVoxeetConferencekitModule.registerActivity(this);
 
         if (null != VoxeetToolkit.instance()) {
