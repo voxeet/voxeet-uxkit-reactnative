@@ -18,17 +18,27 @@ repositories {
     }
     google()
     mavenCentral()
-    maven { url "https://android-sdk.voxeet.com/beta" }
-    maven { url "https://android-sdk.voxeet.com/release" }
+    maven {
+        url "https://android-sdk.voxeet.com/release"
+        content {
+            includeGroup "com.voxeet.sdk"
+        }
+    }
+    maven {
+        url "https://android-sdk.voxeet.com/beta"
+        content {
+            includeGroup "com.voxeet.sdk"
+        }
+    }
 }
 
 apply plugin: 'com.android.library'
 
 def ext = rootProject.ext
-def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 31
-def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "31.0.0"
+def _compile = ext.has("compileSdkVersion") ? ext.compileSdkVersion : 33
+def _buildTools = ext.has("buildToolsVersion") ? ext.buildToolsVersion : "33.0.0"
 def _minSdk = ext.has("minSdkVersion") ? ext.minSdkVersion : 21
-def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 31
+def _targetSdk = ext.has("targetSdkVersion") ? ext.targetSdkVersion : 33
 
 if(_minSdk < 21) _minSdk = 21
 
@@ -61,17 +71,16 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.1.0"
     implementation "androidx.annotation:annotation:1.1.0"
 
-
     //add by default the optional firebase dependency
-    api ("com.voxeet.sdk:uxkit-firebase:3.7.0") {
+    api ("io.dolby:uxkit-firebase:3.7.5") {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
 
     //use the latest uxkit
-    api ('com.voxeet.sdk:uxkit:3.7.0') {
+    api ('io.dolby:uxkit:3.7.5') {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
-    api ('com.voxeet.sdk:uxkit-system-service:3.7.0') {
+    api ('io.dolby:uxkit-system-service:3.7.5') {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
 }

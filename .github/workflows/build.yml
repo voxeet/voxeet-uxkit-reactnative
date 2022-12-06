@@ -1,0 +1,44 @@
+name: Attempt to build react-native
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v3
+      - name: prepare
+        run: |
+          npm install -g cross-os
+          mkdir -p /tmp/plugin
+          cp -r * /tmp/plugin
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.5'
+          bundler-cache: true
+
+      - name: create a minimalist app
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          cd /tmp
+          echo y | npx react-native init hello
+          cd hello
+          npm install --save /tmp/plugin
+
+      - name: build app for android
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+
+          cd /tmp/hello
+          mkdir -p ./android/app/build/intermediates/assets/debug
+          mkdir -p ./android/app/build/intermediates/res/merged/debug
+          echo y | npx react-native bundle --dev false --platform android --entry-file index.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug
+          cd android
+
+          # need to add explicitly the references for the SDK
+          sed -i '' -e "s/google()/google()\nmaven { url \"https:\/\/android-sdk.voxeet.com\/release\" }/g" build.gradle
+          sed -i '' -e "s/compileSdkVersion = 31/compileSdkVersion = 33/g" build.gradle
+          sed -i '' -e "s/targetSdkVersion = 31/targetSdkVersion = 33/g" build.gradle
+          sed -i '' -e "s/buildTypes {/packagingOptions { pickFirst \"**\/libc++_shared.so\" }\n buildTypes {/g" app/build.gradle
+
+          ./gradlew assembleDebug

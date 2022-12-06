@@ -4,19 +4,18 @@ import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
-import com.voxeet.sdk.events.error.CameraSwitchErrorEvent;
+import com.voxeet.sdk.events.CameraSwitchErrorEvent;
+import com.voxeet.sdk.events.CameraSwitchSuccessEvent;
 import com.voxeet.sdk.events.error.GetConferenceStatusErrorEvent;
 import com.voxeet.sdk.events.error.ParticipantAddedErrorEvent;
 import com.voxeet.sdk.events.error.PermissionRefusedEvent;
 import com.voxeet.sdk.events.error.SdkLogoutErrorEvent;
-import com.voxeet.sdk.events.sdk.CameraSwitchSuccessEvent;
 import com.voxeet.sdk.events.sdk.ConferenceStatusUpdatedEvent;
 import com.voxeet.sdk.events.sdk.IncomingCallEvent;
 import com.voxeet.sdk.events.sdk.QualityIndicators;
 import com.voxeet.sdk.events.sdk.SdkLogoutSuccessEvent;
 import com.voxeet.sdk.events.sdk.StartScreenShareAnswerEvent;
 import com.voxeet.sdk.events.sdk.StopScreenShareAnswerEvent;
-import com.voxeet.sdk.events.sdk.StopVideoAnswerEvent;
 import com.voxeet.sdk.json.ConferenceDestroyedPush;
 import com.voxeet.sdk.json.ConferenceEnded;
 import com.voxeet.sdk.json.MediaResponse;
@@ -71,7 +70,7 @@ public class ConferenceStatusEventEmitter extends AbstractEventEmitter {
         }).register(new EventFormatterCallback<CameraSwitchErrorEvent>(CameraSwitchErrorEvent.class) {
             @Override
             void transform(@NonNull WritableMap map, @NonNull CameraSwitchErrorEvent instance) {
-                map.putString("message", instance.message());
+                map.putString("message", instance.message);
             }
         }).register(new EventFormatterCallback<QualityIndicators>(QualityIndicators.class) {
             @Override
