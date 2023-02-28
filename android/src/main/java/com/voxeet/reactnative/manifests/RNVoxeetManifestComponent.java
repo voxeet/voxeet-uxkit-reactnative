@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.facebook.soloader.SoLoader;
 import com.voxeet.VoxeetSDK;
 import com.voxeet.android.media.utils.MediaEngineEnvironmentHelper;
+import com.voxeet.reactnative.BuildConfig;
 import com.voxeet.reactnative.RNVoxeetConferencekitModule;
 import com.voxeet.reactnative.notification.RNVoxeetFirebaseIncomingNotificationService;
 import com.voxeet.reactnative.specifics.RNRootViewProvider;
@@ -51,6 +52,7 @@ public final class RNVoxeetManifestComponent extends AbstractManifestComponentPr
         //Set the context to the SDK to ensure that all the required components are available
         //(call made here in case that the RNVoxeetManifestComponent class is called before the SDK)
         VoxeetSDK.setApplication(context);
+        VoxeetSDK.registerComponentVersion("android-react-native", BuildConfig.VOXEET_REACT_NATIVE_VERSION);
 
         VoxeetToolkit.initialize(application, EventBus.getDefault());
 

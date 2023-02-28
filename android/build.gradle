@@ -72,15 +72,15 @@ dependencies {
     implementation "androidx.annotation:annotation:1.1.0"
 
     //add by default the optional firebase dependency
-    api ("io.dolby:uxkit-firebase:3.7.5") {
+    api ("io.dolby:uxkit-firebase:3.8.1") {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
 
     //use the latest uxkit
-    api ('io.dolby:uxkit:3.7.5') {
+    api ('io.dolby:uxkit:3.8.1') {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
-    api ('io.dolby:uxkit-system-service:3.7.5') {
+    api ('io.dolby:uxkit-system-service:3.8.1') {
         exclude group: 'androidx.appcompat', module: 'appcompat'
     }
 }
