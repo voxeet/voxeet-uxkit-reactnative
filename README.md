@@ -74,20 +74,9 @@ npx react-native link @voxeet/react-native-voxeet-conferencekit
     
     If your `MainActivity` extends `ReactActivity`, change from `MainActivity extends ReactActivity` to `MainActivity extends RNVoxeetActivity`. With the following import: `import com.voxeet.reactnative.specifics.RNVoxeetActivity`
 
-5. Update the `android/build.gradle` and update the allProjects block with the following :
+5. Note : if crashes occurs in debug mode, remove `debugImplementation` for any *flipper* library from the android/app/build.gradle + remove the java file in your debug/ folder. (the initializeFlipper method from the MainApplication can be removed as well)
 
-```gradle
-allprojects {
-    repositories {
-        maven { url "https://android-sdk.voxeet.com/release" }
-        ... // keep the other lines below
-    }
-}
-```
-
-6. Note : if crashes occurs in debug mode, remove `debugImplementation` for any *flipper* library from the android/app/build.gradle + remove the java file in your debug/ folder. (the initializeFlipper method from the MainApplication can be removed as well)
-
-7. Bump the application environment to target Android API Level 33. Note: outdated libraries could be incompatible due to lack of android:exported flag (build 
+6. Bump the application environment to target Android API Level 33. Note: outdated libraries could be incompatible due to lack of android:exported flag (build 
 errors)
 
 ```
