@@ -23,7 +23,7 @@ jobs:
           cd /tmp
           echo y | npx react-native init hello
           cd hello
-          npm install --save /tmp/plugin
+          yarn add /tmp/plugin
 
       - name: build app for android
         run: |
