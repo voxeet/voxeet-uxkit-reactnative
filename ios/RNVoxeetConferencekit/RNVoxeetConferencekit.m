@@ -11,6 +11,9 @@
 @import VoxeetSDK;
 @import VoxeetUXKit;
 
+static NSString * const kRNUXKitVersionKey = @"RNUXKitVersion";
+static NSString * const kRNUXKitComponentName = @"ios-react-native";
+
 @interface RNVoxeetConferencekit()
 
 @property (nonatomic, copy) void (^refreshAccessTokenClosure)(NSString *);
@@ -33,7 +36,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)consumerKey
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
-        VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
+        [self registerComponentVersion];
         
         [VoxeetSDK.shared initializeWithConsumerKey:consumerKey consumerSecret:consumerSecret];
 
@@ -53,7 +56,7 @@ RCT_EXPORT_METHOD(initializeToken:(NSString *)accessToken
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         VoxeetSDK.shared.notification.push.type = VTNotificationPushTypeCallKit;
-        VoxeetSDK.shared.telemetry.platform = VTTelemetryPlatformReactNative;
+        [self registerComponentVersion];
         
         [VoxeetSDK.shared initializeWithAccessToken:accessToken refreshTokenClosureWithParam:^(void (^closure)(NSString *), BOOL isExpired) {
             self.refreshAccessTokenClosure = closure;
@@ -393,6 +396,16 @@ RCT_EXPORT_METHOD(defaultVideo:(BOOL)enable)
     dispatch_async(dispatch_get_main_queue(), ^{
         [VoxeetSDK.shared.conference setDefaultVideo:enable];
     });
+}
+
+/*
+ *  MARK: Help methods
+ */
+- (void)registerComponentVersion {
+    NSString *version = [[[NSBundle bundleForClass:[self class]] infoDictionary] objectForKey:kRNUXKitVersionKey];
+    if (version) {
+        [VoxeetSDK.shared _registerComponentVersionWithName:kRNUXKitComponentName version:version];
+    }
 }
 
 /*
