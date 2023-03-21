@@ -15,8 +15,13 @@ Pod::Spec.new do |spec|
   spec.framework = "UIKit"
   spec.dependency "React"
   spec.dependency "VoxeetUXKit", "~>1.0"
+  spec.dependency "VoxeetSDK", "~>3.8"
 
   spec.pod_target_xcconfig = {
     'ENABLE_BITCODE' => 'NO' # Disable bitcode to support dvclient.framework dependency.
+  }
+
+  spec.info_plist = {
+    "RNUXKitVersion" => "#{spec.version}"
   }
 end
