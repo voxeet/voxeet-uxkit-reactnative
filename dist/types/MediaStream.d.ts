@@ -1,4 +1,4 @@
-export declare type MediaStreamType = "Camera" | "ScreenShare" | "Custom";
+export type MediaStreamType = "Camera" | "ScreenShare" | "Custom";
 export default interface MediaStream {
     peerId: string;
     streamId: string;

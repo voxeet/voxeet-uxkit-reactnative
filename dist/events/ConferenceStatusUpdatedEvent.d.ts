@@ -1,9 +1,9 @@
-export declare type ConferenceStatus = "DEFAULT" | "CREATING" | "CREATED" | "JOINING" | "JOINED" | 
+export type ConferenceStatus = "DEFAULT" | "CREATING" | "CREATED" | "JOINING" | "JOINED" | 
 /** @deprecated */
 "FIRST_PARTICIPANT" | 
 /** @deprecated */
 "NO_MORE_PARTICIPANT" | "LEAVING" | "LEFT" | "ERROR" | "DESTROYED" | "ENDED";
-export declare type PermissionRefusedType = "CAMERA" | "MICROPHONE";
+export type PermissionRefusedType = "CAMERA" | "MICROPHONE";
 /**
  * conferenceId and conferenceAlias can be empty on iOS if the status is LEFT (null or length = 0)
  * This is because the SDK is not currently handling sending conference information in the event

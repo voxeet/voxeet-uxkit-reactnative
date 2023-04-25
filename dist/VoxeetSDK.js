@@ -1,10 +1,9 @@
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, privateMap) {
-    if (!privateMap.has(receiver)) {
-        throw new TypeError("attempted to get private field on non-instance");
-    }
-    return privateMap.get(receiver);
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _events;
+var _RNVoxeetSDK_events;
 import { DeviceEventEmitter, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import VoxeetEvents from './VoxeetEvents';
 import Participant from './types/Participant';
@@ -13,10 +12,10 @@ const { RNVoxeetConferencekit } = NativeModules;
 ;
 class RNVoxeetSDK {
     constructor() {
-        _events.set(this, new VoxeetEvents());
+        _RNVoxeetSDK_events.set(this, new VoxeetEvents());
         this.refreshAccessTokenCallback = null;
     }
-    get events() { return __classPrivateFieldGet(this, _events); }
+    get events() { return __classPrivateFieldGet(this, _RNVoxeetSDK_events, "f"); }
     set events(any) { }
     /**
      * Initializes the SDK using the customer key and secret.
@@ -206,7 +205,7 @@ class RNVoxeetSDK {
         return this.disconnect();
     }
 }
-_events = new WeakMap();
+_RNVoxeetSDK_events = new WeakMap();
 RNVoxeetSDK.VoxeetSDK = new RNVoxeetSDK();
 export default new RNVoxeetSDK();
 //# sourceMappingURL=VoxeetSDK.js.map

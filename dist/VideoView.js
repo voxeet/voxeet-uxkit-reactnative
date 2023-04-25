@@ -19,7 +19,7 @@ const ValidProps = ["style", "isMirror", "scaleType"];
  * isAttached(): Promise<boolean>
  * isScreenShare(): Promise<boolean>
  */
-export default class VideoView extends Component {
+class VideoView extends Component {
     constructor(props) {
         super(props);
         this._UiManager = UIManager;
@@ -130,4 +130,5 @@ VideoView.defaultProps = {
     scaleType: 'fill'
 };
 VideoView._nextRequestId = 1;
+export default VideoView;
 //# sourceMappingURL=VideoView.js.map
