@@ -11,19 +11,16 @@
 #
 name: "CodeQL"
 
-on:
-  push:
-    branches: [ master, develop ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ master, develop ]
-  #schedule:
-  #  - cron: '16 19 * * 4'
+on: [ push, pull_request ]
 
 jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     strategy:
       fail-fast: false
@@ -39,7 +36,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
