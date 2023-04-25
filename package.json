@@ -6,8 +6,7 @@
   "scripts": {
     "postinstall": "cross-os cmd",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-library": "tsc && Echo Build completed!",
-    "publish-library": "bash ./publish.sh && echo Package published!"
+    "build": "tsc"
   },
   "cross-os": {
     "cmd": {
